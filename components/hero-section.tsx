@@ -89,7 +89,7 @@ export default function HeroSection() {
                   <AnimatedGroup variants={transitionVariants}>
                     <Link
                       href="#link"
-                      className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border py-1 px-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
+                      className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border py-1 px-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
                     >
                       <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
                         <div className="flex w-12 translate-x-1/2 rtl:translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
