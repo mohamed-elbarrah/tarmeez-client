@@ -14,7 +14,7 @@ function ProcessSteps() {
             ثلاث خطوات فقط للانطلاق
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-            We follow our process to get you started as quickly as possible
+            من الفكرة إلى التنفيذ.. نبسط لك الإجراءات لتبدأ مشروعك اليوم بأقل مجهود
           </p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">

@@ -7,7 +7,9 @@ export default function MultiStoreFeatures() {
         <section className="bg-zinc-50 py-16 md:py-32 dark:bg-transparent">
             <div className="@container mx-auto max-w-5xl px-6">
                 <div className="text-center">
-                    <h2 className="text-balance text-4xl font-semibold lg:text-5xl">منصة واحدة.. خيارات واسعة</h2>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+           منصة واحدة.. خيارات واسعة
+          </p>
                     <p className="mt-4">سواء كنت تدير وقفاً مستداماً، أو جمع تبرعات لخدمة المجتمع، أو أن تبني إمبراطوريتك التجارية؛ وفرنا لك الأدوات المتخصصة التي تحتاجها للانطلاق ...</p>
                 </div>
                 <div className="@min-4xl:max-w-full @min-4xl:grid-cols-3 mx-auto mt-8 grid max-w-sm gap-6 *:text-center md:mt-16">

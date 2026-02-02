@@ -9,10 +9,11 @@ import { ModeToggle } from './mode-toggle'
 
 const menuItems = [
    
-    { name: 'خدماتنا', href: '#link' },
-    { name: 'المميزات', href: '#link' },
-    { name: 'لمن هذه المنصة؟', href: '#link' },
-    { name: 'الرؤية والهدف', href: '#link' },
+    { name: 'الرئيسية', href: '#link' },
+    { name: 'الميزات', href: '#link' },
+    { name: 'الخطوات', href: '#link' },
+    { name: 'الأسعار', href: '#link' },
+    { name: 'مساعدة', href: '#link' },
 ]
 
 export const HeroHeader = () => {
