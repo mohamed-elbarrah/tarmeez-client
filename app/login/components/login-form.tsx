@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { ModeToggle } from "@/components/mode-toggle"
+import Img from "@/public/tarmeez-logo.jpeg"
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -89,22 +91,22 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                لا تملك حسابًا؟ <a href="/register">سجل الآن</a>
+                لا تملك حسابًا؟ <Link href="/register">سجل الآن</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src={Img.src}
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute  inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
           </div>
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        بالنقر على متابعة، فإنك توافق على <a href="#">شروط الخدمة</a>{" "}
-        و <a href="#">سياسة الخصوصية</a>.
+        بالنقر على متابعة، فإنك توافق على <Link href="#">شروط الخدمة</Link>{" "}
+        و <Link href="#">سياسة الخصوصية</Link>.
       </FieldDescription>
     </div>
   )

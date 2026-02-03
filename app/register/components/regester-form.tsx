@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { ModeToggle } from "@/components/mode-toggle"
+import Img from "@/public/tarmeez-logo.jpeg"
+import Link from "next/link"
+
 
 export function RegesterForm({
   className,
@@ -97,13 +100,13 @@ export function RegesterForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                هل لديك حساب بالفعل؟ <a href="/login">تسجيل الدخول</a>
+                هل لديك حساب بالفعل؟ <Link href="/login">تسجيل الدخول</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src={Img.src}
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
@@ -111,8 +114,8 @@ export function RegesterForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        بالنقر على متابعة، فإنك توافق على <a href="#">شروط الخدمة</a>{" "}
-        و <a href="#">سياسة الخصوصية</a>.
+        بالنقر على متابعة، فإنك توافق على <Link href="#">شروط الخدمة</Link>{" "}
+        و <Link href="#">سياسة الخصوصية</Link>.
       </FieldDescription>
     </div>
   )
