@@ -16,7 +16,7 @@ import Img from "@/public/tarmeez-logo.jpeg"
 import Link from "next/link"
 
 
-export function RegesterForm({
+export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
