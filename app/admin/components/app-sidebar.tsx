@@ -52,86 +52,86 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "لوحة القيادة",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "نظرة عامة",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "المفضلة",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "الإعدادات",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "نوذج الذكاء الاصطناعي",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
+          title: "النماذج",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "مستكشف",
           url: "#",
         },
         {
-          title: "Quantum",
+          title: "الإعدادات",
           url: "#",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "التوثيق",
       url: "#",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
+          title: "مقدمة",
           url: "#",
         },
         {
-          title: "Get Started",
+          title: "البدء",
           url: "#",
         },
         {
-          title: "Tutorials",
+          title: "الدروس",
           url: "#",
         },
         {
-          title: "Changelog",
+          title: "تغيير السجل",
           url: "#",
         },
       ],
     },
     {
-      title: "Settings",
+      title: "الإعدادات",
       url: "#",
       icon: Settings2,
       items: [
         {
-          title: "General",
+          title: "عام",
           url: "#",
         },
         {
-          title: "Team",
+          title: "الفريق",
           url: "#",
         },
         {
-          title: "Billing",
+          title: "الفواتير",
           url: "#",
         },
         {
-          title: "Limits",
+          title: "الحدود",
           url: "#",
         },
       ],
@@ -139,17 +139,17 @@ const data = {
   ],
   projects: [
     {
-      name: "Design Engineering",
+      name: "الهندسة التصميمية",
       url: "#",
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
+      name: "المبيعات والتسويق",
       url: "#",
       icon: PieChart,
     },
     {
-      name: "Travel",
+      name: "السفر",
       url: "#",
       icon: Map,
     },
