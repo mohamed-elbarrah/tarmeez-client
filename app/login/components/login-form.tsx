@@ -14,11 +14,15 @@ import { Input } from "@/components/ui/input"
 import { ModeToggle } from "@/components/mode-toggle"
 import Img from "@/public/tarmeez-logo.jpeg"
 import Link from "next/link"
+import { nav } from "motion/react-client"
+import { navigate } from "next/dist/client/components/segment-cache/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
@@ -56,7 +60,9 @@ export function LoginForm({
                   </a>
               </Field>
               <Field>
-                <Button type="submit">تسجيل الدخول</Button>
+                <Link href="/admin" className="w-full">
+                <Button type="submit" className="w-full">تسجيل الدخول</Button>
+                </Link>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 أو المتابعة مع
