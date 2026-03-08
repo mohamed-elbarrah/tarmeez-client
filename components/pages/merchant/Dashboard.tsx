@@ -77,7 +77,7 @@ export default function Dashboard() {
               <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className={`flex items-center gap-1 text-sm ${stat.trend === "up" ? "text-accent" : "text-destructive"}`}>
+              <div className={`flex items-center gap-1 text-sm ${stat.trend === "up" ? "text-primary" : "text-destructive"}`}>
                 {stat.trend === "up" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                 <span>{stat.change}</span>
               </div>
@@ -101,11 +101,11 @@ export default function Dashboard() {
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="date" stroke="#999" />
-              <YAxis stroke="#999" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis dataKey="date" stroke="var(--chart-axis)" />
+              <YAxis stroke="var(--chart-axis)" />
               <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#39FF14" strokeWidth={3} dot={{ fill: "#39FF14" }} />
+              <Line type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} dot={{ fill: "var(--primary)" }} />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -121,39 +121,39 @@ export default function Dashboard() {
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={ordersData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="day" stroke="#999" />
-              <YAxis stroke="#999" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis dataKey="day" stroke="var(--chart-axis)" />
+              <YAxis stroke="var(--chart-axis)" />
               <Tooltip />
-              <Bar dataKey="orders" fill="#39FF14" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="orders" fill="var(--primary)" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
       </div>
 
       {/* AI Insights */}
-      <Card className="p-6 bg-gradient-to-br from-accent/5 to-transparent border-accent/20">
+      <Card className="p-6 bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-6 h-6 text-black" />
+          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-6 h-6 text-primary-foreground" />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold mb-2">رؤى الذكاء الاصطناعي</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-accent mt-2"></div>
+                <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                 <p className="text-sm">
                   <strong>زيادة المبيعات:</strong> لاحظنا أن الزوار الذين يشاهدون صفحة "ساعة ذكية برو" لديهم معدل تحويل أعلى بنسبة 34%. نقترح زيادة الحملات التسويقية لهذا المنتج.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-accent mt-2"></div>
+                <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                 <p className="text-sm">
                   <strong>استهداف أفضل:</strong> معظم عملائك يزورون المتجر بين الساعة 8-10 مساءً. فكر في جدولة إعلاناتك خلال هذه الفترة.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-accent mt-2"></div>
+                <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                 <p className="text-sm">
                   <strong>تحسين التحويل:</strong> إضافة صور إضافية للمنتجات قد تزيد معدل التحويل بنسبة 18% حسب البيانات التحليلية.
                 </p>
@@ -226,11 +226,10 @@ export default function Dashboard() {
                   <td className="py-4 px-4">{order.customer}</td>
                   <td className="py-4 px-4 font-medium">{order.amount}</td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                      order.status === "مكتمل" ? "bg-accent/10 text-black" :
-                      order.status === "قيد التوصيل" ? "bg-blue-50 text-blue-700" :
-                      "bg-yellow-50 text-yellow-700"
-                    }`}>
+                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${order.status === "مكتمل" ? "bg-primary/10 text-primary" :
+                        order.status === "قيد التوصيل" ? "bg-blue-500/10 text-blue-500" :
+                          "bg-yellow-500/10 text-yellow-500"
+                      }`}>
                       {order.status}
                     </span>
                   </td>

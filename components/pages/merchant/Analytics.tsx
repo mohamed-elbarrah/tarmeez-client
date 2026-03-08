@@ -25,7 +25,7 @@ const revenueByCategory = [
   { name: "أخرى", value: 15000 },
 ];
 
-const COLORS = ["#39FF14", "#000000", "#737373", "#d4d4d4"];
+const COLORS = ["var(--primary)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"];
 
 export default function Analytics() {
   return (
@@ -60,7 +60,7 @@ export default function Analytics() {
               <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className="text-sm text-accent">{stat.change}</div>
+              <div className="text-sm text-primary">{stat.change}</div>
             </div>
             <div className="text-sm text-muted-foreground mb-1">{stat.label}</div>
             <div className="text-3xl font-bold">{stat.value}</div>
@@ -117,11 +117,11 @@ export default function Analytics() {
         <h3 className="text-lg font-bold mb-6">قمع التحويل</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={conversionData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis type="number" stroke="#999" />
-            <YAxis dataKey="stage" type="category" stroke="#999" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+            <XAxis type="number" stroke="var(--chart-axis)" />
+            <YAxis dataKey="stage" type="category" stroke="var(--chart-axis)" />
             <Tooltip />
-            <Bar dataKey="count" fill="#39FF14" radius={[0, 8, 8, 0]} />
+            <Bar dataKey="count" fill="var(--primary)" radius={[0, 8, 8, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>

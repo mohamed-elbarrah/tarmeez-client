@@ -130,7 +130,7 @@ export default function StorefrontHome() {
                     <h3 className="font-bold mb-2">{product.name}</h3>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-accent text-accent" />
+                        <Star className="w-4 h-4 fill-brand text-brand" />
                         <span className="text-sm">{product.rating}</span>
                       </div>
                       <p className="text-lg font-bold">{product.price} ر.س</p>
@@ -145,7 +145,9 @@ export default function StorefrontHome() {
 
       {/* Features */}
       <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="bg-primary rounded-3xl p-12 text-center text-primary-foreground relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-foreground/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="p-8 text-center">
               <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -217,7 +219,7 @@ export default function StorefrontHome() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 px-6 bg-black text-white">
+      <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">اشترك في نشرتنا البريدية</h2>
           <p className="text-lg mb-8 opacity-80">
@@ -227,11 +229,11 @@ export default function StorefrontHome() {
             <input
               type="email"
               placeholder="بريدك الإلكتروني"
-              className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
+              className="flex-1 px-6 py-4 rounded-xl bg-primary-foreground text-primary placeholder:text-primary/50 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50 transition-all border-none"
             />
-            <Button className="bg-accent text-black hover:bg-accent/90">
-              اشترك
-            </Button>
+            <button className="px-8 py-4 bg-background text-foreground rounded-xl font-bold hover:bg-muted transition-colors">
+              اشترك الآن
+            </button>
           </div>
         </div>
       </section>

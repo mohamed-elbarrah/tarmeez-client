@@ -41,7 +41,8 @@ export default function Dashboard() {
               <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className="text-sm text-accent">{stat.change}</div>
+              <div className="flex items-center gap-1 text-sm text-primary">
+                {stat.change}</div>
             </div>
             <div className="text-sm text-muted-foreground mb-1">{stat.label}</div>
             <div className="text-2xl font-bold">{stat.value}</div>
@@ -54,11 +55,11 @@ export default function Dashboard() {
           <h3 className="text-lg font-bold mb-6">إيرادات المنصة</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" stroke="#999" />
-              <YAxis stroke="#999" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis dataKey="month" stroke="var(--chart-axis)" />
+              <YAxis stroke="var(--chart-axis)" />
               <Tooltip />
-              <Line type="monotone" dataKey="revenue" stroke="#39FF14" strokeWidth={3} />
+              <Line type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} dot={{ fill: "var(--primary)" }} />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -67,11 +68,11 @@ export default function Dashboard() {
           <h3 className="text-lg font-bold mb-6">نمو المتاجر</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={storesGrowth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" stroke="#999" />
-              <YAxis stroke="#999" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis dataKey="month" stroke="var(--chart-axis)" />
+              <YAxis stroke="var(--chart-axis)" />
               <Tooltip />
-              <Bar dataKey="stores" fill="#39FF14" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="revenue" fill="var(--primary)" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>

@@ -40,13 +40,13 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-secondary" dir="rtl">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Sidebar */}
-      <aside className="fixed right-0 top-0 h-full w-64 bg-white border-l border-border z-40">
+      <aside className="fixed right-0 top-0 h-full w-64 bg-card border-l border-border z-40">
         <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <span className="text-accent font-bold text-lg">ت</span>
+            <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+              <span className="text-background font-bold text-lg">ت</span>
             </div>
             <span className="text-xl font-bold">ترميز</span>
           </Link>
@@ -60,8 +60,8 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
                 key={item.name}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                    ? "bg-accent/10 text-black font-medium"
-                    : "text-muted-foreground hover:bg-secondary"
+                  ? "bg-primary text-primary-foreground font-medium"
+                  : "text-muted-foreground hover:bg-muted"
                   }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -71,10 +71,10 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-white">
-          <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
-            <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-              <span className="font-bold text-black">أ</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
+          <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+              <span className="font-bold text-primary-foreground">أ</span>
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-medium truncate">أحمد محمد</div>
@@ -88,7 +88,7 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
       {/* Main Content */}
       <div className="mr-64">
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-border">
+        <header className="sticky top-0 z-30 bg-card border-b border-border">
           <div className="flex items-center justify-between px-8 py-4">
             <div className="flex-1 max-w-2xl">
               <div className="relative">
@@ -96,7 +96,7 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
                 <input
                   type="text"
                   placeholder="بحث..."
-                  className="w-full pr-10 pl-4 py-2 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full pr-10 pl-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
               </Button>
               <Button variant="outline">زيارة المتجر</Button>
             </div>

@@ -31,7 +31,7 @@ export default function PlatformRevenue() {
               <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className="text-sm text-accent">{stat.change}</div>
+              <div className="text-sm text-primary">{stat.change}</div>
             </div>
             <div className="text-sm text-muted-foreground mb-1">{stat.label}</div>
             <div className="text-2xl font-bold">{stat.value}</div>
@@ -43,12 +43,12 @@ export default function PlatformRevenue() {
         <h3 className="text-lg font-bold mb-6">الإيرادات الشهرية</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={monthlyRevenue}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="month" stroke="#999" />
-            <YAxis stroke="#999" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+            <XAxis dataKey="month" stroke="var(--chart-axis)" />
+            <YAxis stroke="var(--chart-axis)" />
             <Tooltip />
-            <Bar dataKey="subscriptions" fill="#39FF14" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="marketplace" fill="#000000" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="subscriptions" fill="var(--primary)" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="marketplace" fill="var(--foreground)" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>
