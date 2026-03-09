@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { usePlatformAuth } from "@/hooks/use-platform-auth";
+import { usePlatformLoginMutation } from '@/lib/services/authApi'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +18,8 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { login, isLoading } = usePlatformAuth();
-    const router = useRouter();
+    const [platformLogin, { isLoading }] = usePlatformLoginMutation()
+    const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,26 +31,21 @@ export default function LoginPage() {
         }
 
         try {
-            const user = await login(email, password);
-
-            // Redirect logic
-            if (user.role === 'superadmin') {
-                router.push('/superadmin');
-            } else if (user.role === 'merchant') {
-                if (user.status === 'active') {
-                    router.push('/merchant');
-                } else if (user.status === 'pending') {
-                    router.push('/pending');
-                }
-            }
+            await platformLogin({ email, password }).unwrap()
+            // successful login will be handled by authApi onQueryStarted (redirect)
         } catch (err: any) {
-            // Handle known error messages in Arabic or keep as is if they are from hook
-            if (err.message === "Your account has been rejected. Contact support.") {
-                setError("تم رفض حسابك. يرجى الاتصال بالدعم.");
-            } else if (err.message === "Invalid email or password") {
-                setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+            // RTK Query fetchBaseQuery error handling
+            const status = err?.status
+            const data = err?.data
+
+            if (status === 401) {
+                setError("البريد الإلكتروني أو كلمة المرور غير صحيحة")
+            } else if (status === 403 && typeof data?.message === 'string' && data.message.includes('REJECTED')) {
+                setError("تم رفض حسابك، تواصل مع الدعم")
+            } else if (status === 'FETCH_ERROR') {
+                setError("تعذر الاتصال بالخادم")
             } else {
-                setError(err.message || "حدث خطأ أثناء تسجيل الدخول");
+                setError((data && data.message) || err?.error || 'حدث خطأ أثناء تسجيل الدخول')
             }
         }
     };

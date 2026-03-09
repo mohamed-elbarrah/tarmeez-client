@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,16 +9,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Clock, Mail, ExternalLink, HelpCircle } from "lucide-react";
 
 export default function PendingPage() {
-    const [email, setEmail] = useState("بريدك الإلكتروني");
+    const searchParams = useSearchParams()
+    const [email, setEmail] = useState<string | null>(null)
     const router = useRouter();
 
     useEffect(() => {
-        const pendingData = localStorage.getItem('pending_merchant');
-        if (pendingData) {
-            const { email: savedEmail } = JSON.parse(pendingData);
-            setEmail(savedEmail);
-        }
-    }, []);
+        const e = searchParams.get('email')
+        setEmail(e)
+    }, [searchParams]);
 
     return (
         <Card className="border-none shadow-2xl bg-card/50 backdrop-blur-sm text-center py-6">
@@ -37,7 +36,7 @@ export default function PendingPage() {
                 <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-100 dark:border-orange-900/30">
                     <div className="flex items-center gap-3 text-orange-800 dark:text-orange-300 mb-2 justify-center flex-row-reverse">
                         <Mail size={18} />
-                        <span className="font-medium" dir="ltr">{email}</span>
+                        <span className="font-medium" dir="ltr">{email ?? 'بريدك الإلكتروني'}</span>
                     </div>
                     <p className="text-sm text-orange-700 dark:text-orange-400">
                         سنقوم بإخطارك على هذا العنوان بمجرد قيام فريقنا بمراجعة تفاصيل متجرك (عادة خلال 24-48 ساعة).

@@ -10,12 +10,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, UserPlus } from "lucide-react";
 import { CustomerRegisterFormData, MockCustomer } from "@/lib/types/auth";
+import { useCustomerRegisterMutation } from '@/lib/services/authApi'
 
 export default function StoreRegisterPage() {
     const params = useParams();
     const storeSlug = params.storeSlug as string;
 
     const [isLoading, setIsLoading] = useState(false);
+    const [customerRegister, { isLoading: isSubmitting }] = useCustomerRegisterMutation()
     const [formData, setFormData] = useState<CustomerRegisterFormData>({
         fullName: "",
         email: "",
@@ -60,30 +62,36 @@ export default function StoreRegisterPage() {
         e.preventDefault();
         if (!validate()) return;
 
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        try {
+            await customerRegister({
+                fullName: formData.fullName,
+                email: formData.email,
+                password: formData.password,
+                phone: formData.phone,
+                storeSlug,
+            }).unwrap()
+            // redirect handled by authApi onQueryStarted
+        } catch (err: any) {
+            const status = err?.status
+            const data = err?.data
 
-        // Save to localStorage
-        const localCustomersStr = localStorage.getItem(`customers_${storeSlug}`);
-        const localCustomers: MockCustomer[] = localCustomersStr ? JSON.parse(localCustomersStr) : [];
-
-        const newCustomer: MockCustomer = {
-            storeSlug,
-            name: formData.fullName,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-            createdAt: Date.now()
-        };
-
-        localCustomers.push(newCustomer);
-        localStorage.setItem(`customers_${storeSlug}`, JSON.stringify(localCustomers));
-
-        // Auto login
-        localStorage.setItem(`store_user_${storeSlug}`, JSON.stringify(newCustomer));
-
-        setIsLoading(false);
-        router.push(`/store/${storeSlug}/account`);
+            if (status === 'FETCH_ERROR') {
+                // network
+                // reuse errors object to show generic message
+                setErrors({ email: 'تعذر الاتصال بالخادم' })
+            } else if (typeof data?.message === 'string') {
+                const msg = data.message.toLowerCase()
+                if (msg.includes('email') && (msg.includes('taken') || msg.includes('exists') || msg.includes('مستخدم'))) {
+                    setErrors({ email: 'البريد الإلكتروني مستخدم بالفعل' })
+                } else {
+                    setErrors({ email: data.message })
+                }
+            } else {
+                setErrors({ email: 'حدث خطأ أثناء إنشاء الحساب' })
+            }
+        } finally {
+            setIsLoading(false)
+        }
     };
 
     return (

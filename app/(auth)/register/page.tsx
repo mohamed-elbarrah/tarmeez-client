@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { MerchantRegisterFormData } from "@/lib/types/auth";
+import { useMerchantRegisterMutation } from '@/lib/services/authApi'
 
 const categories = [
     { label: "أزياء", value: "Fashion" },
@@ -37,6 +38,7 @@ const countries = [
 export default function RegisterPage() {
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [merchantRegister, { isLoading: isSubmitting }] = useMerchantRegisterMutation()
     const [formData, setFormData] = useState<MerchantRegisterFormData>({
         fullName: "",
         email: "",
@@ -104,18 +106,43 @@ export default function RegisterPage() {
         e.preventDefault();
         if (!validateStep2()) return;
 
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        setErrors({})
+        try {
+            const payload = {
+                fullName: formData.fullName,
+                email: formData.email,
+                password: formData.password,
+                phone: formData.phone,
+                storeName: formData.storeName,
+                category: formData.category,
+                country: formData.country,
+                city: formData.city,
+                description: formData.description || undefined,
+            }
 
-        const pendingMerchant = {
-            ...formData,
-            status: 'pending',
-            createdAt: Date.now()
-        };
+            await merchantRegister(payload).unwrap()
+            // redirect handled by authApi onQueryStarted
+        } catch (err: any) {
+            const status = err?.status
+            const data = err?.data
 
-        localStorage.setItem('pending_merchant', JSON.stringify(pendingMerchant));
-        setIsLoading(false);
-        router.push('/pending');
+            if (status === 'FETCH_ERROR') {
+                setErrors({ email: 'تعذر الاتصال بالخادم' })
+            } else if (typeof data?.message === 'string') {
+                const msg = data.message.toLowerCase()
+                if (msg.includes('store') && (msg.includes('taken') || msg.includes('exists') || msg.includes('محجوز'))) {
+                    setErrors({ storeName: 'اسم المتجر محجوز، جرب اسماً آخر' })
+                } else if (msg.includes('email') && (msg.includes('taken') || msg.includes('exists') || msg.includes('مستخدم'))) {
+                    setErrors({ email: 'البريد الإلكتروني مستخدم بالفعل' })
+                } else {
+                    setErrors({ email: data.message })
+                }
+            } else {
+                setErrors({ email: 'حدث خطأ أثناء التقديم' })
+            }
+        } finally {
+            setIsLoading(false)
+        }
     };
 
     return (

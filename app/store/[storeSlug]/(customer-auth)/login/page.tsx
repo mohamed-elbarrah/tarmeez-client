@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { useStoreAuth } from "@/hooks/use-store-auth";
+import { useCustomerLoginMutation } from '@/lib/services/authApi'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,7 @@ export default function StoreLoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { login, isLoading } = useStoreAuth(storeSlug);
+    const [customerLogin, { isLoading }] = useCustomerLoginMutation()
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -34,13 +34,18 @@ export default function StoreLoginPage() {
         }
 
         try {
-            await login(email, password);
-            router.push(`/store/${storeSlug}/account`);
+            await customerLogin({ email, password, storeSlug }).unwrap()
+            // redirect handled by authApi onQueryStarted
         } catch (err: any) {
-            if (err.message === "Invalid email or password") {
-                setError("بيانات الدخول غير صحيحة لهذا المتجر.");
+            const status = err?.status
+            const data = err?.data
+
+            if (status === 401) {
+                setError('بيانات الدخول غير صحيحة لهذا المتجر.')
+            } else if (status === 'FETCH_ERROR') {
+                setError('تعذر الاتصال بالخادم')
             } else {
-                setError(err.message || "حدث خطأ أثناء تسجيل الدخول.");
+                setError((data && data.message) || err?.error || 'حدث خطأ أثناء تسجيل الدخول.')
             }
         }
     };
