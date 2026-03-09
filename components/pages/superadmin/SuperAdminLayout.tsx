@@ -2,6 +2,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarRail,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import {
   LayoutDashboard,
   Store,
   Users,
@@ -35,57 +48,65 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
-      <aside className="fixed right-0 top-0 h-full w-64 bg-card border-l border-border z-40">
-        <div className="p-6 border-b border-border">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
-              <span className="text-background font-bold text-lg">ت</span>
+      <SidebarProvider style={{ ["--sidebar-width" as any]: "16rem" } as any}>
+        <Sidebar side="right" collapsible="icon">
+          <SidebarHeader>
+            <div className="flex items-center gap-2 p-4">
+              <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+                <span className="text-background font-bold text-lg">ت</span>
+              </div>
+              <div>
+                <span className="text-xl font-bold group-data-[collapsible=icon]:hidden">ترميز</span>
+                <div className="text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">إدارة المنصة</div>
+              </div>
             </div>
-            <div>
-              <span className="text-xl font-bold">ترميز</span>
-              <div className="text-xs text-muted-foreground">إدارة المنصة</div>
-            </div>
-          </Link>
-        </div>
+          </SidebarHeader>
 
-        <nav className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                  ? "bg-primary text-primary-foreground font-medium"
-                  : "text-muted-foreground hover:bg-muted"
-                  }`}
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
+          <SidebarContent>
+            <SidebarMenu className="p-2">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.href} className="flex items-center gap-3 px-4 py-3">
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarContent>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
-          <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-              <span className="font-bold text-primary-foreground">A</span>
+          <SidebarFooter>
+            <div className="p-4">
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                  <span className="font-bold text-primary-foreground">A</span>
+                </div>
+                <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                  <div className="font-medium truncate">Admin</div>
+                  <div className="text-sm text-muted-foreground truncate">Super Admin</div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-medium truncate">Admin</div>
-              <div className="text-sm text-muted-foreground truncate">Super Admin</div>
-            </div>
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-          </div>
-        </div>
-      </aside>
+          </SidebarFooter>
 
-      <div className="mr-64">
+          <SidebarRail />
+          
+        </Sidebar>
+
+      {/* Main Content */}
+      <SidebarInset>
         <header className="sticky top-0 z-30 bg-card border-b border-border">
           <div className="flex items-center justify-between px-8 py-4">
             <div className="flex-1 max-w-2xl">
-              <div className="relative">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger />
+                <div className="relative">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
@@ -93,6 +114,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                   className="w-full pr-10 pl-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
+              </div>
+              
             </div>
 
             <div className="flex items-center gap-4">
@@ -107,7 +130,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         <main className="p-8">
           {children}
         </main>
-      </div>
+      </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 }
