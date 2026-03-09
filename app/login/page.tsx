@@ -1,7 +1,0 @@
-"use client";
-
-import Page from "@/components/pages/auth/Login";
-
-export default function RoutePage() {
-  return <Page />;
-}
