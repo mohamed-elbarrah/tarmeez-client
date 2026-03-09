@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePlatformLoginMutation } from '@/lib/services/authApi'
+import { useAppDispatch } from '@/lib/store/hooks'
+import { clearUser } from '@/lib/store/slices/authSlice'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +22,7 @@ export default function LoginPage() {
 
     const [platformLogin, { isLoading }] = usePlatformLoginMutation()
     const router = useRouter()
+    const dispatch = useAppDispatch()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,9 +34,25 @@ export default function LoginPage() {
         }
 
         try {
-            await platformLogin({ email, password }).unwrap()
-            // successful login will be handled by authApi onQueryStarted (redirect)
-        } catch (err: any) {
+                const result = await platformLogin({ email, password }).unwrap()
+                const user = result.user
+
+                if (user.role === 'SUPERADMIN') {
+                    router.push('/superadmin')
+                    return
+                }
+
+                if (user.role === 'MERCHANT') {
+                    if (user.merchant?.status === 'REJECTED') {
+                        setError('تم رفض حسابك، تواصل مع الدعم')
+                        dispatch(clearUser())
+                        return
+                    }
+                    // ACTIVE and PENDING both go to /merchant for now
+                    router.push('/merchant')
+                    return
+                }
+            } catch (err: any) {
             // RTK Query fetchBaseQuery error handling
             const status = err?.status
             const data = err?.data

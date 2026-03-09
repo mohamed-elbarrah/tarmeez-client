@@ -1,15 +1,17 @@
 export type UserRole = 'SUPERADMIN' | 'MERCHANT' | 'CUSTOMER'
 export type MerchantStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
+export interface MerchantInfo {
+  status: MerchantStatus
+  storeName: string
+  storeSlug: string
+}
+
 export interface CurrentUser {
   id: string
   email: string
   role: UserRole
-  merchant?: {
-    status: MerchantStatus
-    storeName: string
-    storeSlug: string
-  }
+  merchant?: MerchantInfo | null
 }
 
 export interface PlatformLoginPayload {

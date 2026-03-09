@@ -120,8 +120,9 @@ export default function RegisterPage() {
                 description: formData.description || undefined,
             }
 
-            await merchantRegister(payload).unwrap()
-            // redirect handled by authApi onQueryStarted
+            const result = await merchantRegister(payload).unwrap()
+            // redirect in component after successful registration
+            router.push(`/auth/pending?email=${encodeURIComponent(result.user.email)}`)
         } catch (err: any) {
             const status = err?.status
             const data = err?.data
