@@ -10,7 +10,10 @@ import { Star, SlidersHorizontal } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 
 export default function Collection() {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params.slug as string;
+  const storeSlug = params.storeSlug as string;
+  const storeUrl = `/store/${storeSlug}`;
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [showFilters, setShowFilters] = useState(true);
 
@@ -213,7 +216,7 @@ export default function Collection() {
           {/* Products */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <Link href={`/store/product/${product.slug}`} key={product.id}>
+              <Link href={`${storeUrl}/product/${product.slug}`} key={product.id}>
                 <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback

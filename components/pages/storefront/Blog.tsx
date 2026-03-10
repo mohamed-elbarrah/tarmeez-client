@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,10 @@ import { Calendar, Clock, ArrowLeft, Search } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 
 export default function Blog() {
+  const params = useParams();
+  const storeSlug = params.storeSlug as string;
+  const storeUrl = `/store/${storeSlug}`;
+
   const posts = [
     {
       id: 1,
@@ -149,7 +154,7 @@ export default function Blog() {
                 <span>{featuredPost.readTime}</span>
               </div>
             </div>
-            <Link href={`/store/blog/${featuredPost.slug}`}>
+            <Link href={`${storeUrl}/blog/${featuredPost.slug}`}>
               <Button className="gap-2">
                 اقرأ المزيد
                 <ArrowLeft className="w-4 h-4" />
@@ -162,7 +167,7 @@ export default function Blog() {
       {/* Blog Posts Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {posts.slice(1).map((post) => (
-          <Link href={`/store/blog/${post.slug}`} key={post.id}>
+          <Link href={`${storeUrl}/blog/${post.slug}`} key={post.id}>
             <Card className="overflow-hidden hover:shadow-xl transition-shadow group h-full">
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback

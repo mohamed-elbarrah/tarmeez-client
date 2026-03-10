@@ -1,9 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Search, ShoppingCart, User, Menu, Heart } from "lucide-react";
 
-export default function StorefrontLayout({ children }: { children: React.ReactNode }) {
+export default function StorefrontLayout({
+  children,
+  store
+}: {
+  children: React.ReactNode;
+  store?: any;
+}) {
+  const storeUrl = store ? `/store/${store.slug}` : "/store";
+  const storeName = store?.name || "متجري";
+
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       {/* Top Bar */}
@@ -16,16 +27,22 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between gap-8">
             {/* Logo */}
-            <Link href="/store" className="text-2xl font-bold">متجري</Link>
+            <Link href={storeUrl} className="flex items-center gap-2">
+              {store?.logo ? (
+                <img src={store.logo} alt={storeName} className="h-8 object-contain" />
+              ) : (
+                <span className="text-2xl font-bold">{storeName}</span>
+              )}
+            </Link>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="/store" className="hover:text-accent transition-colors">الرئيسية</Link>
-              <Link href="/store/collection/all" className="hover:text-accent transition-colors">المنتجات</Link>
-              <Link href="/store/collection/new" className="hover:text-accent transition-colors">الجديد</Link>
-              <Link href="/store/collection/sale" className="hover:text-accent transition-colors">التخفيضات</Link>
-              <Link href="/store/blog" className="hover:text-accent transition-colors">المدونة</Link>
-              <Link href="/store/contact" className="hover:text-accent transition-colors">اتصل بنا</Link>
+              <Link href={storeUrl} className="hover:text-primary transition-colors">الرئيسية</Link>
+              <Link href={`${storeUrl}/collection/all`} className="hover:text-primary transition-colors">المنتجات</Link>
+              <Link href={`${storeUrl}/collection/new`} className="hover:text-primary transition-colors">الجديد</Link>
+              <Link href={`${storeUrl}/collection/sale`} className="hover:text-primary transition-colors">التخفيضات</Link>
+              <Link href={`${storeUrl}/blog`} className="hover:text-primary transition-colors">المدونة</Link>
+              <Link href={`${storeUrl}/contact`} className="hover:text-primary transition-colors">اتصل بنا</Link>
             </nav>
 
             {/* Actions */}
@@ -33,7 +50,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
               <Button variant="ghost" size="icon">
                 <Search className="w-5 h-5" />
               </Button>
-              <Link href="/store/account">
+              <Link href={`${storeUrl}/account`}>
                 <Button variant="ghost" size="icon">
                   <User className="w-5 h-5" />
                 </Button>
@@ -41,11 +58,11 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
               <Button variant="ghost" size="icon">
                 <Heart className="w-5 h-5" />
               </Button>
-              <Link href="/store/cart">
+              <Link href={`${storeUrl}/cart`}>
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-black rounded-full text-xs flex items-center justify-center font-bold">
-                    3
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
+                    0
                   </span>
                 </Button>
               </Link>
@@ -67,7 +84,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="font-bold mb-4 text-lg">متجري</h3>
+              <h3 className="font-bold mb-4 text-lg">{storeName}</h3>
               <p className="text-sm text-muted-foreground">
                 وجهتك الأولى للتسوق الإلكتروني
               </p>
@@ -75,10 +92,10 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
             <div>
               <h4 className="font-bold mb-4">روابط سريعة</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/store">الرئيسية</Link></li>
-                <li><Link href="/store/collection/all">المنتجات</Link></li>
-                <li><Link href="/store/blog">المدونة</Link></li>
-                <li><Link href="/store/contact">اتصل بنا</Link></li>
+                <li><Link href={storeUrl}>الرئيسية</Link></li>
+                <li><Link href={`${storeUrl}/collection/all`}>المنتجات</Link></li>
+                <li><Link href={`${storeUrl}/blog`}>المدونة</Link></li>
+                <li><Link href={`${storeUrl}/contact`}>اتصل بنا</Link></li>
               </ul>
             </div>
             <div>
@@ -93,14 +110,14 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
             <div>
               <h4 className="font-bold mb-4">تواصل معنا</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>info@mystore.com</li>
-                <li>+966 50 123 4567</li>
+                <li>{store?.merchant?.email || "info@tarmeez.com"}</li>
+                <li>{store?.merchant?.phone || "+966 50 123 4567"}</li>
                 <li>الرياض، السعودية</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>© 2026 متجري. جميع الحقوق محفوظة.</p>
+            <p>© 2026 {storeName}. جميع الحقوق محفوظة.</p>
           </div>
         </div>
       </footer>

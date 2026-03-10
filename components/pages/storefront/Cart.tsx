@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,10 @@ import { Minus, Plus, X, ShoppingBag } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 
 export default function Cart() {
+  const params = useParams();
+  const storeSlug = params.storeSlug as string;
+  const storeUrl = `/store/${storeSlug}`;
+
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
@@ -76,7 +81,7 @@ export default function Cart() {
           <p className="text-muted-foreground mb-8">
             لم تقم بإضافة أي منتجات إلى سلة التسوق بعد
           </p>
-          <Link href="/store/collection/all">
+          <Link href={`${storeUrl}/collection/all`}>
             <Button size="lg">تصفح المنتجات</Button>
           </Link>
         </div>
@@ -97,7 +102,7 @@ export default function Cart() {
                 <div className="flex gap-6">
                   {/* Product Image */}
                   <Link
-                    href={`/store/product/${item.slug}`}
+                    href={`${storeUrl}/product/${item.slug}`}
                     className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden"
                   >
                     <ImageWithFallback
@@ -110,7 +115,7 @@ export default function Cart() {
                   {/* Product Details */}
                   <div className="flex-1">
                     <div className="flex justify-between mb-2">
-                      <Link href={`/store/product/${item.slug}`}>
+                      <Link href={`${storeUrl}/product/${item.slug}`}>
                         <h3 className="font-bold text-lg hover:text-accent transition-colors">
                           {item.name}
                         </h3>
@@ -249,7 +254,7 @@ export default function Cart() {
             </div>
 
             {/* Checkout Button */}
-            <Link href="/store/checkout">
+            <Link href={`${storeUrl}/checkout`}>
               <Button size="lg" className="w-full">
                 إتمام الطلب
               </Button>

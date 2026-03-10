@@ -8,7 +8,11 @@ import { Star, Heart, Share2, ShoppingCart, Minus, Plus, Check } from "lucide-re
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 
 export default function Product() {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params.slug as string;
+  const storeSlug = params.storeSlug as string;
+  const storeUrl = `/store/${storeSlug}`;
+
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedColor, setSelectedColor] = useState("black");
@@ -95,11 +99,11 @@ export default function Product() {
     <div className="max-w-7xl mx-auto px-6 py-8" dir="rtl">
       {/* Breadcrumb */}
       <div className="mb-8 text-sm text-muted-foreground">
-        <Link href="/store" className="hover:text-foreground">
+        <Link href={storeUrl} className="hover:text-foreground">
           الرئيسية
         </Link>
         <span className="mx-2">/</span>
-        <Link href="/store/collection/all" className="hover:text-foreground">
+        <Link href={`${storeUrl}/collection/all`} className="hover:text-foreground">
           المنتجات
         </Link>
         <span className="mx-2">/</span>
@@ -122,9 +126,8 @@ export default function Product() {
             {product.images.map((image, index) => (
               <Card
                 key={index}
-                className={`overflow-hidden cursor-pointer border-2 ${
-                  selectedImage === index ? "border-accent" : "border-transparent"
-                }`}
+                className={`overflow-hidden cursor-pointer border-2 ${selectedImage === index ? "border-accent" : "border-transparent"
+                  }`}
                 onClick={() => setSelectedImage(index)}
               >
                 <div className="relative h-32">
@@ -150,11 +153,10 @@ export default function Product() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 ${
-                          i < Math.floor(product.rating)
+                        className={`w-5 h-5 ${i < Math.floor(product.rating)
                             ? "fill-accent text-accent"
                             : "text-gray-300"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -226,11 +228,10 @@ export default function Product() {
                 <button
                   key={color.name}
                   onClick={() => setSelectedColor(color.name)}
-                  className={`w-12 h-12 rounded-full border-2 ${
-                    selectedColor === color.name
+                  className={`w-12 h-12 rounded-full border-2 ${selectedColor === color.name
                       ? "border-accent"
                       : "border-gray-300"
-                  } relative`}
+                    } relative`}
                   style={{ backgroundColor: color.hex }}
                   title={color.label}
                 >
@@ -339,11 +340,10 @@ export default function Product() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${
-                            i < review.rating
+                          className={`w-4 h-4 ${i < review.rating
                               ? "fill-accent text-accent"
                               : "text-gray-300"
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -381,7 +381,7 @@ export default function Product() {
         <h2 className="text-3xl font-bold mb-8">منتجات ذات صلة</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {relatedProducts.map((product) => (
-            <Link href={`/store/product/${product.slug}`} key={product.id}>
+            <Link href={`${storeUrl}/product/${product.slug}`} key={product.id}>
               <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
                 <div className="relative h-64 overflow-hidden">
                   <ImageWithFallback

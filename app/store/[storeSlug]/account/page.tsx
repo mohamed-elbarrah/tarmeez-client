@@ -87,7 +87,7 @@ export default function StoreAccountPage() {
                                 </div>
                                 <ChevronLeft className="text-muted-foreground" size={16} />
                             </Link>
-                            <Link href="/" className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors flex-row-reverse">
+                            <Link href={`/store/${storeSlug}`} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors flex-row-reverse">
                                 <div className="flex items-center gap-3 flex-row-reverse">
                                     <Home className="text-muted-foreground" size={20} />
                                     <span>العودة للمتجر</span>
