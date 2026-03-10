@@ -1,12 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { baseQueryWithReauth } from './baseQuery'
 import type { MerchantProfile } from '@/lib/types/auth'
 
 export const superadminApi = createApi({
   reducerPath: 'superadminApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8000/api',
-    credentials: 'include',
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Merchants'],
   endpoints: (build) => ({
     getMerchants: build.query<MerchantProfile[], string | void>({

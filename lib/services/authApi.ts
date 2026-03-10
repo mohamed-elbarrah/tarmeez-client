@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { baseQueryWithReauth } from './baseQuery'
 import type {
   CurrentUser,
   PlatformLoginPayload,
@@ -10,10 +11,7 @@ import { setUser, setInitialized, clearUser } from '@/lib/store/slices/authSlice
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8000/api',
-    credentials: 'include',
-  }),
+  baseQuery: baseQueryWithReauth,
   endpoints: (build) => ({
     platformLogin: build.mutation<{ user: CurrentUser }, PlatformLoginPayload>({
       query: (body) => ({ url: '/auth/platform/login', method: 'POST', body }),

@@ -1,12 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { Product, ProductStats, StoreCustomization, ProductStatus } from '../types/store';
+import { baseQueryWithReauth } from './baseQuery';
 
 export const productsApi = createApi({
     reducerPath: 'productsApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8000/api',
-        credentials: 'include',
-    }),
+    baseQuery: baseQueryWithReauth,
     tagTypes: ['Products', 'Store'],
     endpoints: (builder) => ({
         getProducts: builder.query<{ products: Product[]; stats: ProductStats }, string | void>({
