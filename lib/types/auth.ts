@@ -1,3 +1,26 @@
+export type MerchantStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
+
+export interface StoreInfo {
+  id: string
+  slug: string
+  name: string
+  themeId: string | null
+  isOnboarded: boolean
+  customDomain: string | null
+}
+
+export interface MerchantProfile {
+  id: string
+  fullName: string
+  storeName: string
+  storeSlug: string
+  status: MerchantStatus
+}
+
+export interface MerchantDashboardData {
+  merchant: MerchantProfile
+  store: StoreInfo
+}
 export type UserRole = 'SUPERADMIN' | 'MERCHANT' | 'CUSTOMER'
 export type MerchantStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
