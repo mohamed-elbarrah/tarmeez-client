@@ -6,6 +6,9 @@ export const defaultTokens: ThemeTokens = {
   accent: '#f59e0b',
   fontFamily: "'Inter', 'Cairo', sans-serif",
   borderRadius: '20px',
+  logoWidth: 120,
+  logoHeight: 40,
+  showStoreName: true,
 }
 
 export function resolveTokens(storeData: StoreData): ThemeTokens {
@@ -15,5 +18,8 @@ export function resolveTokens(storeData: StoreData): ThemeTokens {
     accent: storeData.accentColor ?? defaultTokens.accent,
     fontFamily: storeData.fontFamily ?? defaultTokens.fontFamily,
     borderRadius: storeData.borderRadius ?? defaultTokens.borderRadius,
+    logoWidth: storeData.logoWidth ?? defaultTokens.logoWidth,
+    logoHeight: storeData.logoHeight ?? defaultTokens.logoHeight,
+    showStoreName: storeData.showStoreName ?? defaultTokens.showStoreName,
   }
 }

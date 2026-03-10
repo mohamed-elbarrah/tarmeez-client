@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Search, ShoppingCart, User, Truck } from 'lucide-react'
 import { ThemeTokens } from '../../types'
 
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export default function Header({ storeName, logo, theme, cartCount, searchQuery, onSearchChange, onNavigate }: Props) {
+  const [logoError, setLogoError] = useState(false)
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="bg-gray-900 text-white py-2 px-8 flex justify-between items-center text-[10px] md:text-xs">
@@ -22,9 +23,26 @@ export default function Header({ storeName, logo, theme, cartCount, searchQuery,
         <div className="flex gap-6 opacity-80 font-bold"><span>المساعدة</span><span>العربية</span></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
-        <h1 onClick={() => onNavigate('home')} className="text-3xl font-black text-[var(--p-color)] cursor-pointer">
-          {storeName || 'E-mox'}
-        </h1>
+        <div onClick={() => onNavigate('home')} className="flex items-center gap-4 cursor-pointer">
+          {logo && !logoError ? (
+            // @ts-ignore
+            <img
+              src={logo}
+              width={theme.logoWidth}
+              height={theme.logoHeight}
+              style={{ objectFit: 'contain' }}
+              alt={storeName || 'logo'}
+              onError={() => setLogoError(true)}
+              className="block"
+            />
+          ) : null}
+
+          { ( (!logo || logoError) || theme.showStoreName ) && (
+            <span style={{ fontFamily: theme.fontFamily }} className="text-3xl font-black text-[var(--p-color)]">
+              {storeName || 'E-mox'}
+            </span>
+          )}
+        </div>
         <div className="flex-grow max-w-xl relative hidden md:block">
           <input
             type="text"

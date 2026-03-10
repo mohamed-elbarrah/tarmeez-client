@@ -1,5 +1,17 @@
 import { notFound } from "next/navigation";
 import StorefrontLayout from "@/components/pages/storefront/StorefrontLayout";
+import { getStoreBySlug } from '@/lib/api/stores'
+
+export async function generateMetadata({ params }: { params: Promise<{ storeSlug: string }> }) {
+    const { storeSlug } = await params
+    const store = await getStoreBySlug(storeSlug)
+    return {
+        title: store?.name ?? storeSlug,
+        icons: {
+            icon: store?.favicon ?? '/favicon.ico',
+        },
+    }
+}
 
 async function getStoreData(slug: string) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";

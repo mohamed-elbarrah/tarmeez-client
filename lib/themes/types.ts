@@ -4,6 +4,9 @@ export interface ThemeTokens {
   accent: string
   fontFamily: string
   borderRadius: string
+  logoWidth: number
+  logoHeight: number
+  showStoreName: boolean
 }
 
 export interface StoreProduct {
@@ -29,11 +32,16 @@ export interface StoreMerchant {
 export interface StoreData {
   name: string
   logo?: string | null
+  logoWidth?: number | null
+  logoHeight?: number | null
+  showStoreName?: boolean
+  favicon?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   accentColor?: string | null
   fontFamily?: string | null
   borderRadius?: string | null
+  themeId?: string | null
   products?: StoreProduct[]
   merchant?: StoreMerchant
 }

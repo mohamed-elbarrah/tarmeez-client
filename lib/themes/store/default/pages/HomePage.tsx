@@ -15,9 +15,12 @@ interface Props {
 }
 
 export default function HomePage({ theme, products, onNavigate, onCategorySelect }: Props) {
+  const featuredProduct = products?.[0] ?? null
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-16">
-      <HeroBanner theme={theme} featuredProduct={products[5]} onNavigate={onNavigate} />
+      {products.length > 0 && (
+        <HeroBanner theme={theme} featuredProduct={featuredProduct} onNavigate={onNavigate} />
+      )}
       <CategoriesSlider theme={theme} onCategorySelect={onCategorySelect} />
       <PromoGrid theme={theme} products={products} onNavigate={onNavigate} />
       <ProductsSection theme={theme} products={products} onNavigate={onNavigate} />

@@ -25,9 +25,15 @@ export interface ProductStats {
 
 export interface StoreCustomization {
     logo?: string;
+    logoWidth?: number;
+    logoHeight?: number;
+    showStoreName?: boolean;
+    favicon?: string;
     primaryColor?: string;
     secondaryColor?: string;
+    accentColor?: string;
     fontFamily?: string;
+    borderRadius?: string;
 }
 
 export interface StoreProduct {
@@ -44,9 +50,15 @@ export interface StoreData {
     slug: string;
     name: string;
     logo: string | null;
+    logoWidth?: number | null;
+    logoHeight?: number | null;
+    showStoreName?: boolean;
+    favicon?: string | null;
     primaryColor: string | null;
     secondaryColor: string | null;
+    accentColor?: string | null;
     fontFamily: string | null;
+    borderRadius?: string | null;
     merchant: {
         fullName: string;
         category: string;

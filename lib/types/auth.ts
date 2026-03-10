@@ -9,6 +9,19 @@ export interface StoreInfo {
   customDomain: string | null
 }
 
+export interface StoreBrandInfo extends StoreInfo {
+  logo?: string | null
+  logoWidth?: number | null
+  logoHeight?: number | null
+  showStoreName?: boolean
+  favicon?: string | null
+  primaryColor?: string | null
+  secondaryColor?: string | null
+  accentColor?: string | null
+  fontFamily?: string | null
+  borderRadius?: string | null
+}
+
 export interface MerchantProfile {
   id: string
   fullName: string
@@ -19,7 +32,7 @@ export interface MerchantProfile {
 
 export interface MerchantDashboardData {
   merchant: MerchantProfile
-  store: StoreInfo
+  store: StoreBrandInfo
 }
 export type UserRole = 'SUPERADMIN' | 'MERCHANT' | 'CUSTOMER'
 export type MerchantStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'

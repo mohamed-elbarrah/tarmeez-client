@@ -5,11 +5,13 @@ import { ThemeTokens, StoreProduct } from '../../types'
 
 interface Props {
   theme: ThemeTokens
-  featuredProduct: StoreProduct
+  featuredProduct?: StoreProduct | null
   onNavigate: (view: string, product?: StoreProduct) => void
 }
 
 export default function HeroBanner({ theme, featuredProduct, onNavigate }: Props) {
+  if (!featuredProduct) return null
+
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] min-h-[400px] flex items-center p-8 md:p-16 text-white" style={{ backgroundColor: theme.secondary }}>
       <div className="relative z-10 max-w-lg space-y-6">
@@ -19,7 +21,7 @@ export default function HeroBanner({ theme, featuredProduct, onNavigate }: Props
         <button onClick={() => onNavigate('product', featuredProduct)} className="bg-white text-black px-10 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">تسوق الآن</button>
       </div>
       <div className="absolute left-0 bottom-0 top-0 w-1/2 hidden md:block">
-        <img src={featuredProduct.image} className="w-full h-full object-contain object-bottom translate-y-10" alt="Hero" />
+        <img src={featuredProduct?.image} className="w-full h-full object-contain object-bottom translate-y-10" alt="Hero" />
       </div>
     </section>
   )

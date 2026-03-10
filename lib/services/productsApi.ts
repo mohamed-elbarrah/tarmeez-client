@@ -45,6 +45,14 @@ export const productsApi = createApi({
             }),
             invalidatesTags: ['Store'],
         }),
+        uploadStoreImage: builder.mutation<{ url: string }, FormData>({
+            query: (formData) => ({
+                url: '/merchant/store/upload-image',
+                method: 'POST',
+                body: formData,
+            }),
+            invalidatesTags: ['Store'],
+        }),
     }),
 });
 
@@ -54,4 +62,5 @@ export const {
     useUpdateProductMutation,
     useDeleteProductMutation,
     useUpdateStoreCustomizationMutation,
+    useUploadStoreImageMutation,
 } = productsApi;

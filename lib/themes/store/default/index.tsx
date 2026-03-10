@@ -122,6 +122,7 @@ export default function DefaultTheme({ storeData }: ThemeProps) {
 
       <Footer
         storeName={storeData.name}
+        logo={storeData.logo}
         theme={theme}
         onNavigate={navigate}
       />
