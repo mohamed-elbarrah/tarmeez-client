@@ -26,9 +26,10 @@ function InitAuth({ children }: Props) {
   useEffect(() => {
     // once initialized, redirect unauthenticated users to home
     if (isInitialized && !user) {
-      // allow public routes: home, login, register
-      const publicPaths = ['/', '/login', '/register']
-      if (pathname && !publicPaths.includes(pathname)) router.push('/')
+      // allow public routes: home, login, register, store (and any store subpath)
+      const publicPaths = ['/', '/login', '/register', '/store']
+      const isStorePath = pathname ? pathname.startsWith('/store') : false
+      if (pathname && !(publicPaths.includes(pathname) || isStorePath)) router.push('/')
     }
   }, [isInitialized, user, pathname, router])
 
