@@ -1,15 +1,6 @@
-import { notFound } from "next/navigation";
-import StorefrontHome from "@/components/pages/storefront/Home";
-
-async function getStoreData(slug: string) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-    const res = await fetch(`${apiUrl}/stores/${slug}`, {
-        next: { revalidate: 3600 },
-    });
-
-    if (!res.ok) return null;
-    return res.json();
-}
+import { getTheme } from '@/lib/themes'
+import { getStoreBySlug } from '@/lib/api/stores'
+import { notFound } from 'next/navigation'
 
 export default async function StorePage({
     params,
@@ -17,11 +8,10 @@ export default async function StorePage({
     params: Promise<{ storeSlug: string }>;
 }) {
     const { storeSlug } = await params;
-    const store = await getStoreData(storeSlug);
+    const store = await getStoreBySlug(storeSlug);
+    if (!store) notFound();
 
-    if (!store) {
-        notFound();
-    }
+    const ThemeComponent = getTheme(store.themeId)
 
-    return <StorefrontHome store={store} />;
+    return <ThemeComponent storeData={store} />
 }
