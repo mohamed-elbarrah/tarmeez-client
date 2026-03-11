@@ -1,17 +1,23 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { resolveTokens } from './config'
 import { ThemeProps, StoreProduct } from '../../types'
 import Header from './components/Header'
+import { useRouter } from 'next/navigation'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import ProductsPage from './pages/ProductsPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import AccountPage from './pages/AccountPage'
+import CheckoutPage from './pages/CheckoutPage'
+import OrderSuccessPage from './pages/OrderSuccessPage'
+import OrderTrackingPage from './pages/OrderTrackingPage'
+import { useAppDispatch, useAppSelector } from '@/lib/store/hooks'
+import { addItem as addCartItem, removeItem as removeCartItem, updateQuantity as updateCartQuantity, clearCart as clearCartAction, setStoreSlug } from '@/lib/store/slices/cartSlice'
 
-interface CartItem extends StoreProduct { qty: number }
+// Cart stored in Redux uses `quantity` per item
 
 const MOCK_PRODUCTS: StoreProduct[] = [
   { id: 1, name: "Samsung Galaxy S24 Ultra, 512GB", price: 4499, oldPrice: 5399, discount: "20%", rating: 4.8, category: "جوالات", image: "https://m.media-amazon.com/images/I/71RZAucP-GL._AC_SL1500_.jpg" },
@@ -24,12 +30,15 @@ const MOCK_PRODUCTS: StoreProduct[] = [
   { id: 8, name: "ماكينة قهوة نسبريسو", price: 899, oldPrice: 1100, rating: 4.6, category: "منزل", image: "https://m.media-amazon.com/images/I/61-9p0vV7SL._AC_SL1500_.jpg" },
 ]
 
-export default function DefaultTheme({ storeData }: ThemeProps) {
+export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
   const theme = resolveTokens(storeData)
   
-  const [view, setView] = useState('home')
+  const [view, setView] = useState(initialView ?? 'home')
+  const [orderCode, setOrderCode] = useState<string | null>(null)
   const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(null)
-  const [cart, setCart] = useState<CartItem[]>([])
+  const dispatch = useAppDispatch()
+  const cart = useAppSelector((s) => s.cart.items)
+  const currentStoreSlug = useAppSelector((s) => s.cart.storeSlug)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('الكل')
 
@@ -43,16 +52,21 @@ export default function DefaultTheme({ storeData }: ThemeProps) {
     if (typeof window !== 'undefined') window.scrollTo(0, 0)
   }
 
+  useEffect(() => {
+    // set store slug in cart state when mounting
+    if (storeData?.slug && storeData?.slug !== currentStoreSlug) {
+      dispatch(setStoreSlug(storeData.slug))
+    }
+  }, [storeData?.slug, currentStoreSlug, dispatch])
+
   const addToCart = (p: StoreProduct) => {
-    setCart(prev => {
-      const exists = prev.find(i => i.id === p.id)
-      if (exists) return prev.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i)
-      return [...prev, {...p, qty: 1}]
-    })
+    dispatch(addCartItem({ id: p.id, name: p.name, price: p.price as any, image: p.image || null, quantity: 1, slug: (p as any).slug || '' }))
     navigate('cart')
   }
 
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0)
+  const router = useRouter()
+
+  const cartCount = cart.reduce((s: number, i: any) => s + (i.quantity || 0), 0)
 
   return (
     <div
@@ -111,13 +125,33 @@ export default function DefaultTheme({ storeData }: ThemeProps) {
         <CartPage
           theme={theme}
           cart={cart}
-          onUpdateQty={(id, delta) => setCart(prev =>
-            prev.map(i => i.id === id ? {...i, qty: Math.max(1, i.qty + delta)} : i)
-          )}
-          onRemove={(id) => setCart(prev => prev.filter(i => i.id !== id))}
+          onUpdateQty={(id, delta) => dispatch(updateCartQuantity({ id, quantity: Math.max(1, (cart.find((x: any) => x.id === id)?.quantity || 1) + delta) }))}
+          onRemove={(id) => dispatch(removeCartItem(id))}
           onContinueShopping={() => navigate('home')}
+          onCheckout={() => router.push(`/store/${storeData.slug}/checkout`)}
         />
       )}
+
+          {view === 'checkout' && (
+            <CheckoutPage
+              storeData={storeData}
+              theme={theme}
+              cart={cart}
+              onSuccess={(code: string) => {
+                setOrderCode(code)
+                dispatch(clearCartAction())
+                navigate('order-success')
+              }}
+            />
+          )}
+
+          {view === 'order-success' && (
+            <OrderSuccessPage storeData={storeData} orderCode={orderCode} />
+          )}
+
+          {view === 'track' && (
+            <OrderTrackingPage storeData={storeData} />
+          )}
 
       {view === 'account' && (
         <AccountPage theme={theme} products={allProducts} />

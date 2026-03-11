@@ -5,13 +5,17 @@ import authReducer from './slices/authSlice'
 import { merchantApi } from '@/lib/services/merchantApi'
 import { superadminApi } from '@/lib/services/superadminApi'
 import { productsApi } from '@/lib/services/productsApi'
+import cartReducer from './slices/cartSlice'
+import { ordersApi } from '@/lib/services/ordersApi'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    cart: cartReducer,
     [authApi.reducerPath]: authApi.reducer,
     [customerApi.reducerPath]: customerApi.reducer,
     [merchantApi.reducerPath]: merchantApi.reducer,
+    [ordersApi.reducerPath]: ordersApi.reducer,
     [superadminApi.reducerPath]: superadminApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
   },
@@ -20,6 +24,7 @@ export const store = configureStore({
       authApi.middleware,
       customerApi.middleware,
       merchantApi.middleware,
+      ordersApi.middleware,
       superadminApi.middleware,
       productsApi.middleware,
     ),

@@ -3,7 +3,7 @@
 import React from 'react'
 import { StoreProduct, ThemeTokens } from '../../types'
 
-interface CartItem extends StoreProduct { qty: number }
+interface CartItem extends StoreProduct { quantity: number }
 
 interface Props {
   theme: ThemeTokens
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function CartSummary({ theme, cart, onCheckout }: Props) {
-  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
+  const subtotal = cart.reduce((s, i) => s + i.price * (i.quantity || 0), 0)
   return (
     <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-fit space-y-6 sticky top-28">
       <h3 className="text-xl font-black border-b pb-4">ملخص الطلب</h3>

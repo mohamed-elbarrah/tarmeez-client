@@ -33,6 +33,7 @@ export interface StoreMerchant {
 }
 
 export interface StoreData {
+  slug: string
   name: string
   logo?: string | null
   logoWidth?: number | null
@@ -54,4 +55,5 @@ export interface StoreData {
 
 export interface ThemeProps {
   storeData: StoreData
+  initialView?: string
 }

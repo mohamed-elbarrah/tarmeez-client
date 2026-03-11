@@ -8,7 +8,7 @@ import { clearUser } from '@/lib/store/slices/authSlice'
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
 
-const baseQuery = fetchBaseQuery({
+export const baseQuery = fetchBaseQuery({
     baseUrl,
     credentials: 'include',
 })
