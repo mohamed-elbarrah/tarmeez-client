@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { authApi } from '@/lib/services/authApi'
+import { customerApi } from '@/lib/services/customerApi'
 import authReducer from './slices/authSlice'
 import { merchantApi } from '@/lib/services/merchantApi'
 import { superadminApi } from '@/lib/services/superadminApi'
@@ -9,6 +10,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     [authApi.reducerPath]: authApi.reducer,
+    [customerApi.reducerPath]: customerApi.reducer,
     [merchantApi.reducerPath]: merchantApi.reducer,
     [superadminApi.reducerPath]: superadminApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
@@ -16,6 +18,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
+      customerApi.middleware,
       merchantApi.middleware,
       superadminApi.middleware,
       productsApi.middleware,
