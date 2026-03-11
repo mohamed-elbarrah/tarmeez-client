@@ -28,7 +28,7 @@ export interface StoreCustomization {
     logoWidth?: number;
     logoHeight?: number;
     showStoreName?: boolean;
-    favicon?: string;
+    favicon?: string | null;
     primaryColor?: string;
     secondaryColor?: string;
     accentColor?: string;

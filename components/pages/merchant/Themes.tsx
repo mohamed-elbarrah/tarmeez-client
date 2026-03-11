@@ -44,15 +44,24 @@ const AdvancedColorPicker: React.FC<{
       </button>
 
       {open && (
-        <div className="absolute z-50 right-0 mt-2 w-64 p-3 bg-white border rounded shadow-lg">
+        <div
+          className="absolute z-50 right-0 mt-2 w-64 p-3 rounded shadow-lg"
+          style={{ backgroundColor: 'var(--color-popover)', borderColor: 'var(--color-border)', color: 'var(--color-popover-foreground)' }}
+        >
           <input type="color" value={hex} onChange={e => { setHex(e.target.value); onChange(e.target.value) }} className="w-full h-12 p-0" />
           <div className="mt-2 flex items-center gap-2">
-            <input value={hex} onChange={e => setHex(e.target.value)} onBlur={() => onChange(hex)} className="border p-1 rounded w-full text-sm" />
+            <input
+              value={hex}
+              onChange={e => setHex(e.target.value)}
+              onBlur={() => onChange(hex)}
+              className="text-sm p-1 rounded w-full"
+              style={{ backgroundColor: 'var(--color-input)', borderColor: 'var(--color-border)', color: 'var(--color-foreground)', borderStyle: 'solid' }}
+            />
           </div>
 
           <div className="grid grid-cols-10 gap-1 mt-3">
             {quick.map(c => (
-              <button key={c} onClick={() => { setHex(c); onChange(c) }} style={{ background: c }} className="w-6 h-6 rounded" />
+              <button key={c} onClick={() => { setHex(c); onChange(c) }} style={{ background: c, borderColor: 'var(--color-border)' }} className="w-6 h-6 rounded border" />
             ))}
           </div>
         </div>
@@ -71,10 +80,16 @@ const NumberInput: React.FC<{
   const num = Number(value || 0)
   return (
     <div>
-      <input type="range" min={min} max={max} value={num} onChange={e => onChange(Number(e.target.value))} />
+      <input className="w-full" type="range" min={min} max={max} value={num} onChange={e => onChange(Number(e.target.value))} />
       <div className="flex items-center gap-2 mt-2">
-        <input type="number" value={num} onChange={e => onChange(Number(e.target.value))} className="w-20 border rounded px-2 py-1" />
-        {suffix && <div className="text-sm text-gray-500">{suffix}</div>}
+        <input
+          type="number"
+          value={num}
+          onChange={e => onChange(Number(e.target.value))}
+          className="w-20 rounded px-2 py-1"
+          style={{ backgroundColor: 'var(--color-input)', border: '1px solid var(--color-border)', color: 'var(--color-foreground)' }}
+        />
+        {suffix && <div className="text-sm" style={{ color: 'var(--color-muted-foreground)' }}>{suffix}</div>}
       </div>
     </div>
   )
@@ -195,9 +210,9 @@ const BrandIdentitySection = () => {
 
   return (
     <Card className="p-6 mt-8">
-      <div className="flex  bg-slate-50 rounded-2xl overflow-hidden border">
+      <div className="flex rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-background)', border: '1px solid var(--color-border)' }}>
         {/* RIGHT: Controls (rtl) */}
-        <aside className="m-auto bg-white border-l flex flex-col p-4" dir="rtl">
+        <aside className="m-auto flex flex-col p-4" dir="rtl" style={{ backgroundColor: 'var(--color-card)', borderLeft: '1px solid var(--color-border)' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.5"/></svg>
@@ -217,12 +232,12 @@ const BrandIdentitySection = () => {
 
             <div>
               <div className="text-xs text-gray-500 mb-2">الشعار</div>
-              <div className="border p-3 rounded flex flex-col gap-2">
+              <div className="p-3 rounded flex flex-col gap-2" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <label className="text-sm">رفع الشعار</label>
                 <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'logo')} />
                 <div className="flex items-center gap-3">
-                  <div className="w-32 h-12 bg-gray-100 flex items-center justify-center">
-                    {config.logo ? <img src={config.logo} alt="logo" style={{ width: config.logoWidth, height: config.logoHeight, objectFit: 'contain' }} /> : <div className="text-xs">رفع الشعار</div>}
+                  <div className="w-32 h-12 flex items-center justify-center" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    {config.logo ? <img src={config.logo} alt="logo" style={{ width: config.logoWidth, height: config.logoHeight, objectFit: 'contain' }} /> : <div className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>رفع الشعار</div>}
                   </div>
                   <div className="flex-1">
                     <div className="text-xs">عرض الشعار</div>
@@ -241,11 +256,11 @@ const BrandIdentitySection = () => {
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">الفيفيكون</div>
-              <div className="border p-3 rounded flex items-center gap-3">
+              <div className="text-xs text-gray-500 mb-2">أيقونة المتجر</div>
+              <div className="p-3 rounded flex items-center gap-3" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'favicon')} />
-                <div className="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                  {config.favicon ? <img src={config.favicon} alt="favicon" width={32} height={32} /> : <div className="text-xs">32x32</div>}
+                <div className="w-8 h-8 flex items-center justify-center" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                  {config.favicon ? <img src={config.favicon} alt="favicon" width={32} height={32} /> : <div className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>32x32</div>}
                 </div>
               </div>
             </div>
@@ -287,7 +302,7 @@ const BrandIdentitySection = () => {
 
             <div>
               <div className="text-xs text-gray-500 mb-2">الزوايا</div>
-              <div className="border p-3 rounded">
+              <div className="p-3 rounded" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <NumberInput value={parseInt(config.borderRadius || '0')} min={0} max={40} onChange={v => setConfig(prev => ({ ...prev, borderRadius: `${v}px` }))} suffix="px" />
                 <div className="flex gap-2 mt-3">
                   {[{ value: '0px', label: 'حاد' }, { value: '8px', label: 'خفيف' }, { value: '16px', label: 'متوسط' }, { value: '20px', label: 'افتراضي' }, { value: '32px', label: 'دائري' }, { value: '9999px', label: 'كامل' }].map(opt => (
@@ -302,20 +317,20 @@ const BrandIdentitySection = () => {
 
             <div>
               <div className="text-xs text-gray-500 mb-2">الخط</div>
-              <select value={config.fontFamily} onChange={e => setConfig(prev => ({ ...prev, fontFamily: e.target.value }))} className="w-full mt-1 px-3 py-2 border rounded-lg">
+              <select value={config.fontFamily} onChange={e => setConfig(prev => ({ ...prev, fontFamily: e.target.value }))} className="w-full mt-1 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-input)', border: '1px solid var(--color-border)', color: 'var(--color-foreground)' }}>
                 <option value="'Cairo', sans-serif">Cairo</option>
                 <option value="'Tajawal', sans-serif">Tajawal</option>
                 <option value="'Noto Sans Arabic', sans-serif">Noto Sans Arabic</option>
                 <option value="'Inter', sans-serif">Inter</option>
                 <option value="'Poppins', sans-serif">Poppins</option>
               </select>
-              <div className="mt-3 p-3 border rounded" style={{ fontFamily: config.fontFamily }}>
+              <div className="mt-3 p-3 rounded" style={{ fontFamily: config.fontFamily, backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)', color: 'var(--color-card-foreground)' }}>
                 مرحبياً بكم في متجرنا – Welcome
               </div>
             </div>
           </div>
 
-          <div className="sticky bottom-0 bg-white p-4 border-t">
+          <div className="sticky bottom-0 p-4" style={{ backgroundColor: 'var(--color-card)', borderTop: '1px solid var(--color-border)' }}>
             <button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 text-white py-2 rounded">
               {isSaving ? 'جاري الحفظ...' : 'حفظ الهوية البصرية'}
             </button>
@@ -351,12 +366,8 @@ export default function Themes() {
 
       <div className="grid grid-cols-3 gap-6">
         {[
-          { name: "Modern Shop", price: "مجاني", popular: true },
-          { name: "Minimal Store", price: "مجاني", popular: false },
-          { name: "Fashion Pro", price: "299 ر.س", popular: true },
-          { name: "Tech Store", price: "199 ر.س", popular: false },
-          { name: "Food Market", price: "مجاني", popular: false },
-          { name: "Sports Elite", price: "399 ر.س", popular: true },
+          { name: "Modern Shop", price: "مجاني", popular: false },
+          { name: "Sports Elite", price: "399 ر.س", popular: false },
         ].map((theme, i) => (
           <Card key={i} className="overflow-hidden">
             {theme.popular && (

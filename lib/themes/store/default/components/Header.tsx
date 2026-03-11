@@ -20,7 +20,7 @@ export default function Header({ storeName, logo, theme, cartCount, searchQuery,
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="bg-gray-900 text-white py-2 px-8 flex justify-between items-center text-[10px] md:text-xs">
         <span className="flex items-center gap-1 opacity-80"><Truck size={14} /> شحن مجاني للطلبات فوق 200 ريال</span>
-        <div className="flex gap-6 opacity-80 font-bold"><span>المساعدة</span><span>العربية</span></div>
+        <div className="flex gap-6 opacity-80 font-bold"><span>المساعدة</span></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
         <div onClick={() => onNavigate('home')} className="flex items-center gap-4 cursor-pointer">
