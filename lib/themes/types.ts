@@ -2,6 +2,9 @@ export interface ThemeTokens {
   primary: string
   secondary: string
   accent: string
+  textColor: string
+  headingColor: string
+  buttonColor: string
   fontFamily: string
   borderRadius: string
   logoWidth: number
@@ -39,6 +42,9 @@ export interface StoreData {
   primaryColor?: string | null
   secondaryColor?: string | null
   accentColor?: string | null
+  textColor?: string | null
+  headingColor?: string | null
+  buttonColor?: string | null
   fontFamily?: string | null
   borderRadius?: string | null
   themeId?: string | null

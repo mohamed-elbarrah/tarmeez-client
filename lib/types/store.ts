@@ -32,6 +32,10 @@ export interface StoreCustomization {
     primaryColor?: string;
     secondaryColor?: string;
     accentColor?: string;
+    storeName?: string;
+    textColor?: string;
+    headingColor?: string;
+    buttonColor?: string;
     fontFamily?: string;
     borderRadius?: string;
 }
@@ -59,6 +63,10 @@ export interface StoreData {
     accentColor?: string | null;
     fontFamily: string | null;
     borderRadius?: string | null;
+    storeName?: string | null;
+    textColor?: string | null;
+    headingColor?: string | null;
+    buttonColor?: string | null;
     merchant: {
         fullName: string;
         category: string;

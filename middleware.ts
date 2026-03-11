@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/merchant') || pathname.startsWith('/superadmin')) {
     if (!accessToken) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+      return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 

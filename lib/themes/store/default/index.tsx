@@ -60,6 +60,9 @@ export default function DefaultTheme({ storeData }: ThemeProps) {
         '--p-color': theme.primary,
         '--s-color': theme.secondary,
         '--a-color': theme.accent,
+        '--b-color': theme.buttonColor,
+        '--t-color': theme.textColor,
+        '--h-color': theme.headingColor,
         '--radius': theme.borderRadius,
         fontFamily: theme.fontFamily,
       } as React.CSSProperties}

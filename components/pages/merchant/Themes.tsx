@@ -6,266 +6,328 @@ import { Label } from "@/components/ui/label";
 import { Eye, Download } from "lucide-react";
 import { useUpdateStoreCustomizationMutation, useUploadStoreImageMutation } from '@/lib/services/productsApi';
 import { useGetMyStoreQuery } from '@/lib/services/merchantApi';
+import React from "react";
+
+const AdvancedColorPicker: React.FC<{
+  value: string
+  onChange: (hex: string) => void
+  label?: string
+}> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false)
+  const ref = React.useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!ref.current) return
+      if (!(e.target instanceof Node)) return
+      if (!ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  }, [])
+
+  const quick = [
+    "#F44336","#E91E63","#9C27B0","#673AB7","#3F51B5",
+    "#2196F3","#03A9F4","#00BCD4","#009688","#4CAF50",
+    "#8BC34A","#CDDC39","#FFEB3B","#FFC107","#FF9800",
+    "#FF5722","#795548","#9E9E9E","#607D8B","#000000",
+  ]
+
+  const [hex, setHex] = useState(value)
+  useEffect(() => setHex(value), [value])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-2">
+        <span style={{ background: value }} className="w-6 h-6 rounded" />
+        <div className="text-sm">{value}</div>
+      </button>
+
+      {open && (
+        <div className="absolute z-50 right-0 mt-2 w-64 p-3 bg-white border rounded shadow-lg">
+          <input type="color" value={hex} onChange={e => { setHex(e.target.value); onChange(e.target.value) }} className="w-full h-12 p-0" />
+          <div className="mt-2 flex items-center gap-2">
+            <input value={hex} onChange={e => setHex(e.target.value)} onBlur={() => onChange(hex)} className="border p-1 rounded w-full text-sm" />
+          </div>
+
+          <div className="grid grid-cols-10 gap-1 mt-3">
+            {quick.map(c => (
+              <button key={c} onClick={() => { setHex(c); onChange(c) }} style={{ background: c }} className="w-6 h-6 rounded" />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const NumberInput: React.FC<{
+  value: number | string
+  min: number
+  max: number
+  onChange: (v: number) => void
+  suffix?: string
+}> = ({ value, min, max, onChange, suffix }) => {
+  const num = Number(value || 0)
+  return (
+    <div>
+      <input type="range" min={min} max={max} value={num} onChange={e => onChange(Number(e.target.value))} />
+      <div className="flex items-center gap-2 mt-2">
+        <input type="number" value={num} onChange={e => onChange(Number(e.target.value))} className="w-20 border rounded px-2 py-1" />
+        {suffix && <div className="text-sm text-gray-500">{suffix}</div>}
+      </div>
+    </div>
+  )
+}
 
 const BrandIdentitySection = () => {
-  const { data, isLoading } = useGetMyStoreQuery();
-  const [updateCustomization, { isLoading: isSaving }] = useUpdateStoreCustomizationMutation();
+  const { data, isLoading } = useGetMyStoreQuery()
+  const [updateCustomization, { isLoading: isSaving }] = useUpdateStoreCustomizationMutation()
+  const [uploadStoreImage] = useUploadStoreImageMutation()
+  const [device, setDevice] = useState<'desktop'|'mobile'>('desktop')
 
-  const [logo, setLogo] = useState('');
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [logoWidth, setLogoWidth] = useState(120);
-  const [logoHeight, setLogoHeight] = useState(40);
-  const [showStoreName, setShowStoreName] = useState(true);
-  const [favicon, setFavicon] = useState<string | null>(null);
-  const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
-  const [primaryColor, setPrimaryColor] = useState('#2563eb');
-  const [secondaryColor, setSecondaryColor] = useState('#0f172a');
-  const [accentColor, setAccentColor] = useState('#f59e0b');
-  const [fontFamily, setFontFamily] = useState("'Cairo', sans-serif");
-  const [borderRadius, setBorderRadius] = useState('20px');
-  const [logoError, setLogoError] = useState(false);
-  const [faviconError, setFaviconError] = useState(false);
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
-  const [isUploadingFavicon, setIsUploadingFavicon] = useState(false);
-
-  const [uploadStoreImage] = useUploadStoreImageMutation();
+  const [config, setConfig] = useState({
+    storeName: '',
+    logo: '',
+    logoWidth: 120,
+    logoHeight: 40,
+    showStoreName: true,
+    favicon: '',
+    primaryColor: '#2563eb',
+    secondaryColor: '#0f172a',
+    accentColor: '#f59e0b',
+    textColor: '#1e293b',
+    headingColor: '#000000',
+    buttonColor: '#2563eb',
+    fontFamily: "'Cairo', sans-serif",
+    borderRadius: '20px',
+  })
 
   useEffect(() => {
     if (data?.store) {
-      const s = data.store as any;
-      setLogo(s.logo ?? '');
-      setLogoPreview(null);
-      setLogoWidth(s.logoWidth ?? 120);
-      setLogoHeight(s.logoHeight ?? 40);
-      setShowStoreName(s.showStoreName ?? true);
-      setFavicon(s.favicon ?? null);
-      setFaviconPreview(null);
-      setPrimaryColor(s.primaryColor ?? '#2563eb');
-      setSecondaryColor(s.secondaryColor ?? '#0f172a');
-      setAccentColor(s.accentColor ?? '#f59e0b');
-      setFontFamily(s.fontFamily ?? "'Cairo', sans-serif");
-      setBorderRadius(s.borderRadius ?? '20px');
-      setLogoError(false);
-      setFaviconError(false);
+      const s: any = data.store
+      setConfig({
+        storeName: s.storeName ?? s.name ?? '',
+        logo: s.logo ?? '',
+        logoWidth: s.logoWidth ?? 120,
+        logoHeight: s.logoHeight ?? 40,
+        showStoreName: s.showStoreName ?? true,
+        favicon: s.favicon ?? '',
+        primaryColor: s.primaryColor ?? '#2563eb',
+        secondaryColor: s.secondaryColor ?? '#0f172a',
+        accentColor: s.accentColor ?? '#f59e0b',
+        textColor: s.textColor ?? '#1e293b',
+        headingColor: s.headingColor ?? '#000000',
+        buttonColor: s.buttonColor ?? '#2563eb',
+        fontFamily: s.fontFamily ?? "'Cairo', sans-serif",
+        borderRadius: s.borderRadius ?? '20px',
+      })
     }
-  }, [data]);
+  }, [data])
 
-  // Load Google Font when fontFamily changes (simple heuristic)
   useEffect(() => {
-    const name = fontFamily.split(',')[0].replace(/['"]/g, '').trim();
-    if (!name) return;
-    const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@300;400;600;700&display=swap`;
-    const existing = document.querySelector(`link[data-font='${name}']`);
+    const name = (config.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim()
+    if (!name) return
+    const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@300;400;600;700&display=swap`
+    const existing = document.querySelector(`link[data-font='${name}']`)
     if (!existing) {
-      const l = document.createElement('link');
-      l.rel = 'stylesheet';
-      l.href = href;
-      l.setAttribute('data-font', name);
-      document.head.appendChild(l);
+      const l = document.createElement('link')
+      l.rel = 'stylesheet'
+      l.href = href
+      l.setAttribute('data-font', name)
+      document.head.appendChild(l)
     }
-  }, [fontFamily]);
+  }, [config.fontFamily])
+
+  const handleUpload = async (file?: File, key: 'logo'|'favicon' = 'logo') => {
+    if (!file) return
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await uploadStoreImage(form).unwrap()
+      setConfig(prev => ({ ...prev, [key]: res.url }))
+    } catch (err) {
+      console.error(err)
+      alert('فشل رفع الصورة')
+    }
+  }
 
   const handleSave = async () => {
     try {
       await updateCustomization({
-        logo,
-        logoWidth,
-        logoHeight,
-        showStoreName,
-        favicon: favicon ?? null,
-        primaryColor,
-        secondaryColor,
-        accentColor,
-        fontFamily,
-        borderRadius,
-      }).unwrap();
-      alert('تم حفظ الهوية البصرية بنجاح ✓');
-    } catch (e) {
-      console.error(e);
-      alert('فشل الحفظ، حاول مرة أخرى');
-    }
-  };
-
-  const handleLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setLogoError(false);
-    const localUrl = URL.createObjectURL(file);
-    setLogoPreview(localUrl);
-    setIsUploadingLogo(true);
-    try {
-      const form = new FormData();
-      form.append('file', file);
-      const res = await uploadStoreImage(form).unwrap();
-      setLogo(res.url);
-      setLogoPreview(null);
+        storeName: config.storeName,
+        logo: config.logo,
+        logoWidth: config.logoWidth,
+        logoHeight: config.logoHeight,
+        showStoreName: config.showStoreName,
+        favicon: config.favicon || null,
+        primaryColor: config.primaryColor,
+        secondaryColor: config.secondaryColor,
+        accentColor: config.accentColor,
+        textColor: config.textColor,
+        headingColor: config.headingColor,
+        buttonColor: config.buttonColor,
+        fontFamily: config.fontFamily,
+        borderRadius: config.borderRadius,
+      }).unwrap()
+      // use Sonner toast
+      const { toast } = await import('sonner')
+      toast.success('تم حفظ الهوية البصرية بنجاح ✓')
     } catch (err) {
-      console.error(err);
-      setLogoError(true);
-      alert('فشل رفع الشعار');
-    } finally {
-      setIsUploadingLogo(false);
+      console.error(err)
+      alert('فشل الحفظ')
     }
-  };
-
-  const handleFaviconFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setFaviconError(false);
-    const localUrl = URL.createObjectURL(file);
-    setFaviconPreview(localUrl);
-    setIsUploadingFavicon(true);
-    try {
-      const form = new FormData();
-      form.append('file', file);
-      const res = await uploadStoreImage(form).unwrap();
-      setFavicon(res.url);
-      setFaviconPreview(null);
-    } catch (err) {
-      console.error(err);
-      setFaviconError(true);
-      alert('فشل رفع الفيفيكون');
-    } finally {
-      setIsUploadingFavicon(false);
-    }
-  };
-
-  const borderOptions = [
-    { value: '0px', label: 'حاد' },
-    { value: '8px', label: 'خفيف' },
-    { value: '16px', label: 'متوسط' },
-    { value: '20px', label: 'افتراضي' },
-    { value: '32px', label: 'دائري' },
-    { value: '9999px', label: 'كامل' },
-  ];
-
-  if (isLoading) {
-    return (
-      <Card className="p-6 mt-8">
-        <h2 className="text-xl font-bold mb-6">الهوية البصرية</h2>
-        <div className="animate-pulse h-40 bg-gray-100 rounded" />
-      </Card>
-    );
   }
+
+  const resetToDefaults = () => {
+    setConfig({
+      storeName: '', logo: '', logoWidth: 120, logoHeight: 40, showStoreName: true, favicon: '',
+      primaryColor: '#2563eb', secondaryColor: '#0f172a', accentColor: '#f59e0b', textColor: '#1e293b', headingColor: '#000000', buttonColor: '#2563eb',
+      fontFamily: "'Cairo', sans-serif", borderRadius: '20px',
+    })
+  }
+
+  if (isLoading) return (
+    <Card className="p-6 mt-8">
+      <div className="animate-pulse h-40 bg-gray-100 rounded" />
+    </Card>
+  )
 
   return (
     <Card className="p-6 mt-8">
-      <h2 className="text-xl font-bold mb-6">الهوية البصرية</h2>
-      <div className="grid grid-cols-2 gap-6">
-        {/* Logo Section */}
-        <div className="col-span-2">
-          <Label>شعار المتجر</Label>
-          <input type="file" accept="image/*" onChange={handleLogoFile} className="mt-2" />
-          {isUploadingLogo && <div className="text-sm text-gray-500 mt-2">جاري رفع الشعار...</div>}
-          <div className="mt-3 flex items-center gap-4">
-            { (logoPreview || logo) && !logoError ? (
-              <img src={logoPreview ?? logo ?? ''} alt="logo preview" width={logoWidth} height={logoHeight} style={{ objectFit: 'contain' }} onError={() => setLogoError(true)} />
-            ) : (
-              <div className="text-sm font-bold">{data?.store.name}</div>
-            )}
-            <div className="flex flex-col">
-              <label className="text-xs">عرض الشعار: {logoWidth}px</label>
-              <input type="range" min={40} max={300} step={10} value={logoWidth} onChange={e => setLogoWidth(Number(e.target.value))} />
-              <label className="text-xs mt-2">ارتفاع الشعار: {logoHeight}px</label>
-              <input type="range" min={20} max={120} step={5} value={logoHeight} onChange={e => setLogoHeight(Number(e.target.value))} />
-              <label className="flex items-center gap-2 mt-2 text-sm"><input type="checkbox" checked={showStoreName} onChange={e => setShowStoreName(e.target.checked)} /> عرض اسم المتجر بجانب الشعار</label>
+      <div className="flex  bg-slate-50 rounded-2xl overflow-hidden border">
+        {/* RIGHT: Controls (rtl) */}
+        <aside className="m-auto bg-white border-l flex flex-col p-4" dir="rtl">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <div className="font-bold">تخصيص الهوية</div>
+            </div>
+            <button title="إعادة" onClick={resetToDefaults} className="p-2 rounded hover:bg-gray-100">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 1 3 6.7" stroke="currentColor" strokeWidth="1.5"/></svg>
+            </button>
+          </div>
+
+          <div className="space-y-4 overflow-auto" style={{ flex: 1 }}>
+            <div>
+              <div className="text-xs text-gray-500 mb-2">المعلومات الأساسية</div>
+              <Label>اسم المتجر / العلامة التجارية</Label>
+              <Input value={config.storeName} onChange={e => setConfig(prev => ({ ...prev, storeName: e.target.value }))} className="mt-1" />
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-500 mb-2">الشعار</div>
+              <div className="border p-3 rounded flex flex-col gap-2">
+                <label className="text-sm">رفع الشعار</label>
+                <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'logo')} />
+                <div className="flex items-center gap-3">
+                  <div className="w-32 h-12 bg-gray-100 flex items-center justify-center">
+                    {config.logo ? <img src={config.logo} alt="logo" style={{ width: config.logoWidth, height: config.logoHeight, objectFit: 'contain' }} /> : <div className="text-xs">رفع الشعار</div>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs">عرض الشعار</div>
+                    <NumberInput value={config.logoWidth} min={40} max={300} onChange={v => setConfig(prev => ({ ...prev, logoWidth: v }))} />
+                    <div className="text-xs mt-2">ارتفاع الشعار</div>
+                    <NumberInput value={config.logoHeight} min={20} max={150} onChange={v => setConfig(prev => ({ ...prev, logoHeight: v }))} />
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={() => setConfig(prev => ({ ...prev, logoWidth: 80, logoHeight: 30 }))} className="px-2 py-1 border rounded text-sm">صغير</button>
+                      <button onClick={() => setConfig(prev => ({ ...prev, logoWidth: 120, logoHeight: 40 }))} className="px-2 py-1 border rounded text-sm">متوسط</button>
+                      <button onClick={() => setConfig(prev => ({ ...prev, logoWidth: 180, logoHeight: 60 }))} className="px-2 py-1 border rounded text-sm">كبير</button>
+                    </div>
+                    <label className="flex items-center gap-2 mt-2 text-sm"><input type="checkbox" checked={config.showStoreName} onChange={e => setConfig(prev => ({ ...prev, showStoreName: e.target.checked }))} /> إظهار الاسم بجانب الشعار</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-500 mb-2">الفيفيكون</div>
+              <div className="border p-3 rounded flex items-center gap-3">
+                <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'favicon')} />
+                <div className="w-8 h-8 bg-gray-100 flex items-center justify-center">
+                  {config.favicon ? <img src={config.favicon} alt="favicon" width={32} height={32} /> : <div className="text-xs">32x32</div>}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-500 mb-2">الألوان</div>
+              <div className="space-y-3">
+                <div>
+                  <div className="text-sm">اللون الرئيسي <div className="text-xs text-gray-400">الروابط والحدود</div></div>
+                  <AdvancedColorPicker value={config.primaryColor} onChange={v => setConfig(prev => ({ ...prev, primaryColor: v }))} />
+                </div>
+
+                <div>
+                  <div className="text-sm">لون الخلفيات <div className="text-xs text-gray-400">الهيدر والبانر</div></div>
+                  <AdvancedColorPicker value={config.secondaryColor} onChange={v => setConfig(prev => ({ ...prev, secondaryColor: v }))} />
+                </div>
+
+                <div>
+                  <div className="text-sm">لون التمييز <div className="text-xs text-gray-400">النجوم والشارات</div></div>
+                  <AdvancedColorPicker value={config.accentColor} onChange={v => setConfig(prev => ({ ...prev, accentColor: v }))} />
+                </div>
+
+                <div>
+                  <div className="text-sm">لون الأزرار <div className="text-xs text-gray-400">خلفية الأزرار الرئيسية</div></div>
+                  <AdvancedColorPicker value={config.buttonColor} onChange={v => setConfig(prev => ({ ...prev, buttonColor: v }))} />
+                </div>
+
+                <div>
+                  <div className="text-sm">لون العناوين <div className="text-xs text-gray-400">عناوين المنتجات والأقسام</div></div>
+                  <AdvancedColorPicker value={config.headingColor} onChange={v => setConfig(prev => ({ ...prev, headingColor: v }))} />
+                </div>
+
+                <div>
+                  <div className="text-sm">لون النصوص <div className="text-xs text-gray-400">نصوص الوصف والتفاصيل</div></div>
+                  <AdvancedColorPicker value={config.textColor} onChange={v => setConfig(prev => ({ ...prev, textColor: v }))} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-500 mb-2">الزوايا</div>
+              <div className="border p-3 rounded">
+                <NumberInput value={parseInt(config.borderRadius || '0')} min={0} max={40} onChange={v => setConfig(prev => ({ ...prev, borderRadius: `${v}px` }))} suffix="px" />
+                <div className="flex gap-2 mt-3">
+                  {[{ value: '0px', label: 'حاد' }, { value: '8px', label: 'خفيف' }, { value: '16px', label: 'متوسط' }, { value: '20px', label: 'افتراضي' }, { value: '32px', label: 'دائري' }, { value: '9999px', label: 'كامل' }].map(opt => (
+                    <button key={opt.value} onClick={() => setConfig(prev => ({ ...prev, borderRadius: opt.value }))} className="p-2 border rounded flex items-center gap-2">
+                      <div style={{ width: 36, height: 18, borderRadius: opt.value, background: '#eee' }} />
+                      <div className="text-xs">{opt.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-500 mb-2">الخط</div>
+              <select value={config.fontFamily} onChange={e => setConfig(prev => ({ ...prev, fontFamily: e.target.value }))} className="w-full mt-1 px-3 py-2 border rounded-lg">
+                <option value="'Cairo', sans-serif">Cairo</option>
+                <option value="'Tajawal', sans-serif">Tajawal</option>
+                <option value="'Noto Sans Arabic', sans-serif">Noto Sans Arabic</option>
+                <option value="'Inter', sans-serif">Inter</option>
+                <option value="'Poppins', sans-serif">Poppins</option>
+              </select>
+              <div className="mt-3 p-3 border rounded" style={{ fontFamily: config.fontFamily }}>
+                مرحبياً بكم في متجرنا – Welcome
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Favicon */}
-        <div className="col-span-2">
-          <Label>فيفيكون المتجر</Label>
-          <input type="file" accept="image/*" onChange={handleFaviconFile} className="mt-2" />
-          {isUploadingFavicon && <div className="text-sm text-gray-500 mt-2">جاري رفع الفيفيكون...</div>}
-          <div className="mt-2">
-            { (faviconPreview || favicon) && !faviconError ? (
-              <img src={faviconPreview ?? favicon ?? ''} alt="favicon" width={32} height={32} onError={() => setFaviconError(true)} />
-            ) : (
-              <div className="text-xs text-gray-500">معاينة الفيفيكون</div>
-            )}
+          <div className="sticky bottom-0 bg-white p-4 border-t">
+            <button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 text-white py-2 rounded">
+              {isSaving ? 'جاري الحفظ...' : 'حفظ الهوية البصرية'}
+            </button>
           </div>
-        </div>
+        </aside>
 
-        {/* Colors */}
-        <div>
-          <Label>اللون الرئيسي — الأزرار والروابط</Label>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }} className="mt-1">
-            <input type="color" value={primaryColor} onChange={e => setPrimaryColor(e.target.value)} className="w-12 h-10 rounded" />
-            <Input value={primaryColor} onChange={e => setPrimaryColor(e.target.value)} />
-          </div>
-        </div>
-
-        <div>
-          <Label>اللون الثانوي — الخلفيات</Label>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }} className="mt-1">
-            <input type="color" value={secondaryColor} onChange={e => setSecondaryColor(e.target.value)} className="w-12 h-10 rounded" />
-            <Input value={secondaryColor} onChange={e => setSecondaryColor(e.target.value)} />
-          </div>
-        </div>
-
-        <div>
-          <Label>لون التمييز — النجوم والشارات</Label>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }} className="mt-1">
-            <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)} className="w-12 h-10 rounded" />
-            <Input value={accentColor} onChange={e => setAccentColor(e.target.value)} />
-          </div>
-        </div>
-
-        {/* Font */}
-        <div>
-          <Label>الخط</Label>
-          <select value={fontFamily} onChange={e => setFontFamily(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-lg">
-            <option value="'Cairo', sans-serif">Cairo — عربي</option>
-            <option value="'Tajawal', sans-serif">Tajawal — عربي</option>
-            <option value="'Noto Sans Arabic', sans-serif">Noto Sans Arabic</option>
-            <option value="'Inter', sans-serif">Inter — إنجليزي</option>
-            <option value="'Poppins', sans-serif">Poppins — إنجليزي</option>
-          </select>
-          <div className="mt-3 p-3 border rounded" style={{ fontFamily }}>
-            مرحباً بكم في متجرنا — Welcome
-          </div>
-        </div>
-
-        {/* Border radius */}
-        <div className="col-span-2">
-          <Label>الزوايا</Label>
-          <div className="flex gap-3 mt-2">
-            {borderOptions.map(opt => (
-              <button key={opt.value} onClick={() => setBorderRadius(opt.value)} className={`p-3 border ${borderRadius === opt.value ? 'ring-2 ring-offset-1' : ''}`}>
-                <div style={{ width: 48, height: 24, borderRadius: opt.value, background: '#eee' }}></div>
-                <div className="text-xs mt-1">{opt.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Live preview */}
-        <div className="col-span-2">
-          <Label>معاينة مباشرة</Label>
-          <div className="mt-2 p-6" style={{ background: primaryColor, borderRadius, fontFamily }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {logo && !logoError ? (
-                <img src={logo} alt="preview logo" width={logoWidth} height={logoHeight} style={{ objectFit: 'contain' }} onError={() => setLogoError(true)} />
-              ) : (
-                <div style={{ color: 'white', fontWeight: 800, fontSize: 20 }}>{data?.store.name}</div>
-              )}
-              <button style={{ background: secondaryColor, color: 'white', padding: '8px 16px', borderRadius }} className="ml-auto">زر تجريبي</button>
-            </div>
-            <p className="text-white/70 mt-4">نص تجريبي يظهر بالخط المختار</p>
-          </div>
-        </div>
-
-      </div>
-
-      <div className="mt-6 flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-accent text-black hover:bg-accent/90">
-          {isSaving ? 'جاري الحفظ...' : 'حفظ الهوية البصرية'}
-        </Button>
+        
+        
       </div>
     </Card>
-  );
-};
+  )
+}
 
 export default function Themes() {
   return (
