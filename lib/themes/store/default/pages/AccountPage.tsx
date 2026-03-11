@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Package, MapPin, CreditCard, Heart, Settings, LogOut, ShoppingBag } from 'lucide-react'
 import { ThemeTokens, StoreProduct } from '../../types'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/lib/store/hooks'
+import { useAppSelector } from '@/lib/store/hooks'
 import { clearUser } from '@/lib/store/slices/authSlice'
 import {
   useGetCustomerMeQuery,
@@ -30,6 +31,21 @@ export default function AccountPage({ theme, products }: Props) {
   const dispatch = useAppDispatch()
   const router = useRouter()
   const pathname = usePathname()
+  const user = useAppSelector((s: any) => s.auth.user)
+
+  const storeBase = (() => {
+    if (!pathname) return '/'
+    const parts = pathname.split('/').filter(Boolean)
+    const idx = parts.indexOf('store')
+    if (idx !== -1 && parts.length > idx + 1) return `/store/${parts[idx + 1]}`
+    return '/'
+  })()
+
+  useEffect(() => {
+    if (!user) {
+      router.push(`${storeBase}/login`)
+    }
+  }, [user, router, storeBase])
 
   const { data: profile } = useGetCustomerMeQuery()
   const { data: orders } = useGetOrdersQuery()
@@ -46,13 +62,6 @@ export default function AccountPage({ theme, products }: Props) {
 
   const [logoutMutation] = useCustomerLogoutMutation()
 
-  const storeBase = (() => {
-    if (!pathname) return '/'
-    const parts = pathname.split('/').filter(Boolean)
-    const idx = parts.indexOf('store')
-    if (idx !== -1 && parts.length > idx + 1) return `/store/${parts[idx + 1]}`
-    return '/'
-  })()
 
   const handleLogout = async () => {
     try {
