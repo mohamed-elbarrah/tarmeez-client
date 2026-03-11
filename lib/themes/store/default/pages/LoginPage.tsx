@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Github, Chrome } from 'lucide-react'
 import { useCustomerLoginMutation } from '@/lib/services/authApi'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -11,10 +12,7 @@ export default function LoginPage({ storeData, storeSlug }: { storeData: StoreDa
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [phone, setPhone] = useState('')
+  const { register, handleSubmit } = useForm()
   const [error, setError] = useState<string | null>(null)
 
   const [login, { isLoading: isLoggingIn }] = useCustomerLoginMutation()
@@ -29,10 +27,9 @@ export default function LoginPage({ storeData, storeSlug }: { storeData: StoreDa
     ['--radius' as any]: storeData?.borderRadius ?? tokens.borderRadius,
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleLogin = async (data: any) => {
     try {
-      await login({ email, password, storeSlug: storeSlug ?? storeData.slug }).unwrap()
+      await login({ email: data.email, password: data.password, storeSlug: storeSlug ?? storeData.slug }).unwrap()
       const redirect = searchParams?.get('redirect') ?? `/store/${storeSlug ?? storeData.slug}`
       router.push(redirect)
     } catch (err: any) {
@@ -40,7 +37,7 @@ export default function LoginPage({ storeData, storeSlug }: { storeData: StoreDa
     }
   }
 
-  const InputField = ({ label, type, icon: Icon, placeholder, value, onChange }: any) => (
+  const InputField = ({ label, type, icon: Icon, placeholder, inputProps }: any) => (
     <div className="space-y-2">
       <label className="text-sm font-bold text-slate-700 pr-1">{label}</label>
       <div className="relative group">
@@ -48,10 +45,9 @@ export default function LoginPage({ storeData, storeSlug }: { storeData: StoreDa
           <Icon size={18} />
         </div>
         <input 
+          {...inputProps}
           type={type === 'password' && showPassword ? 'text' : type}
           placeholder={placeholder}
-          value={value}
-          onChange={onChange}
           className="w-full pr-12 pl-4 py-3.5 bg-slate-50 border border-slate-100 rounded-[var(--radius)] outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-[var(--p-color)] transition-all text-sm font-medium"
           style={{ borderRadius: 'var(--radius)' }}
         />
@@ -82,13 +78,13 @@ export default function LoginPage({ storeData, storeSlug }: { storeData: StoreDa
             <p className="text-slate-400 text-xs font-bold">{isLogin ? 'أهلاً بك مجدداً، يسعدنا رؤيتك!' : 'انضم إلينا واستمتع بتجربة تسوق فريدة'}</p>
           </div>
 
-          <form className="space-y-5" onSubmit={handleLogin}>
+          <form className="space-y-5" onSubmit={handleSubmit(handleLogin)}>
             {!isLogin && (
-              <InputField label="الاسم الكامل" type="text" icon={User} placeholder="مثال: محمد علي" value={fullName} onChange={(e: any) => setFullName(e.target.value)} />
+              <InputField label="الاسم الكامل" type="text" icon={User} placeholder="مثال: محمد علي" inputProps={register('fullName')} />
             )}
-            <InputField label="البريد الإلكتروني" type="email" icon={Mail} placeholder="name@example.com" value={email} onChange={(e: any) => setEmail(e.target.value)} />
+            <InputField label="البريد الإلكتروني" type="email" icon={Mail} placeholder="name@example.com" inputProps={register('email')} />
             <div className="space-y-1">
-              <InputField label="كلمة المرور" type="password" icon={Lock} placeholder="••••••••" value={password} onChange={(e: any) => setPassword(e.target.value)} />
+              <InputField label="كلمة المرور" type="password" icon={Lock} placeholder="••••••••" inputProps={register('password')} />
               {isLogin && (
                 <div className="flex justify-end">
                   <button type="button" className="text-xs font-bold text-blue-600 hover:underline">نسيت كلمة المرور؟</button>
