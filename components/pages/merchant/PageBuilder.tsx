@@ -20,9 +20,9 @@ function DraggableSection({ type }: { type: typeof SECTION_TYPES[0] }) {
     }),
   }));
 
-  return (
+    return (
     <div
-      ref={drag}
+      ref={drag as any}
       className={`p-4 bg-white border-2 border-dashed border-border rounded-lg cursor-move hover:border-accent transition-colors ${
         isDragging ? "opacity-50" : ""
       }`}
@@ -44,9 +44,9 @@ function Canvas() {
     }),
   }));
 
-  return (
+    return (
     <div
-      ref={drop}
+      ref={drop as any}
       className={`min-h-[600px] bg-white border-2 border-dashed rounded-lg p-8 ${
         isOver ? "border-accent bg-accent/5" : "border-border"
       }`}

@@ -67,7 +67,7 @@ export default function HeroSection() {
                       },
                     },
                   },
-                }}
+                } as any}
                 className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 lg:top-32"
               >
                 <Image
@@ -86,7 +86,7 @@ export default function HeroSection() {
 
               <div className="mx-auto max-w-7xl px-6">
                 <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-                  <AnimatedGroup variants={transitionVariants}>
+                  <AnimatedGroup variants={transitionVariants as any}>
                     <Link
                       href="#link"
                       className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border py-1 px-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
@@ -140,7 +140,7 @@ export default function HeroSection() {
                         },
                       },
                       ...transitionVariants,
-                    }}
+                    } as any}
                     className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row"
                   >
                     <div
@@ -183,7 +183,7 @@ export default function HeroSection() {
                     },
                   },
                   ...transitionVariants,
-                }}
+                } as any}
               >
                 <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
                   <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">

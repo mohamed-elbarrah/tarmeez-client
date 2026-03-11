@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogTrigger, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
-const statusMap: Record<string, { label: string; variant: 'default' | 'destructive' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'default' },> = {
+const statusMap: Record<string, { label: string; variant: 'default' | 'destructive' | 'secondary' | 'outline' | 'ghost' | 'link' }> = {
   PENDING: { label: 'قيد الانتظار', variant: 'secondary' },
   ACTIVE: { label: 'مفعّل', variant: 'default' },
   REJECTED: { label: 'مرفوض', variant: 'destructive' },

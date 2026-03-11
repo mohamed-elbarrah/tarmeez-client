@@ -51,7 +51,7 @@ export default function ProductEditor() {
         status,
         images,
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      }).unwrap();
+      } as any).unwrap();
 
       router.push("/merchant/products");
     } catch (err) {
