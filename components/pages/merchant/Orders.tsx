@@ -1,21 +1,56 @@
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Download, Eye } from "lucide-react";
+import { Search, Filter, Download, Eye, Loader2 } from "lucide-react";
+import { useGetOrdersQuery } from "@/lib/services/merchantApi";
 
-const orders = [
-  { id: "#1234", customer: "أحمد محمد", email: "ahmad@example.com", amount: "450 ر.س", items: 3, status: "مكتمل", date: "6 مارس 2026" },
-  { id: "#1233", customer: "فاطمة علي", email: "fatima@example.com", amount: "320 ر.س", items: 2, status: "قيد التوصيل", date: "6 مارس 2026" },
-  { id: "#1232", customer: "محمد خالد", email: "mohammed@example.com", amount: "680 ر.س", items: 5, status: "قيد المعالجة", date: "5 مارس 2026" },
-  { id: "#1231", customer: "سارة أحمد", email: "sarah@example.com", amount: "290 ر.س", items: 1, status: "مكتمل", date: "5 مارس 2026" },
-  { id: "#1230", customer: "خالد عمر", email: "khalid@example.com", amount: "540 ر.س", items: 4, status: "مكتمل", date: "5 مارس 2026" },
-  { id: "#1229", customer: "نورة سعيد", email: "noura@example.com", amount: "380 ر.س", items: 2, status: "ملغي", date: "4 مارس 2026" },
-  { id: "#1228", customer: "عبدالله حسن", email: "abdullah@example.com", amount: "720 ر.س", items: 6, status: "مكتمل", date: "4 مارس 2026" },
-  { id: "#1227", customer: "مريم عمر", email: "mariam@example.com", amount: "410 ر.س", items: 3, status: "قيد التوصيل", date: "4 مارس 2026" },
-];
+const statusTranslations: Record<string, { label: string, color: string }> = {
+  PENDING: { label: "قيد الانتظار", color: "bg-yellow-50 text-yellow-700" },
+  CONFIRMED: { label: "مؤكد", color: "bg-blue-50 text-blue-700" },
+  PROCESSING: { label: "قيد المعالجة", color: "bg-yellow-50 text-yellow-700" },
+  SHIPPED: { label: "قيد التوصيل", color: "bg-blue-50 text-blue-700" },
+  DELIVERED: { label: "مكتمل", color: "bg-accent/10 text-black" },
+  CANCELLED: { label: "ملغي", color: "bg-red-50 text-red-700" },
+  REFUNDED: { label: "مسترجع", color: "bg-gray-100 text-gray-700" },
+};
+
+const formatDate = (dateString: string) => {
+  const d = new Date(dateString);
+  const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+};
 
 export default function Orders() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isError } = useGetOrdersQuery({
+    page: currentPage,
+    limit: 10,
+    search: debouncedSearch,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-20">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  const items = data?.items || [];
+  const stats = data?.stats || { total: 0, processing: 0, shipping: 0, completed: 0 };
+  const totalRaw = data?.total || 0;
+  const totalPages = Math.ceil(totalRaw / 10);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -33,10 +68,10 @@ export default function Orders() {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: "جميع الطلبات", value: "1,234", color: "bg-blue-500" },
-          { label: "قيد المعالجة", value: "45", color: "bg-yellow-500" },
-          { label: "قيد التوصيل", value: "28", color: "bg-purple-500" },
-          { label: "مكتمل", value: "1,161", color: "bg-accent" },
+          { label: "جميع الطلبات", value: stats.total.toLocaleString(), color: "bg-blue-500" },
+          { label: "قيد المعالجة", value: stats.processing.toLocaleString(), color: "bg-yellow-500" },
+          { label: "قيد التوصيل", value: stats.shipping.toLocaleString(), color: "bg-purple-500" },
+          { label: "مكتمل", value: stats.completed.toLocaleString(), color: "bg-accent" },
         ].map((stat, i) => (
           <Card key={i} className="p-4">
             <div className="flex items-center gap-3">
@@ -55,7 +90,15 @@ export default function Orders() {
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input placeholder="بحث بالرقم، العميل، أو البريد الإلكتروني..." className="pr-10" />
+            <Input 
+              placeholder="بحث بالرقم..." 
+              className="pr-10" 
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
           </div>
           <Button variant="outline">
             <Filter className="w-4 h-4 ml-2" />
@@ -80,58 +123,90 @@ export default function Orders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, i) => (
-                <tr key={i} className="border-b border-border hover:bg-secondary/50 transition-colors">
-                  <td className="py-4 px-4">
-                    <Link href={`/merchant/orders/${order.id.replace('#', '')}`} className="font-medium hover:text-accent">
-                      {order.id}
-                    </Link>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div>
-                      <div className="font-medium">{order.customer}</div>
-                      <div className="text-sm text-muted-foreground">{order.email}</div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4 text-muted-foreground">{order.items} منتج</td>
-                  <td className="py-4 px-4 font-medium">{order.amount}</td>
-                  <td className="py-4 px-4">
-                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                      order.status === "مكتمل" ? "bg-accent/10 text-black" :
-                      order.status === "قيد التوصيل" ? "bg-blue-50 text-blue-700" :
-                      order.status === "قيد المعالجة" ? "bg-yellow-50 text-yellow-700" :
-                      "bg-red-50 text-red-700"
-                    }`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-muted-foreground">{order.date}</td>
-                  <td className="py-4 px-4">
-                    <Link href={`/merchant/orders/${order.id.replace('#', '')}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </Link>
+              {items.map((order: any, i: number) => {
+                const status = statusTranslations[order.status] || { label: order.status, color: "bg-gray-100 text-gray-700" };
+                return (
+                  <tr key={i} className="border-b border-border hover:bg-secondary/50 transition-colors">
+                    <td className="py-4 px-4">
+                      <Link href={`/merchant/orders/${order.orderCode}`} className="font-medium hover:text-accent">
+                        #{order.orderCode}
+                      </Link>
+                    </td>
+                    <td className="py-4 px-4">
+                      <div>
+                        <div className="font-medium">{order.customerName}</div>
+                        <div className="text-sm text-muted-foreground">{order.customerEmail}</div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-muted-foreground">{order.items?.length || 0} منتج</td>
+                    <td className="py-4 px-4 font-medium">{Number(order.total).toLocaleString()} ر.س</td>
+                    <td className="py-4 px-4">
+                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>
+                        {status.label}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-muted-foreground">{formatDate(order.createdAt)}</td>
+                    <td className="py-4 px-4">
+                      <Link href={`/merchant/orders/${order.orderCode}`}>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {items.length === 0 && !isLoading && (
+                <tr>
+                  <td colSpan={7} className="text-center py-20 text-muted-foreground">
+                    لا توجد طلبات للعرض
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
-          <div className="text-sm text-muted-foreground">
-            عرض 1 - 8 من 1,234 طلب
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
+            <div className="text-sm text-muted-foreground">
+              عرض {(currentPage - 1) * 10 + 1} - {Math.min(currentPage * 10, totalRaw)} من {totalRaw} طلب
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              >
+                السابق
+              </Button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <Button 
+                    key={pageNum}
+                    variant="outline" 
+                    size="sm" 
+                    className={currentPage === pageNum ? "bg-accent text-black" : ""}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+              <Button 
+                variant="outline" 
+                size="sm"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              >
+                التالي
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">السابق</Button>
-            <Button variant="outline" size="sm" className="bg-accent text-black">1</Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">3</Button>
-            <Button variant="outline" size="sm">التالي</Button>
-          </div>
-        </div>
+        )}
       </Card>
     </div>
   );

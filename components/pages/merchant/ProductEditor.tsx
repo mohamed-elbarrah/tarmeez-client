@@ -1,17 +1,27 @@
-import { useState } from "react";
+'use client'
+import { ArrowRight, Upload, Plus, X, Sparkles, Trash2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { useCreateProductMutation, useGetProductByIdQuery, useUpdateProductMutation } from "@/lib/services/productsApi";
+import { Switch } from "@/components/ui/switch";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Upload, Plus, X, Sparkles } from "lucide-react";
-import { useCreateProductMutation } from "@/lib/services/productsApi";
 
 export default function ProductEditor() {
   const router = useRouter();
-  const [createProduct, { isLoading }] = useCreateProductMutation();
+  const params = useParams();
+  const productId = params?.id as string;
+  
+  const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
+  const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
+  const { data: existingProduct, isLoading: isProductLoading } = useGetProductByIdQuery(productId, { skip: !productId });
+
+  const isLoading = isCreating || isUpdating;
 
   const [form, setForm] = useState({
     name: "",
@@ -32,15 +42,96 @@ export default function ProductEditor() {
   });
 
   const [images, setImages] = useState<string[]>([]);
+  
+  // Variants State
+  const [hasVariants, setHasVariants] = useState(false);
+  const [options, setOptions] = useState<any[]>([
+    { name: "", type: "DROPDOWN", values: [] }
+  ]);
+  const [variants, setVariants] = useState<any[]>([]);
+  const [isVariantsOpen, setIsVariantsOpen] = useState(true);
 
-  const handleCreate = async (status: "ACTIVE" | "DRAFT") => {
+  // Generate variants whenever options or their values change
+  useEffect(() => {
+    if (!hasVariants) return;
+
+    const validOptions = options.filter(opt => opt.name && opt.values.length > 0);
+    if (validOptions.length === 0) {
+      setVariants([]);
+      return;
+    }
+
+    // Cartesian product helper
+    const cartesian = (...a: any[]) => a.reduce((a, b) => a.flatMap((d: any) => b.map((e: any) => [d, e].flat())));
+
+    const optionValues = validOptions.map(opt => opt.values);
+    const combinations = optionValues.length === 1 
+      ? optionValues[0].map((v: any) => [v])
+      : cartesian(...optionValues);
+
+    const newVariants = combinations.map((combo: any[]) => {
+      const existing = variants.find(v => JSON.stringify(v.optionValues) === JSON.stringify(combo));
+      return existing || {
+        optionValues: combo,
+        price: form.price,
+        sku: `${form.sku}-${combo.join("-")}`,
+        quantity: 0,
+        isActive: true
+      };
+    });
+
+    setVariants(newVariants);
+  }, [options, hasVariants]);
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (existingProduct) {
+      setForm({
+        name: existingProduct.name,
+        description: existingProduct.description || "",
+        price: existingProduct.price,
+        comparePrice: existingProduct.comparePrice || 0,
+        cost: existingProduct.cost || 0,
+        sku: existingProduct.sku || "",
+        barcode: existingProduct.barcode || "",
+        quantity: existingProduct.quantity,
+        trackStock: existingProduct.trackStock,
+        weight: existingProduct.weight || 0,
+        isPhysical: existingProduct.isPhysical,
+        category: existingProduct.category || "",
+        tags: existingProduct.tags.join(", "),
+        seoTitle: existingProduct.seoTitle || "",
+        seoDesc: existingProduct.seoDesc || "",
+      });
+      setImages(existingProduct.images);
+      
+      if (existingProduct.options && existingProduct.options.length > 0) {
+        setHasVariants(true);
+        setOptions(existingProduct.options.map((opt: any) => ({
+          name: opt.name,
+          type: opt.type,
+          values: opt.values.map((v: any) => v.value)
+        })));
+        
+        setVariants(existingProduct.variants.map((v: any) => ({
+          optionValues: v.optionValues.map((ov: any) => ov.optionValue.value),
+          price: v.price,
+          sku: v.sku,
+          quantity: v.quantity,
+          isActive: v.isActive
+        })));
+      }
+    }
+  }, [existingProduct]);
+
+  const handleSave = async (status: "ACTIVE" | "DRAFT") => {
     try {
       const slug = form.name
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^\w-]/g, "");
 
-      await createProduct({
+      const payload: any = {
         ...form,
         price: Number(form.price),
         comparePrice: form.comparePrice ? Number(form.comparePrice) : undefined,
@@ -51,14 +142,35 @@ export default function ProductEditor() {
         status,
         images,
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      } as any).unwrap();
+      };
+
+      if (hasVariants) {
+        payload.options = options.filter(opt => opt.name && opt.values.length > 0);
+        payload.variants = variants;
+      }
+
+      if (productId) {
+        await updateProduct({ id: productId, data: payload }).unwrap();
+        toast.success("تم تحديث المنتج بنجاح");
+      } else {
+        await createProduct(payload).unwrap();
+        toast.success("تم إنشاء المنتج بنجاح");
+      }
 
       router.push("/merchant/products");
     } catch (err) {
-      console.error("Failed to create product:", err);
-      // In a real app, show a toast here
+      console.error("Failed to save product:", err);
+      toast.error("حدث خطأ أثناء حفظ المنتج");
     }
   };
+
+  if (isProductLoading) {
+    return (
+      <div className="flex items-center justify-center p-20">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,24 +183,24 @@ export default function ProductEditor() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold mb-1">منتج جديد</h1>
-            <p className="text-muted-foreground">أضف منتج جديد إلى متجرك</p>
+            <h1 className="text-3xl font-bold mb-1">{productId ? "تعديل منتج" : "منتج جديد"}</h1>
+            <p className="text-muted-foreground">{productId ? "تعديل بيانات المنتج الموجود" : "أضف منتج جديد إلى متجرك"}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             disabled={isLoading}
-            onClick={() => handleCreate("DRAFT")}
+            onClick={() => handleSave("DRAFT")}
           >
             {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
           </Button>
           <Button
             className="bg-accent text-black hover:bg-accent/90"
             disabled={isLoading}
-            onClick={() => handleCreate("ACTIVE")}
+            onClick={() => handleSave("ACTIVE")}
           >
-            {isLoading ? "جاري النشر..." : "نشر المنتج"}
+            {isLoading ? "جاري النشر..." : productId ? "تحديث المنتج" : "نشر المنتج"}
           </Button>
         </div>
       </div>
@@ -167,6 +279,182 @@ export default function ProductEditor() {
                 <span className="text-xs">رابط صورة</span>
               </div>
             </div>
+          </Card>
+
+          {/* Variants Card */}
+          <Card className="overflow-hidden">
+            <div className="p-6 flex items-center justify-between border-b cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setIsVariantsOpen(!isVariantsOpen)}>
+              <div className="flex items-center gap-3">
+                <Switch 
+                  id="variants-toggle" 
+                  checked={hasVariants} 
+                  onCheckedChange={setHasVariants}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <h3 className="text-lg font-bold">المتغيرات</h3>
+              </div>
+              <Button variant="ghost" size="icon">
+                {isVariantsOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              </Button>
+            </div>
+
+            {hasVariants && isVariantsOpen && (
+              <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                {/* Options List */}
+                <div className="space-y-6">
+                  {options.map((opt, optIdx) => (
+                    <div key={optIdx} className="p-4 bg-muted/30 rounded-lg border border-dashed relative group">
+                      <button 
+                         onClick={() => setOptions(options.filter((_, i) => i !== optIdx))}
+                         className="absolute -top-2 -left-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <Label>اسم الخيار</Label>
+                          <Input 
+                            placeholder="مثال: الحجم، اللون..." 
+                            value={opt.name}
+                            onChange={(e) => {
+                              const newOpts = [...options];
+                              newOpts[optIdx].name = e.target.value;
+                              setOptions(newOpts);
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <Label>النوع</Label>
+                          <select 
+                            className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm"
+                            value={opt.type}
+                            onChange={(e) => {
+                              const newOpts = [...options];
+                              newOpts[optIdx].type = e.target.value;
+                              setOptions(newOpts);
+                            }}
+                          >
+                            <option value="DROPDOWN">قائمة منسدلة</option>
+                            <option value="BUTTONS">أزرار نصية</option>
+                            <option value="COLORS">أزرار قائمة على اللون</option>
+                            <option value="RADIO">أزرار الراديو</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label>القيم</Label>
+                        <div className="flex flex-wrap gap-2 p-2 min-h-[42px] border rounded-md bg-background focus-within:ring-2 ring-accent/30 transition-all">
+                          {opt.values.map((val: string, valIdx: number) => (
+                            <span key={valIdx} className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 border border-accent/20 rounded text-sm">
+                              {val}
+                              <X 
+                                className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                                onClick={() => {
+                                  const newOpts = [...options];
+                                  newOpts[optIdx].values = newOpts[optIdx].values.filter((_: any, i: number) => i !== valIdx);
+                                  setOptions(newOpts);
+                                }}
+                              />
+                            </span>
+                          ))}
+                          <input 
+                            className="flex-1 bg-transparent border-none outline-none text-sm min-w-[120px]"
+                            placeholder="اكتب القيمة ثم اضغط Enter..."
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const val = e.currentTarget.value.trim();
+                                if (val && !opt.values.includes(val)) {
+                                  const newOpts = [...options];
+                                  newOpts[optIdx].values = [...opt.values, val];
+                                  setOptions(newOpts);
+                                  e.currentTarget.value = '';
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-dashed"
+                    onClick={() => setOptions([...options, { name: "", type: "DROPDOWN", values: [] }])}
+                    disabled={options.length >= 3}
+                  >
+                    <Plus className="w-4 h-4 ml-2" />
+                    أضف خيارًا آخر
+                  </Button>
+                </div>
+
+                {/* Variants List */}
+                {variants.length > 0 && (
+                  <div className="pt-6 border-t">
+                    <h4 className="font-bold mb-4">قائمة المتغيرات ({variants.length})</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="text-right text-sm text-muted-foreground border-b">
+                            <th className="pb-2 font-medium">المتغير</th>
+                            <th className="pb-2 font-medium w-32">السعر</th>
+                            <th className="pb-2 font-medium w-24">الكمية</th>
+                            <th className="pb-2 font-medium w-40">SKU</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {variants.map((variant, idx) => (
+                            <tr key={idx} className="group">
+                              <td className="py-3 pr-2">
+                                <span className="font-medium">{variant.optionValues.join(" / ")}</span>
+                              </td>
+                              <td className="py-3 px-2">
+                                <Input 
+                                  type="number" 
+                                  className="h-8" 
+                                  value={variant.price}
+                                  onChange={(e) => {
+                                    const newVars = [...variants];
+                                    newVars[idx].price = Number(e.target.value);
+                                    setVariants(newVars);
+                                  }}
+                                />
+                              </td>
+                              <td className="py-3 px-2">
+                                <Input 
+                                  type="number" 
+                                  className="h-8" 
+                                  value={variant.quantity}
+                                  onChange={(e) => {
+                                    const newVars = [...variants];
+                                    newVars[idx].quantity = Number(e.target.value);
+                                    setVariants(newVars);
+                                  }}
+                                />
+                              </td>
+                              <td className="py-3 pl-2">
+                                <Input 
+                                  className="h-8" 
+                                  value={variant.sku}
+                                  onChange={(e) => {
+                                    const newVars = [...variants];
+                                    newVars[idx].sku = e.target.value;
+                                    setVariants(newVars);
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
 
           {/* SEO */}

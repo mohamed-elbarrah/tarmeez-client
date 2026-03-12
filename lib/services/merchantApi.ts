@@ -40,6 +40,13 @@ export const merchantApi = createApi({
   }),
 })
 
-export const { useGetMyStoreQuery, useGetCustomersQuery, useUpdateCustomerStatusMutation } = merchantApi
+export const { 
+  useGetMyStoreQuery, 
+  useGetCustomersQuery, 
+  useUpdateCustomerStatusMutation,
+  useGetOrdersQuery,
+  useGetOrderByCodeQuery,
+  useUpdateOrderStatusMutation
+} = merchantApi
 
 export default merchantApi

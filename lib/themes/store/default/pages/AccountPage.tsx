@@ -103,7 +103,7 @@ export default function AccountPage({ theme, products }: Props) {
       <div className="flex-grow space-y-8">
         <div className="flex items-center justify-between">
            <h2 className="text-3xl font-black">طلباتك</h2>
-           <div className="text-xs font-bold text-gray-400">عرض أخر 6 أشهر</div>
+           
         </div>
 
         {active === 'orders' && (
