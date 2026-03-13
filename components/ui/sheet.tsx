@@ -71,6 +71,7 @@ function SheetContent({
             "inset-x-0 bottom-0 h-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
           className
         )}
+        style={{ fontFamily: 'inherit' }}
         {...props}
       >
         {children}
@@ -135,6 +136,7 @@ export {
   Sheet,
   SheetTrigger,
   SheetClose,
+  SheetPortal,
   SheetContent,
   SheetHeader,
   SheetFooter,

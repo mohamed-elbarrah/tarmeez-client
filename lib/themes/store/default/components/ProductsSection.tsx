@@ -19,7 +19,7 @@ export default function ProductsSection({ theme, products, storeSlug }: Props) {
         </div>
         <Link href={`/store/${storeSlug}/products`} className="text-sm font-bold text-[var(--p-color)]">عرض المزيد</Link>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
         {products.slice(0, 5).map(p => (
           <ProductCard key={p.id} product={p} theme={theme} storeSlug={storeSlug} />
         ))}
