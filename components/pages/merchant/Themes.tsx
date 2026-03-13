@@ -352,7 +352,7 @@ export default function Themes() {
         <p className="text-muted-foreground">اختر قالب احترافي لمتجرك</p>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2">
         {["الكل", "أزياء", "إلكترونيات", "طعام", "رياضة"].map((cat, i) => (
           <Button
             key={i}

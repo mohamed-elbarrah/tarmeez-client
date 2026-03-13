@@ -91,7 +91,7 @@ export default function OrderDetails() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Link href="/merchant/orders">
             <Button variant="ghost" size="icon">
               <ArrowRight className="w-5 h-5" />
@@ -128,7 +128,7 @@ export default function OrderDetails() {
             <h3 className="text-lg font-bold mb-4">المنتجات</h3>
             <div className="space-y-4">
               {order.items.map((item: any, i: number) => (
-                <div key={i} className="flex items-center gap-4 pb-4 border-b border-border last:border-0">
+                <div key={i} className="flex items-center gap-2 pb-4 border-b border-border last:border-0">
                   <div className="w-16 h-16 bg-secondary rounded-lg border border-border overflow-hidden flex items-center justify-center">
                     {item.productImage ? (
                       <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover" />
@@ -179,7 +179,7 @@ export default function OrderDetails() {
               }).reverse().map((statusKey, i) => {
                 const config = statusConfig[statusKey];
                 return (
-                  <div key={i} className="flex gap-4">
+                  <div key={i} className="flex gap-2">
                     <div className="flex flex-col items-center">
                       <div className={`w-3 h-3 rounded-full ${i === 0 ? "bg-accent" : "bg-secondary"}`}></div>
                       {i < 4 && <div className="w-0.5 h-12 bg-secondary"></div>}

@@ -48,7 +48,7 @@ export default function LandingPage() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             منصة شاملة لإنشاء وإدارة المتاجر الإلكترونية مع تحليلات متقدمة وتوصيات ذكية لزيادة مبيعاتك
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <Link href="/signup">
               <Button size="lg" className="bg-accent text-black hover:bg-accent/90 text-lg px-8 py-6">
                 ابدأ متجرك الآن
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 <h3 className="text-sm text-muted-foreground mb-2">لوحة التحكم</h3>
                 <h2 className="text-2xl font-bold">نظرة عامة على متجرك</h2>
               </div>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-4 gap-2">
                 {[
                   { label: "الإيرادات", value: "45,231 ر.س", change: "+12.5%" },
                   { label: "الطلبات", value: "1,234", change: "+8.2%" },

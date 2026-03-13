@@ -25,7 +25,7 @@ export default function Team() {
             { name: "سارة أحمد", email: "sarah@example.com", role: "محرر", status: "معلق" },
           ].map((member, i) => (
             <div key={i} className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
                   <span className="font-bold text-black text-lg">{member.name[0]}</span>
                 </div>
@@ -37,7 +37,7 @@ export default function Team() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <div className="text-left">
                   <div className="text-sm text-muted-foreground mb-1">الدور</div>
                   <div className="font-medium">{member.role}</div>

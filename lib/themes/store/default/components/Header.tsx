@@ -29,26 +29,39 @@ export default function Header({ storeSlug, storeName, logo, theme }: Props) {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="bg-gray-900 text-white py-2 px-8 flex justify-between items-center text-[10px] md:text-xs">
+      <div 
+        className="py-2 px-8 flex justify-between items-center text-[10px] md:text-xs text-white"
+        style={{ backgroundColor: 'var(--s-color)' }}
+      >
         <span className="flex items-center gap-1 opacity-80"><Truck size={14} /> شحن مجاني للطلبات فوق 200 ريال</span>
         <div className="flex gap-6 opacity-80 font-bold"><span>المساعدة</span></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
-        <Link href={`/store/${storeSlug}`} className="flex items-center gap-4 cursor-pointer">
-          {logo && !logoError ? (
+        <Link href={`/store/${storeSlug}`} className="flex items-center gap-2 cursor-pointer">
+          {logo && !logoError && (
             <img
               src={logo}
               width={theme.logoWidth}
               height={theme.logoHeight}
-              style={{ objectFit: 'contain' }}
+              style={{ 
+                objectFit: 'contain',
+                maxWidth: theme.logoWidth,
+                maxHeight: theme.logoHeight
+              }}
               alt={storeName || 'logo'}
               onError={() => setLogoError(true)}
               className="block"
             />
-          ) : null}
+          )}
 
           { ( (!logo || logoError) || theme.showStoreName ) && (
-            <span style={{ fontFamily: theme.fontFamily }} className="text-3xl font-black text-[var(--p-color)]">
+            <span 
+              style={{ 
+                fontFamily: theme.fontFamily,
+                color: 'var(--p-color)'
+              }} 
+              className="text-2xl md:text-3xl font-black transition-colors"
+            >
               {storeName || 'E-mox'}
             </span>
           )}
@@ -59,7 +72,8 @@ export default function Header({ storeSlug, storeName, logo, theme }: Props) {
             placeholder="ما الذي تبحث عنه اليوم؟"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-100 border-none rounded-full py-2.5 px-12 text-sm focus:ring-2 focus:ring-[var(--p-color)] outline-none"
+            className="w-full bg-gray-100 border-none py-2.5 px-12 text-sm focus:ring-2 focus:ring-[var(--p-color)] outline-none"
+            style={{ borderRadius: 'var(--radius)' }}
           />
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
         </form>
@@ -69,7 +83,14 @@ export default function Header({ storeSlug, storeName, logo, theme }: Props) {
           </Link>
           <Link href={`/store/${storeSlug}/cart`} className="relative cursor-pointer text-gray-700 flex flex-col items-center hover:text-[var(--p-color)] transition-colors">
             <ShoppingCart size={22} /><span className="text-[10px] mt-1 font-bold">السلة</span>
-            {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[var(--p-color)] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>}
+            {cartCount > 0 && (
+              <span 
+                className="absolute -top-1 -right-1 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold border-2 border-white"
+                style={{ backgroundColor: 'var(--p-color)' }}
+              >
+                {cartCount}
+              </span>
+            )}
           </Link>
         </div>
       </div>

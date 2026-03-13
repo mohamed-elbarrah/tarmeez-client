@@ -6,7 +6,7 @@ import { ArrowRight, Mail, Phone, MapPin, ShoppingCart } from "lucide-react";
 export default function CustomerProfile() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <Link href="/merchant/customers">
           <Button variant="ghost" size="icon">
             <ArrowRight className="w-5 h-5" />

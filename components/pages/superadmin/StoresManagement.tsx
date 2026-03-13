@@ -11,7 +11,7 @@ export default function StoresManagement() {
         <p className="text-muted-foreground">عرض وإدارة جميع المتاجر</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: "إجمالي المتاجر", value: "1,847" },
           { label: "نشط", value: "1,692" },
@@ -26,7 +26,7 @@ export default function StoresManagement() {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="بحث عن متجر..." className="pr-10" />

@@ -29,15 +29,6 @@ export default async function CheckoutLayout({
 
     return (
         <div style={cssVars} dir="rtl" className="min-h-screen bg-gray-50">
-            <nav className="bg-white border-b py-4 px-8 flex justify-between items-center">
-                <span style={{ color: 'var(--p-color)' }} className="font-black text-xl">
-                    {store.name}
-                </span>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <ShieldCheck size={14} className="text-green-500" />
-                    خروج آمن
-                </div>
-            </nav>
             <main>{children}</main>
         </div>
     );

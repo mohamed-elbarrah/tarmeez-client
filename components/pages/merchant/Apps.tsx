@@ -10,7 +10,7 @@ export default function Apps() {
         <p className="text-muted-foreground">وسّع إمكانيات متجرك</p>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-2">
         {["الكل", "المثبتة", "التسويق", "المبيعات", "الشحن"].map((tab, i) => (
           <Button key={i} variant={i === 0 ? "default" : "outline"}
             className={i === 0 ? "bg-accent text-black hover:bg-accent/90" : ""}>
@@ -29,7 +29,7 @@ export default function Apps() {
           { name: "Live Chat", category: "دعم", rating: 4.8, installs: "2.7k", price: "149 ر.س/شهر" },
         ].map((app, i) => (
           <Card key={i} className="p-6">
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex items-start gap-2 mb-4">
               <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center">
                 <Plus className="w-8 h-8" />
               </div>
@@ -38,7 +38,7 @@ export default function Apps() {
                 <p className="text-sm text-muted-foreground">{app.category}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 mb-4 text-sm">
+            <div className="flex items-center gap-2 mb-4 text-sm">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 fill-accent text-accent" />
                 <span className="font-medium">{app.rating}</span>

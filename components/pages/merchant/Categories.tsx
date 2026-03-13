@@ -113,7 +113,7 @@ export default function Categories() {
             <h3 className="text-lg font-bold">{editingId ? "تعديل الفئة" : "فئة جديدة"}</h3>
             <button onClick={resetForm}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
               <Label>اسم الفئة</Label>
               <Input

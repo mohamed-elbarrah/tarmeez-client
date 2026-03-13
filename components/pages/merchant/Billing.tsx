@@ -21,7 +21,7 @@ export default function Billing() {
             <div className="text-sm text-muted-foreground">شهرياً</div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-2 mb-6">
           {[
             "منتجات غير محدودة",
             "تحليلات متقدمة",

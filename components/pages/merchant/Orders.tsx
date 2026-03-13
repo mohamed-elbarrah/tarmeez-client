@@ -66,7 +66,7 @@ export default function Orders() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: "جميع الطلبات", value: stats.total.toLocaleString(), color: "bg-blue-500" },
           { label: "قيد المعالجة", value: stats.processing.toLocaleString(), color: "bg-yellow-500" },
@@ -87,7 +87,7 @@ export default function Orders() {
 
       {/* Filters */}
       <Card className="p-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <div className="flex-1 relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input 

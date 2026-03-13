@@ -25,7 +25,7 @@ export default function Support() {
         />
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { icon: BookOpen, label: "مركز المساعدة", count: "234 مقال" },
           { icon: Video, label: "فيديوهات تعليمية", count: "56 فيديو" },

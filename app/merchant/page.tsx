@@ -32,7 +32,7 @@ export default function MerchantPage() {
         <CardHeader>
           <CardTitle>مرحباً {merchant.fullName} 👋</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-2">
           <div className="text-sm text-muted-foreground">متجرك: <strong>{store.name}</strong></div>
           <div className="flex gap-3">
             <Button asChild>

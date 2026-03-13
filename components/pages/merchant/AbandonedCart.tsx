@@ -10,7 +10,7 @@ export default function AbandonedCart() {
         <p className="text-muted-foreground">استرجاع العربات المتروكة</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2">
         {[
           { label: "سلات مهجورة", value: "45" },
           { label: "قيمة محتملة", value: "12,340 ر.س" },

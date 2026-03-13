@@ -35,30 +35,51 @@ export default function ProductCard({ product, theme, storeSlug }: Props) {
   }
   
   return (
-    <div className="group bg-white p-4 rounded-3xl border border-gray-100 hover:shadow-2xl transition-all relative flex flex-col h-full">
+    <div 
+      className="group bg-white p-4 border border-gray-100 hover:shadow-2xl transition-all relative flex flex-col h-full"
+      style={{ borderRadius: 'var(--radius)' }}
+    >
       <Link href={productUrl} className="flex flex-col h-full">
-        <div className="aspect-square mb-4 overflow-hidden rounded-2xl relative bg-gray-50 p-6">
+        <div 
+          className="aspect-square mb-4 overflow-hidden relative bg-gray-50 p-6"
+          style={{ borderRadius: 'calc(var(--radius) * 0.75)' }}
+        >
           <ProductImage 
             src={displayImage} 
             alt={product.name} 
             fill
             className="object-contain group-hover:scale-110 transition-transform duration-700" 
           />
-          {product.discount && <span className="absolute top-3 right-3 bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg z-10">خصم {product.discount}</span>}
+          {product.discount && (
+            <span className="absolute top-3 right-3 bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg z-10">
+              خصم {product.discount}
+            </span>
+          )}
         </div>
-        <h3 className="text-sm font-black line-clamp-2 h-10 mb-2 leading-tight group-hover:text-[var(--p-color)] transition-colors">{product.name}</h3>
+        <h3 
+          className="text-sm font-black line-clamp-2 h-10 mb-2 leading-tight group-hover:text-[var(--p-color)] transition-colors"
+          style={{ color: 'var(--h-color)' }}
+        >
+          {product.name}
+        </h3>
         <div className="flex items-center gap-1 text-[var(--a-color)] mb-3">
-          <Star size={10} fill="currentColor" /><span className="text-[10px] font-black text-gray-900">{product.rating}</span>
+          <Star size={10} fill="currentColor" />
+          <span className="text-[10px] font-black text-gray-900">{product.rating}</span>
         </div>
       </Link>
       <div className="flex items-center justify-between mt-auto">
         <div className="flex flex-col">
           <span className="font-black text-lg text-[var(--p-color)]">{product.price.toLocaleString()} ر.س</span>
-          {product.oldPrice && <span className="text-[10px] text-gray-300 line-through font-bold">{product.oldPrice.toLocaleString()} ر.س</span>}
+          {product.oldPrice && (
+            <span className="text-[10px] text-gray-300 line-through font-bold">
+              {product.oldPrice.toLocaleString()} ر.س
+            </span>
+          )}
         </div>
         <button 
           onClick={handleAddToCart}
-          className="bg-gray-100 p-2.5 rounded-xl text-gray-600 hover:bg-[var(--p-color)] hover:text-white hover:rotate-90 transition-all duration-300 active:scale-90"
+          className="bg-gray-100 p-2.5 text-gray-600 hover:bg-[var(--p-color)] hover:text-white hover:rotate-90 transition-all duration-300 active:scale-90"
+          style={{ borderRadius: 'calc(var(--radius) * 0.5)' }}
         >
           <Plus size={18} />
         </button>

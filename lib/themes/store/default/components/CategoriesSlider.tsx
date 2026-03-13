@@ -4,6 +4,13 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ThemeTokens, StoreCategory } from '@/lib/themes/types'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface Props {
   theme: ThemeTokens
@@ -24,33 +31,47 @@ export default function CategoriesSlider({ theme, storeSlug, categories }: Props
       ];
 
   return (
-    <section>
+    <section className="relative px-4">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-black">تسوق حسب الفئة</h2>
         <Link href={`/store/${storeSlug}/products`} className="text-sm font-bold text-[var(--p-color)]">عرض الكل</Link>
       </div>
-      <div className="flex gap-8 overflow-x-auto pb-4 scrollbar-hide">
-        {cats.map((cat, i) => (
-          <Link 
-            key={cat.id} 
-            href={`/store/${storeSlug}/products?category=${cat.slug}`}
-            className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group"
-          >
-            <div className="w-24 h-24 rounded-full bg-white border flex items-center justify-center p-5 group-hover:border-[var(--p-color)] group-hover:shadow-md transition-all">
-                 <div className="w-full h-full relative">
-                   <Image 
-                      src={cat.image || `https://cdn-icons-png.flaticon.com/512/3659/${3659899 + i}.png`} 
-                      alt={cat.name} 
-                      fill 
-                      unoptimized={cat.image?.startsWith('https://placehold.co')} 
-                      className="object-contain"
-                   />
-                 </div>
-            </div>
-            <span className="text-sm font-bold">{cat.name}</span>
-          </Link>
-        ))}
-      </div>
+      
+      <Carousel
+        opts={{
+          align: "start",
+          direction: "rtl",
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4">
+          {cats.map((cat, i) => (
+            <CarouselItem key={cat.id} className="pl-4 basis-1/3 sm:basis-1/6 md:basis-1/4 lg:basis-1/10">
+              <Link 
+                href={`/store/${storeSlug}/products?category=${cat.slug}`}
+                className="flex flex-col items-center gap-3 cursor-pointer group"
+              >
+                <div 
+                  className="w-24 h-24 rounded-full bg-white border flex items-center justify-center group-hover:border-[var(--p-color)] group-hover:shadow-md transition-all relative overflow-hidden"
+                >
+                  <Image 
+                    src={cat.image || `https://cdn-icons-png.flaticon.com/512/3659/${3659899 + i}.png`} 
+                    alt={cat.name} 
+                    fill 
+                    unoptimized={cat.image?.startsWith('https://placehold.co')} 
+                    className="object-contain"
+                  />
+                </div>
+                <span className="text-sm font-bold text-center whitespace-nowrap">{cat.name}</span>
+              </Link>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="hidden md:block">
+          <CarouselPrevious className="-right-12" />
+          <CarouselNext className="-left-12" />
+        </div>
+      </Carousel>
     </section>
   )
 }

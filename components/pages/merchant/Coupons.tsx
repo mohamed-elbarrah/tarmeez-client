@@ -16,7 +16,7 @@ export default function Coupons() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-2">
         {[
           { code: "SUMMER2026", type: "نسبة", value: "20%", used: 234, limit: 1000, expires: "30 يونيو 2026" },
           { code: "WELCOME", type: "مبلغ ثابت", value: "50 ر.س", used: 890, limit: null, expires: "بدون" },

@@ -34,7 +34,7 @@ export default function Customers() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         <Card className="p-4">
           <div className="text-2xl font-bold mb-1">{data?.total ?? 0}</div>
           <div className="text-sm text-muted-foreground">إجمالي العملاء</div>
@@ -54,7 +54,7 @@ export default function Customers() {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="بحث عن عميل..." className="pr-10" value={search} onChange={(e)=>setSearch(e.target.value)} />

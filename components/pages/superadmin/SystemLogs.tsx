@@ -18,7 +18,7 @@ export default function SystemLogs() {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="بحث في السجلات..." className="pr-10" />

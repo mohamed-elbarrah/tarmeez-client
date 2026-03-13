@@ -23,6 +23,10 @@ hostname: 'dcsa.com.au'
       {
         protocol: 'https',
         hostname: 'placehold.co'
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost:8000'
       }
     ],
   },

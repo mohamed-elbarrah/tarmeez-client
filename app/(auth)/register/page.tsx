@@ -175,7 +175,7 @@ export default function RegisterPage() {
                                 <Input id="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="john@example.com" dir="ltr" className={`text-right ${errors.email ? "border-destructive" : ""}`} />
                                 {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
                                     <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleInputChange} className={`text-right ${errors.confirmPassword ? "border-destructive" : ""}`} />
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                                 {errors.storeName && <p className="text-xs text-destructive">{errors.storeName}</p>}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="category">الفئة</Label>
                                     <Select onValueChange={(v) => handleSelectChange("category", v)} value={formData.category}>

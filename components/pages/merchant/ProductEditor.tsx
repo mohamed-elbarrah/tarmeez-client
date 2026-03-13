@@ -181,7 +181,7 @@ export default function ProductEditor() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Link href="/merchant/products">
             <Button variant="ghost" size="icon">
               <ArrowRight className="w-5 h-5" />
@@ -261,7 +261,7 @@ export default function ProductEditor() {
                 إضافة رابط صورة
               </Button>
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-2">
               {images.map((img, i) => (
                 <div key={i} className="relative aspect-square bg-secondary rounded-lg border border-border flex items-center justify-center group">
                   <img src={img} alt="Product" className="w-full h-full object-cover rounded-lg" />
@@ -316,7 +316,7 @@ export default function ProductEditor() {
                         <Trash2 className="w-4 h-4" />
                       </button>
                       
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-2 gap-2 mb-4">
                         <div>
                           <Label>اسم الخيار</Label>
                           <Input 
@@ -726,7 +726,7 @@ function OffersSection({ productId }: { productId: string }) {
               <Input type="number" min={0} value={offerForm.sortOrder} onChange={(e) => setOfferForm({ ...offerForm, sortOrder: Number(e.target.value) })} />
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <Switch id="offer-active" checked={offerForm.isActive} onCheckedChange={(v) => setOfferForm({ ...offerForm, isActive: v })} />
               <Label htmlFor="offer-active">مفعّل</Label>

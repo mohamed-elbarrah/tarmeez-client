@@ -16,7 +16,7 @@ export default function ThemesMarketplace() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: "إجمالي القوالب", value: "45" },
           { label: "مجانية", value: "28" },

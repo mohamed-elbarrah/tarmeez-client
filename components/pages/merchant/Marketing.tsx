@@ -57,7 +57,7 @@ export default function Marketing() {
                 <span className="font-bold">{campaign.name}</span>
                 <span className="text-sm text-accent">{campaign.revenue}</span>
               </div>
-              <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-3 gap-2 text-sm">
                 <div>
                   <div className="text-muted-foreground">تم الإرسال</div>
                   <div className="font-medium">{campaign.sent.toLocaleString()}</div>

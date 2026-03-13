@@ -31,7 +31,7 @@ export default function CartSummary({ theme, cart, storeSlug }: Props) {
       >
         إتمام عملية الشراء
       </Link>
-      <div className="flex items-center justify-center gap-4 pt-2 opacity-50 grayscale">
+      <div className="flex items-center justify-center gap-2 pt-2 opacity-50 grayscale">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-4" />
         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-6" />
         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" className="h-4" />

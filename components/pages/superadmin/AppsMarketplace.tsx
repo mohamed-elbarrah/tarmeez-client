@@ -19,7 +19,7 @@ export default function AppsMarketplace() {
       <div className="grid grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i} className="p-6">
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex items-start gap-2 mb-4">
               <div className="w-16 h-16 bg-accent/10 rounded-xl"></div>
               <div className="flex-1">
                 <h3 className="font-bold mb-1">App {i + 1}</h3>

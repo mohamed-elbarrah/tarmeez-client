@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { StoreProduct, StoreData } from '@/lib/themes/types'
 import ProductCard from '@/lib/themes/store/default/components/ProductCard'
+import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 import StarRating from '@/lib/themes/store/default/components/StarRating'
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks'
 import { addItem } from '@/lib/store/slices/cartSlice'
@@ -113,11 +114,13 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   }
 
   const themeStyles = {
-    '--p-color': storeData.primaryColor || '#2563eb',
-    '--h-color': storeData.headingColor || '#0f172a',
-    '--t-color': storeData.textColor || '#64748b',
-    '--radius': `${storeData.borderRadius || 16}px`,
-    '--a-color': '#f59e0b',
+    '--p-color': theme.primary,
+    '--s-color': theme.secondary,
+    '--a-color': theme.accent,
+    '--b-color': theme.buttonColor,
+    '--t-color': theme.textColor,
+    '--h-color': theme.headingColor,
+    '--radius': theme.borderRadius,
   } as React.CSSProperties
 
   const savings =
@@ -151,11 +154,11 @@ export default function ProductDetailPage({ storeData, product }: Props) {
               </span>
             )}
             {productImages[selectedImage] ? (
-              <Image
+              <ProductImage
                 src={productImages[selectedImage]}
                 alt={product.name}
                 fill
-                className="object-contain p-8 group-hover:scale-110 transition-transform duration-500"
+                className="object-contain  group-hover:scale-110 transition-transform duration-500"
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -177,7 +180,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
                       : 'border-slate-100 bg-slate-50 hover:border-slate-300'
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-contain p-2" sizes="100px" />
+                  <ProductImage src={img} alt="" fill className="object-contain p-2" sizes="100px" />
                 </div>
               ))}
             </div>
@@ -189,8 +192,12 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           <div className="flex justify-between items-start mb-2">
             {product.category && (
               <span
-                className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full"
-                style={{ color: 'var(--p-color)', backgroundColor: 'color-mix(in srgb, var(--p-color) 10%, transparent)' }}
+                className="text-[10px] font-black uppercase tracking-widest px-3 py-1"
+                style={{ 
+                  color: 'var(--p-color)', 
+                  backgroundColor: 'color-mix(in srgb, var(--p-color) 10%, transparent)',
+                  borderRadius: 'calc(var(--radius) * 0.5)'
+                }}
               >
                 {product.category}
               </span>
@@ -212,7 +219,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
             {product.name}
           </h1>
 
-          <div className="flex items-center gap-4 mb-6 flex-wrap">
+          <div className="flex items-center gap-2 mb-6 flex-wrap">
             <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
               <Star size={16} className="text-amber-400" fill="currentColor" />
               <span className="font-black text-sm text-amber-700">
@@ -234,7 +241,8 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           )}
 
           {/* Price Section */}
-          <div className="bg-slate-50 p-6 rounded-2xl mb-8 border border-slate-100 flex items-center justify-between">
+          <div className="p-6 mb-8 border border-slate-100 flex items-center justify-between"
+               style={{ backgroundColor: 'bg-slate-50', borderRadius: 'var(--radius)' }}>
             <div className="space-y-1">
               <span className="text-4xl font-black" style={{ color: 'var(--p-color)' }}>
                 {product.price.toLocaleString()} ر.س
@@ -281,7 +289,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
                         {offer.badge}
                       </div>
                     )}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                           selectedOffer === offer.id ? 'border-[var(--p-color)]' : 'border-slate-200'
@@ -326,10 +334,10 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <button
               onClick={handleAddToCart}
-              className="flex-grow py-5 text-white font-black text-lg shadow-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-4 group"
+              className="flex-grow py-5 text-white font-black text-lg shadow-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 group"
               style={{ backgroundColor: 'var(--p-color)', borderRadius: 'var(--radius)' }}
             >
               <ShoppingCart size={22} className="group-hover:animate-bounce" />
@@ -477,7 +485,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
       {relatedProducts.length > 0 && (
         <section className="mt-16 space-y-8">
           <h2 className="text-2xl font-black">منتجات مشابهة</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {relatedProducts.map((p) => (
               <ProductCard key={p.id} product={p} theme={theme} storeSlug={storeSlug} />
             ))}

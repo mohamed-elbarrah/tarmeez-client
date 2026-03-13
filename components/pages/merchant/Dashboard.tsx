@@ -133,7 +133,7 @@ export default function Dashboard() {
 
       {/* AI Insights */}
       <Card className="p-6 bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-2">
           <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-6 h-6 text-primary-foreground" />
           </div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
         </div>
         <div className="space-y-4">
           {topProducts.map((product, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 bg-secondary rounded-lg hover:shadow-sm transition-shadow">
+            <div key={i} className="flex items-center gap-2 p-4 bg-secondary rounded-lg hover:shadow-sm transition-shadow">
               <div className="w-12 h-12 bg-white rounded-lg border border-border"></div>
               <div className="flex-1">
                 <div className="font-medium mb-1">{product.name}</div>

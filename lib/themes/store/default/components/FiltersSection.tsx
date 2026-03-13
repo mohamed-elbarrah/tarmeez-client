@@ -46,7 +46,10 @@ export default function FiltersSection({
 
   const filteredProducts = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCategory = selectedCategory === 'الكل' || p.category === selectedCategory;
+    const matchCategory = 
+      selectedCategory === 'الكل' || 
+      p.category === selectedCategory || 
+      categories.find(c => c.slug === selectedCategory)?.name === p.category;
     const matchPrice = p.price <= priceRange;
     return matchSearch && matchCategory && matchPrice;
   })
@@ -65,10 +68,21 @@ export default function FiltersSection({
     setCurrentPage(1)
   }
 
+  const themeStyles = {
+    '--p-color': theme.primary,
+    '--s-color': theme.secondary,
+    '--a-color': theme.accent,
+    '--b-color': theme.buttonColor,
+    '--t-color': theme.textColor,
+    '--h-color': theme.headingColor,
+    '--radius': theme.borderRadius,
+  } as React.CSSProperties
+
   return (
-    <main className="min-h-screen max-w-7xl mx-auto px-4 md:px-8 py-10">
+    <main className="min-h-screen max-w-7xl mx-auto px-4 md:px-8 py-10" style={themeStyles}>
       <div className="flex flex-col md:flex-row gap-8">
-        <aside className="hidden md:block w-64 space-y-8 bg-white p-6 rounded-3xl border border-gray-100 h-fit sticky top-28">
+        <aside className="hidden md:block w-64 space-y-8 bg-white p-6 border border-gray-100 h-fit sticky top-28"
+               style={{ borderRadius: 'var(--radius)' }}>
           <div className="flex items-center justify-between">
             <h3 className="font-black text-lg">الفلاتر</h3>
             <span onClick={() => { onReset(); setCurrentPage(1); }} className="text-xs text-gray-400 hover:text-red-500 font-bold cursor-pointer transition-colors">إعادة ضبط</span>
@@ -76,12 +90,17 @@ export default function FiltersSection({
 
           <div className="space-y-4">
             <h4 className="font-bold text-sm">الفئة</h4>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2">
               {['الكل', ...categories.map(c => c.name)].map(cat => (
                 <button 
                   key={cat}
                   onClick={() => handleCategoryChange(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${selectedCategory === cat ? 'bg-[var(--p-color)] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white'}`}
+                  className={`px-3 py-1.5 font-bold transition-all ${
+                    selectedCategory === cat 
+                      ? 'bg-[var(--p-color)] text-white shadow-md' 
+                      : 'bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white'
+                  }`}
+                  style={{ borderRadius: 'var(--radius)', fontSize: '0.75rem' }}
                 >
                   {cat}
                 </button>
@@ -137,16 +156,17 @@ export default function FiltersSection({
                           <h4 className="font-bold text-base">الفئة</h4>
                           <span onClick={() => { onReset(); setCurrentPage(1); }} className="text-xs text-gray-400 hover:text-red-500 font-bold cursor-pointer transition-colors">إعادة ضبط</span>
                         </div>
-                        <div className="flex flex-wrap gap-2 justify-start">
+                        <div className="flex flex-wrap gap-2 ">
                           {['الكل', ...categories.map(c => c.name)].map(cat => (
                             <button 
                               key={cat}
                               onClick={() => handleCategoryChange(cat)}
-                              className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                              className={`px-4 py-2 font-bold transition-all ${
                                 selectedCategory === cat 
                                   ? 'bg-[var(--p-color)] text-white shadow-md' 
                                   : 'bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white'
                               }`}
+                              style={{ borderRadius: 'var(--radius)', fontSize: '0.75rem' }}
                             >
                               {cat}
                             </button>

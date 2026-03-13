@@ -74,7 +74,7 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-8 border rounded-lg">
             <h2 className="text-lg font-black mb-4">عنوان الشحن</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="space-y-1">
                 <input {...register('customerName')} placeholder="الاسم الكامل" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.customerName ? 'border-red-500' : ''}`} />
                 {errors.customerName && <p className="text-red-500 text-[10px] pr-2">{errors.customerName.message}</p>}
@@ -119,7 +119,7 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
             <h3 className="text-lg font-black mb-6 text-center">ملخص الطلب</h3>
             <div className="space-y-4 mb-6">
               {cart.map((item: any) => (
-                <div key={item.id} className="flex gap-4 items-center">
+                <div key={item.id} className="flex gap-2 items-center">
                   <div className="w-16 h-16 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center border">
                     <img src={item.image || '/placeholder-product.png'} className="w-full h-full object-contain" alt={item.name} />
                   </div>

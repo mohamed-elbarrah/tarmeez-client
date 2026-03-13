@@ -10,7 +10,7 @@ export default function CallToAction() {
                     <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">احصل على منصتك وابدأ الآن</p>
                     <p className="mt-4">لا تضيع الوقت في التعقيد التقني. منصتنا تمنحك الأدوات التي تحتاجها للتركيز على مشروعك وتحقيق أهدافك.</p>
 
-                    <div className="mt-12 flex flex-wrap justify-center gap-4">
+                    <div className="mt-12 flex flex-wrap justify-center gap-2">
                         <Button
                             asChild
                             size="lg">

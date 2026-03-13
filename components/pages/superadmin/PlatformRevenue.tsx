@@ -19,7 +19,7 @@ export default function PlatformRevenue() {
         <p className="text-muted-foreground">تقارير مالية شاملة</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: "إجمالي الإيرادات", value: "1,234,560 ر.س", change: "+23.4%", icon: DollarSign },
           { label: "الاشتراكات", value: "892,340 ر.س", change: "+18.7%", icon: Users },

@@ -48,7 +48,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: "إجمالي الزوار", value: "12,456", change: "+23.1%", icon: Eye },
           { label: "معدل التحويل", value: "3.2%", change: "+0.5%", icon: TrendingUp },
