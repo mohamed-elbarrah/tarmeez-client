@@ -1,6 +1,7 @@
 'use client'
-import { ArrowRight, Upload, Plus, X, Sparkles, Trash2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useCreateProductMutation, useGetProductByIdQuery, useUpdateProductMutation } from "@/lib/services/productsApi";
+import { ArrowRight, Upload, Plus, X, Sparkles, Trash2, ChevronDown, ChevronUp, Loader2, Tag } from "lucide-react";
+import { useCreateProductMutation, useGetProductByIdQuery, useUpdateProductMutation, useGetProductOffersQuery, useCreateOfferMutation, useDeleteOfferMutation } from "@/lib/services/productsApi";
+import { useGetCategoriesQuery } from "@/lib/services/categoriesApi";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -20,6 +21,7 @@ export default function ProductEditor() {
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const { data: existingProduct, isLoading: isProductLoading } = useGetProductByIdQuery(productId, { skip: !productId });
+  const { data: categories = [] } = useGetCategoriesQuery();
 
   const isLoading = isCreating || isUpdating;
 
@@ -113,7 +115,7 @@ export default function ProductEditor() {
           values: opt.values.map((v: any) => v.value)
         })));
         
-        setVariants(existingProduct.variants.map((v: any) => ({
+        setVariants((existingProduct.variants ?? []).map((v: any) => ({
           optionValues: v.optionValues.map((ov: any) => ov.optionValue.value),
           price: v.price,
           sku: v.sku,
@@ -127,9 +129,11 @@ export default function ProductEditor() {
   const handleSave = async (status: "ACTIVE" | "DRAFT") => {
     try {
       const slug = form.name
+        .trim()
         .toLowerCase()
         .replace(/\s+/g, "-")
-        .replace(/[^\w-]/g, "");
+        .replace(/[^\p{L}\p{N}_-]/gu, "")
+        || `product-${Date.now()}`;
 
       const payload: any = {
         ...form,
@@ -152,12 +156,13 @@ export default function ProductEditor() {
       if (productId) {
         await updateProduct({ id: productId, data: payload }).unwrap();
         toast.success("تم تحديث المنتج بنجاح");
+        router.push("/merchant/products");
       } else {
-        await createProduct(payload).unwrap();
+        const created = await createProduct(payload).unwrap();
         toast.success("تم إنشاء المنتج بنجاح");
+        // Redirect to edit page so merchant can add offers
+        router.push(`/merchant/products/${(created as any).id}`);
       }
-
-      router.push("/merchant/products");
     } catch (err) {
       console.error("Failed to save product:", err);
       toast.error("حدث خطأ أثناء حفظ المنتج");
@@ -482,6 +487,9 @@ export default function ProductEditor() {
               </div>
             </div>
           </Card>
+
+          {/* Offers Section */}
+          {productId && <OffersSection productId={productId} />}
         </div>
 
         {/* Sidebar */}
@@ -609,9 +617,9 @@ export default function ProductEditor() {
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                 >
                   <option value="">اختر فئة</option>
-                  <option value="electronics">إلكترونيات</option>
-                  <option value="clothing">ملابس</option>
-                  <option value="accessories">إكسسوارات</option>
+                  {categories.map((cat: any) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -628,5 +636,154 @@ export default function ProductEditor() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ── Offers Management Sub-component ── */
+function OffersSection({ productId }: { productId: string }) {
+  const { data: offers = [], isLoading } = useGetProductOffersQuery(productId);
+  const [createOffer, { isLoading: isCreating }] = useCreateOfferMutation();
+  const [deleteOffer] = useDeleteOfferMutation();
+  const [showForm, setShowForm] = useState(false);
+  const [offerForm, setOfferForm] = useState({
+    title: '',
+    description: '',
+    quantity: 1,
+    price: 0,
+    badge: '',
+    sortOrder: 0,
+    isActive: true,
+  });
+
+  const handleCreate = async () => {
+    try {
+      await createOffer({
+        productId,
+        data: {
+          ...offerForm,
+          quantity: Number(offerForm.quantity),
+          price: Number(offerForm.price),
+          sortOrder: Number(offerForm.sortOrder),
+        },
+      }).unwrap();
+      toast.success('تم إنشاء العرض بنجاح');
+      setShowForm(false);
+      setOfferForm({ title: '', description: '', quantity: 1, price: 0, badge: '', sortOrder: 0, isActive: true });
+    } catch {
+      toast.error('حدث خطأ أثناء إنشاء العرض');
+    }
+  };
+
+  const handleDelete = async (offerId: string) => {
+    try {
+      await deleteOffer({ productId, offerId }).unwrap();
+      toast.success('تم حذف العرض');
+    } catch {
+      toast.error('حدث خطأ أثناء حذف العرض');
+    }
+  };
+
+  return (
+    <Card className="p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold flex items-center gap-2">
+          <Tag className="w-5 h-5" />
+          عروض التوفير
+        </h3>
+        <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
+          <Plus className="w-4 h-4 ml-2" />
+          إضافة عرض جديد
+        </Button>
+      </div>
+
+      {showForm && (
+        <div className="p-4 mb-4 border border-dashed rounded-lg space-y-3 bg-muted/30">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>عنوان العرض</Label>
+              <Input placeholder="اشترِ 2 + 1 مجاناً" value={offerForm.title} onChange={(e) => setOfferForm({ ...offerForm, title: e.target.value })} />
+            </div>
+            <div>
+              <Label>الوصف (اختياري)</Label>
+              <Input placeholder="وفر 30 ر.س اليوم" value={offerForm.description} onChange={(e) => setOfferForm({ ...offerForm, description: e.target.value })} />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            <div>
+              <Label>الكمية</Label>
+              <Input type="number" min={1} value={offerForm.quantity} onChange={(e) => setOfferForm({ ...offerForm, quantity: Number(e.target.value) })} />
+            </div>
+            <div>
+              <Label>السعر</Label>
+              <Input type="number" min={0} step="0.01" value={offerForm.price} onChange={(e) => setOfferForm({ ...offerForm, price: Number(e.target.value) })} />
+            </div>
+            <div>
+              <Label>الشارة (اختياري)</Label>
+              <Input placeholder="الأكثر مبيعاً" value={offerForm.badge} onChange={(e) => setOfferForm({ ...offerForm, badge: e.target.value })} />
+            </div>
+            <div>
+              <Label>الترتيب</Label>
+              <Input type="number" min={0} value={offerForm.sortOrder} onChange={(e) => setOfferForm({ ...offerForm, sortOrder: Number(e.target.value) })} />
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Switch id="offer-active" checked={offerForm.isActive} onCheckedChange={(v) => setOfferForm({ ...offerForm, isActive: v })} />
+              <Label htmlFor="offer-active">مفعّل</Label>
+            </div>
+            <div className="flex gap-2 mr-auto">
+              <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>إلغاء</Button>
+              <Button size="sm" className="bg-accent text-black hover:bg-accent/90" disabled={isCreating || !offerForm.title} onClick={handleCreate}>
+                {isCreating ? 'جاري الحفظ...' : 'حفظ العرض'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center py-6"><Loader2 className="w-6 h-6 animate-spin" /></div>
+      ) : offers.length === 0 ? (
+        <p className="text-muted-foreground text-sm text-center py-6">لا توجد عروض لهذا المنتج بعد</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="text-right text-muted-foreground border-b">
+                <th className="pb-2 font-medium">العنوان</th>
+                <th className="pb-2 font-medium w-20">الكمية</th>
+                <th className="pb-2 font-medium w-24">السعر</th>
+                <th className="pb-2 font-medium w-24">الشارة</th>
+                <th className="pb-2 font-medium w-16">الحالة</th>
+                <th className="pb-2 font-medium w-16"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {offers.map((offer: any) => (
+                <tr key={offer.id} className="group">
+                  <td className="py-3 pr-2">
+                    <div className="font-medium">{offer.title}</div>
+                    {offer.description && <div className="text-xs text-muted-foreground">{offer.description}</div>}
+                  </td>
+                  <td className="py-3 px-2">{offer.quantity}</td>
+                  <td className="py-3 px-2">{Number(offer.price)} ر.س</td>
+                  <td className="py-3 px-2">{offer.badge || '—'}</td>
+                  <td className="py-3 px-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${offer.isActive ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                      {offer.isActive ? 'مفعّل' : 'معطّل'}
+                    </span>
+                  </td>
+                  <td className="py-3 pl-2">
+                    <button onClick={() => handleDelete(offer.id)} className="text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Card>
   );
 }

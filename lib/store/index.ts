@@ -7,6 +7,9 @@ import { superadminApi } from '@/lib/services/superadminApi'
 import { productsApi } from '@/lib/services/productsApi'
 import cartReducer from './slices/cartSlice'
 import { ordersApi } from '@/lib/services/ordersApi'
+import { reviewsApi } from '@/lib/services/reviewsApi'
+import { wishlistApi } from '@/lib/services/wishlistApi'
+import { categoriesApi } from '@/lib/services/categoriesApi'
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +21,9 @@ export const store = configureStore({
     [ordersApi.reducerPath]: ordersApi.reducer,
     [superadminApi.reducerPath]: superadminApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
+    [reviewsApi.reducerPath]: reviewsApi.reducer,
+    [wishlistApi.reducerPath]: wishlistApi.reducer,
+    [categoriesApi.reducerPath]: categoriesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -27,6 +33,9 @@ export const store = configureStore({
       ordersApi.middleware,
       superadminApi.middleware,
       productsApi.middleware,
+      reviewsApi.middleware,
+      wishlistApi.middleware,
+      categoriesApi.middleware,
     ),
 })
 

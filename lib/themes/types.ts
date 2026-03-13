@@ -12,16 +12,33 @@ export interface ThemeTokens {
   showStoreName: boolean
 }
 
+export interface ProductOffer {
+  id: string
+  title: string
+  description?: string
+  quantity: number
+  price: number
+  badge?: string
+  sortOrder: number
+}
+
 export interface StoreProduct {
   id: number | string
   name: string
   price: number
   oldPrice?: number
+  comparePrice?: number
   discount?: string
   rating?: number
   category?: string
   image: string
+  images?: string[]
   slug?: string
+  description?: string
+  offers?: ProductOffer[]
+  averageRating?: number
+  reviewCount?: number
+  isWishlisted?: boolean
 }
 
 export interface StoreMerchant {
@@ -30,6 +47,14 @@ export interface StoreMerchant {
   city: string
   country: string
   description?: string | null
+}
+
+export interface StoreCategory {
+  id: string
+  name: string
+  slug: string
+  image?: string | null
+  sortOrder: number
 }
 
 export interface StoreData {
@@ -50,6 +75,7 @@ export interface StoreData {
   borderRadius?: string | null
   themeId?: string | null
   products?: StoreProduct[]
+  categories?: StoreCategory[]
   merchant?: StoreMerchant
 }
 

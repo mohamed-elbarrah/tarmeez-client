@@ -47,6 +47,7 @@ export async function getStoreBySlug(slug: string) {
     borderRadius: s.borderRadius ?? null,
     merchant: s.merchant ?? null,
     products: s.products ?? [],
+    categories: s.categories ?? [],
   }
 
   if (!storeData.slug) {
@@ -54,4 +55,20 @@ export async function getStoreBySlug(slug: string) {
   }
 
   return storeData
+}
+
+export async function getProductBySlug(storeId: string, productIdOrSlug: string) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  const encodedSlug = encodeURIComponent(productIdOrSlug)
+  const res = await fetch(`${apiUrl}/stores/${storeId}/products/${encodedSlug}`, { cache: 'no-store' })
+  
+  if (!res.ok) return null
+  
+  try {
+    return await res.json()
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('getProductBySlug: failed to parse json', err)
+    return null
+  }
 }

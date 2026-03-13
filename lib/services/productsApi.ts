@@ -5,7 +5,7 @@ import { baseQueryWithReauth } from './baseQuery';
 export const productsApi = createApi({
     reducerPath: 'productsApi',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Products', 'Store'],
+    tagTypes: ['Products', 'Store', 'Offers'],
     endpoints: (builder) => ({
         getProducts: builder.query<{ products: Product[]; stats: ProductStats }, string | void>({
             query: (status) => ({
@@ -57,6 +57,35 @@ export const productsApi = createApi({
             }),
             invalidatesTags: ['Store'],
         }),
+
+        // ── Offers ──
+        getProductOffers: builder.query<any[], string>({
+            query: (productId) => `/merchant/products/${productId}/offers`,
+            providesTags: ['Offers'],
+        }),
+        createOffer: builder.mutation<any, { productId: string; data: any }>({
+            query: ({ productId, data }) => ({
+                url: `/merchant/products/${productId}/offers`,
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Offers'],
+        }),
+        updateOffer: builder.mutation<any, { productId: string; offerId: string; data: any }>({
+            query: ({ productId, offerId, data }) => ({
+                url: `/merchant/products/${productId}/offers/${offerId}`,
+                method: 'PATCH',
+                body: data,
+            }),
+            invalidatesTags: ['Offers'],
+        }),
+        deleteOffer: builder.mutation<any, { productId: string; offerId: string }>({
+            query: ({ productId, offerId }) => ({
+                url: `/merchant/products/${productId}/offers/${offerId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Offers'],
+        }),
     }),
 });
 
@@ -68,4 +97,8 @@ export const {
     useDeleteProductMutation,
     useUpdateStoreCustomizationMutation,
     useUploadStoreImageMutation,
+    useGetProductOffersQuery,
+    useCreateOfferMutation,
+    useUpdateOfferMutation,
+    useDeleteOfferMutation,
 } = productsApi;

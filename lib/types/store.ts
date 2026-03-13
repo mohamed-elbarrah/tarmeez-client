@@ -6,13 +6,23 @@ export interface Product {
     description?: string;
     price: number;
     comparePrice?: number;
+    cost?: number;
     quantity: number;
     status: ProductStatus;
     images: string[];
     slug: string;
     category?: string;
+    categoryId?: string;
     tags: string[];
     sku?: string;
+    barcode?: string;
+    trackStock: boolean;
+    weight?: number;
+    isPhysical: boolean;
+    seoTitle?: string;
+    seoDesc?: string;
+    options?: any[];
+    variants?: any[];
     createdAt: string;
 }
 

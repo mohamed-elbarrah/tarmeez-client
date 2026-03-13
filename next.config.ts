@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'm.media-amazon.com' ,
       },
+      {
+protocol: 'https',
+hostname: 'dcsa.com.au'
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co'
+      }
     ],
   },
 };

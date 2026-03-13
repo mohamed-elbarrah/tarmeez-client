@@ -14,6 +14,7 @@ export default async function StorePage({
 
     const theme = resolveTokens(store);
     const products = store.products ?? [];
+    const categories = store.categories ?? [];
 
-    return <HomePage theme={theme} products={products} storeSlug={storeSlug} />
+    return <HomePage theme={theme} products={products} storeSlug={storeSlug} categories={categories} />
 }
