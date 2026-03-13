@@ -16,7 +16,7 @@ const getImageSrc = (image: string | undefined | null) => {
   if (!image) return '/placeholder-product.png'
   if (image.startsWith('data:')) return image
   if (image.startsWith('http')) return image
-  return '/placeholder-product.png'
+  return image // Return as is, next/image might handle it if it's a valid path we missed
 }
 
 export default function ProductImage({ 
@@ -43,6 +43,7 @@ export default function ProductImage({
         src={imageSrc} 
         alt={alt} 
         fill 
+        unoptimized={imageSrc.startsWith('https://placehold.co')} 
         className={className} 
         priority={priority} 
         sizes={sizes}
@@ -56,6 +57,7 @@ export default function ProductImage({
       alt={alt} 
       width={width || 400} 
       height={height || 400} 
+      unoptimized={imageSrc.startsWith('https://placehold.co')} 
       className={className} 
       priority={priority}
       sizes={sizes}

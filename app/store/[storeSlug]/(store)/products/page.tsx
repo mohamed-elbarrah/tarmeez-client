@@ -12,5 +12,13 @@ export default async function Page({
   const store = await getStoreBySlug(storeSlug)
   if (!store) notFound()
   const theme = resolveTokens(store)
-  return <ProductsPage theme={theme} products={store.products ?? []} storeSlug={storeSlug} />
+  const products = store.products ?? []
+  const categories = store.categories ?? []
+  
+  return <ProductsPage 
+    theme={theme} 
+    products={products} 
+    categories={categories}
+    storeSlug={storeSlug} 
+  />
 }

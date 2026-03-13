@@ -17,6 +17,7 @@ import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 export default function ProductCard({ product, theme, storeSlug }: Props) {
   const dispatch = useAppDispatch()
   const productUrl = `/store/${storeSlug}/product/${product.slug || product.id}`
+  const displayImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : null)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -27,7 +28,7 @@ export default function ProductCard({ product, theme, storeSlug }: Props) {
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.image || '',
+        image: displayImage || '',
         quantity: 1
       }
     }))
@@ -38,7 +39,7 @@ export default function ProductCard({ product, theme, storeSlug }: Props) {
       <Link href={productUrl} className="flex flex-col h-full">
         <div className="aspect-square mb-4 overflow-hidden rounded-2xl relative bg-gray-50 p-6">
           <ProductImage 
-            src={product.image} 
+            src={displayImage} 
             alt={product.name} 
             fill
             className="object-contain group-hover:scale-110 transition-transform duration-700" 

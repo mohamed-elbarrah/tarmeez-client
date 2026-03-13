@@ -37,23 +37,15 @@ export default function CategoriesSlider({ theme, storeSlug, categories }: Props
             className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group"
           >
             <div className="w-24 h-24 rounded-full bg-white border flex items-center justify-center p-5 group-hover:border-[var(--p-color)] group-hover:shadow-md transition-all">
-               <div className="w-full h-full relative">
-                 {cat.image ? (
+                 <div className="w-full h-full relative">
                    <Image 
-                      src={cat.image} 
+                      src={cat.image || `https://cdn-icons-png.flaticon.com/512/3659/${3659899 + i}.png`} 
                       alt={cat.name} 
                       fill 
+                      unoptimized={cat.image?.startsWith('https://placehold.co')} 
                       className="object-contain"
                    />
-                 ) : (
-                   <Image 
-                      src={`https://cdn-icons-png.flaticon.com/512/3659/${3659899 + i}.png`} 
-                      alt={cat.name} 
-                      fill 
-                      className="object-contain"
-                   />
-                 )}
-               </div>
+                 </div>
             </div>
             <span className="text-sm font-bold">{cat.name}</span>
           </Link>
