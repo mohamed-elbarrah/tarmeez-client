@@ -9,44 +9,54 @@ export interface CartItem {
   slug?: string
 }
 
-interface CartState {
+interface CartStore {
   items: CartItem[]
-  storeSlug: string | null
 }
 
-const initialState: CartState = { items: [], storeSlug: null }
+interface CartState {
+  carts: Record<string, CartStore>
+}
+
+const initialState: CartState = { carts: {} }
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addItem(state, action: PayloadAction<CartItem>) {
-      const it = action.payload
-      const existing = state.items.find(i => i.id === it.id)
+    addItem(state, action: PayloadAction<{ storeSlug: string; item: CartItem }>) {
+      const { storeSlug, item } = action.payload
+      if (!state.carts[storeSlug]) state.carts[storeSlug] = { items: [] }
+      const cart = state.carts[storeSlug]
+      const existing = cart.items.find(i => i.id === item.id)
       if (existing) {
-        existing.quantity += it.quantity
+        existing.quantity += item.quantity
       } else {
-        state.items.push(it)
+        cart.items.push(item)
       }
     },
-    removeItem(state, action: PayloadAction<string | number>) {
-      state.items = state.items.filter(i => i.id !== action.payload)
+    removeItem(state, action: PayloadAction<{ storeSlug: string; id: string | number }>) {
+      const { storeSlug, id } = action.payload
+      if (state.carts[storeSlug]) {
+        state.carts[storeSlug].items = state.carts[storeSlug].items.filter(i => i.id !== id)
+      }
     },
-    updateQuantity(state, action: PayloadAction<{ id: string | number; quantity: number }>) {
-      const { id, quantity } = action.payload
-      const it = state.items.find(i => i.id === id)
-      if (it) it.quantity = Math.max(1, quantity)
+    updateQuantity(state, action: PayloadAction<{ storeSlug: string; id: string | number; quantity: number }>) {
+      const { storeSlug, id, quantity } = action.payload
+      const cart = state.carts[storeSlug]
+      if (cart) {
+        const it = cart.items.find(i => i.id === id)
+        if (it) it.quantity = Math.max(1, quantity)
+      }
     },
-    clearCart(state) {
-      state.items = []
-      state.storeSlug = null
-    },
-    setStoreSlug(state, action: PayloadAction<string | null>) {
-      state.storeSlug = action.payload
+    clearCart(state, action: PayloadAction<string>) {
+      const storeSlug = action.payload
+      if (state.carts[storeSlug]) {
+        state.carts[storeSlug].items = []
+      }
     },
   },
 })
 
-export const { addItem, removeItem, updateQuantity, clearCart, setStoreSlug } = cartSlice.actions
+export const { addItem, removeItem, updateQuantity, clearCart } = cartSlice.actions
 
 export default cartSlice.reducer

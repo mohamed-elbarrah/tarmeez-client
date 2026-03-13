@@ -24,7 +24,7 @@ export async function getStoreBySlug(slug: string) {
 
   if (!s || !s.id) return null
 
-  return {
+  const storeData = {
     id: s.id,
     slug: s.slug ?? slug,
     name: s.name,
@@ -40,9 +40,18 @@ export async function getStoreBySlug(slug: string) {
     primaryColor: s.primaryColor ?? null,
     secondaryColor: s.secondaryColor ?? null,
     accentColor: s.accentColor ?? null,
+    textColor: s.textColor ?? null,
+    headingColor: s.headingColor ?? null,
+    buttonColor: s.buttonColor ?? null,
     fontFamily: s.fontFamily ?? null,
     borderRadius: s.borderRadius ?? null,
     merchant: s.merchant ?? null,
     products: s.products ?? [],
   }
+
+  if (!storeData.slug) {
+    throw new Error(`Store with id ${s.id} is missing a slug.`)
+  }
+
+  return storeData
 }

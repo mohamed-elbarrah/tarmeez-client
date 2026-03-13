@@ -1,17 +1,18 @@
 "use client"
 
 import React from 'react'
-import { StoreProduct, ThemeTokens } from '../../types'
+import Link from 'next/link'
+import { ThemeTokens, StoreProduct } from '@/lib/themes/types'
 
 interface CartItem extends StoreProduct { quantity: number }
 
 interface Props {
   theme: ThemeTokens
   cart: CartItem[]
-  onCheckout: () => void
+  storeSlug: string
 }
 
-export default function CartSummary({ theme, cart, onCheckout }: Props) {
+export default function CartSummary({ theme, cart, storeSlug }: Props) {
   const subtotal = cart.reduce((s, i) => s + i.price * (i.quantity || 0), 0)
   return (
     <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-fit space-y-6 sticky top-28">
@@ -24,7 +25,12 @@ export default function CartSummary({ theme, cart, onCheckout }: Props) {
           <span className="text-[var(--p-color)]">{subtotal.toLocaleString()} ر.س</span>
         </div>
       </div>
-      <button onClick={onCheckout} disabled={cart.length === 0} className="w-full bg-[var(--s-color)] text-white py-4 rounded-2xl font-black text-lg disabled:opacity-30 hover:shadow-xl transition-all">إتمام عملية الشراء</button>
+      <Link 
+        href={cart.length === 0 ? '#' : `/store/${storeSlug}/checkout`} 
+        className={`w-full bg-[var(--s-color)] text-white py-4 rounded-2xl font-black text-lg text-center block ${cart.length === 0 ? 'opacity-30 pointer-events-none' : 'hover:shadow-xl'} transition-all`}
+      >
+        إتمام عملية الشراء
+      </Link>
       <div className="flex items-center justify-center gap-4 pt-2 opacity-50 grayscale">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-4" />
         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-6" />

@@ -1,6 +1,7 @@
-import { getTheme } from '@/lib/themes'
 import { getStoreBySlug } from '@/lib/api/stores'
 import { notFound } from 'next/navigation'
+import HomePage from '@/lib/themes/store/default/pages/HomePage'
+import { resolveTokens } from '@/lib/themes/store/default/config'
 
 export default async function StorePage({
     params,
@@ -11,7 +12,8 @@ export default async function StorePage({
     const store = await getStoreBySlug(storeSlug);
     if (!store) notFound();
 
-    const ThemeComponent = getTheme(store.themeId)
+    const theme = resolveTokens(store);
+    const products = store.products ?? [];
 
-    return <ThemeComponent storeData={store} />
+    return <HomePage theme={theme} products={products} storeSlug={storeSlug} />
 }

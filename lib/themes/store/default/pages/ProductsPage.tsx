@@ -1,18 +1,18 @@
 "use client"
 
 import React, { useState } from 'react'
-import { ThemeTokens, StoreProduct } from '../../types'
-import FiltersSection from '../components/FiltersSection'
+import { ThemeTokens, StoreProduct } from '@/lib/themes/types'
+import FiltersSection from '@/lib/themes/store/default/components/FiltersSection'
 
 interface Props {
   theme: ThemeTokens
   products: StoreProduct[]
+  storeSlug: string
   initialSearch?: string
   initialCategory?: string
-  onProductClick: (product: StoreProduct) => void
 }
 
-export default function ProductsPage({ theme, products, initialSearch = '', initialCategory = 'الكل', onProductClick }: Props) {
+export default function ProductsPage({ theme, products, storeSlug, initialSearch = '', initialCategory = 'الكل' }: Props) {
   const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [priceRange, setPriceRange] = useState(5000)
@@ -21,6 +21,7 @@ export default function ProductsPage({ theme, products, initialSearch = '', init
     <FiltersSection
       theme={theme}
       products={products}
+      storeSlug={storeSlug}
       searchQuery={searchQuery}
       selectedCategory={selectedCategory}
       priceRange={priceRange}
@@ -28,7 +29,6 @@ export default function ProductsPage({ theme, products, initialSearch = '', init
       onCategoryChange={(c) => setSelectedCategory(c)}
       onPriceChange={(p) => setPriceRange(p)}
       onReset={() => { setSelectedCategory('الكل'); setPriceRange(5000); setSearchQuery('') }}
-      onProductClick={onProductClick}
     />
   )
 }

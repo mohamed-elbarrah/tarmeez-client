@@ -2,63 +2,64 @@
 
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { useCreateOrderMutation } from '@/lib/services/ordersApi'
 import { useAppSelector, useAppDispatch } from '@/lib/store/hooks'
 import { clearCart } from '@/lib/store/slices/cartSlice'
 import { useRouter } from 'next/navigation'
+import { ThemeTokens } from '@/lib/themes/types'
+
+const checkoutSchema = z.object({
+  customerName: z.string().min(3, 'الاسم يجب أن يكون 3 أحرف على الأقل'),
+  customerPhone: z.string().min(10, 'رقم الجوال غير صحيح'),
+  customerEmail: z.string().email('بريد إلكتروني غير صحيح').optional().or(z.literal('')),
+  city: z.string().min(2, 'المدينة مطلوبة'),
+  region: z.string().min(2, 'المنطقة مطلوبة'),
+  street: z.string().min(5, 'يرجى إدخال اسم الشارع بشكل مفصل'),
+  notes: z.string().optional(),
+})
+
+type CheckoutFormData = z.infer<typeof checkoutSchema>
 
 interface Props {
-  storeData: any
-  theme: any
-  cart: any[]
-  onSuccess: (orderCode: string) => void
+  theme: ThemeTokens
+  storeSlug: string
 }
 
-export default function CheckoutPage({ storeData, theme, cart, onSuccess }: Props) {
-  const { register, handleSubmit, formState: { errors } } = useForm()
+export default function CheckoutPage({ theme, storeSlug }: Props) {
+  const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutSchema)
+  })
   const [createOrder, { isLoading }] = useCreateOrderMutation()
-  const reduxCart = useAppSelector((s) => s.cart.items)
+  const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || [])
   const dispatch = useAppDispatch()
   const router = useRouter()
 
-  // prefer cart prop, otherwise use redux cart
-  const cartSource = cart ?? reduxCart
-
-  // Use storeData.slug directly (flat shape expected)
-  const storeSlug = storeData?.slug
-  if (!storeSlug) {
-    console.error('CheckoutPage: storeData.slug is missing; storeData:', storeData)
-  }
-
-  const onSubmit = async (data: any) => {
-    if (!cartSource || cartSource.length === 0) return alert('سلة الشراء فارغة')
-    if (!storeSlug) return alert('خطأ: لا يوجد متجر محدد')
+  const onSubmit = async (data: CheckoutFormData) => {
+    if (cart.length === 0) return alert('سلة الشراء فارغة')
+    
     const payload = {
       customerName: data.customerName,
       customerPhone: data.customerPhone,
       customerEmail: data.customerEmail || undefined,
       shippingAddress: {
-        fullName: data.fullName || data.customerName,
+        fullName: data.customerName,
         phone: data.customerPhone,
         city: data.city,
         region: data.region,
         street: data.street,
-        buildingNo: data.buildingNo || undefined,
       },
       paymentMethod: 'cash_on_delivery',
-      items: cartSource.map((i: any) => ({ productId: String(i.id), quantity: i.quantity })),
+      items: cart.map((i: any) => ({ productId: String(i.id), quantity: i.quantity })),
       notes: data.notes,
       storeSlug: String(storeSlug),
     }
-    console.debug('createOrder payload', payload)
+
     try {
       const res: any = await createOrder(payload).unwrap()
-      if (typeof onSuccess === 'function') {
-        onSuccess(res.orderCode)
-      } else {
-        dispatch(clearCart())
-        router.push(`/store/${storeSlug}/order-success?code=${res.orderCode}`)
-      }
+      dispatch(clearCart(storeSlug))
+      router.push(`/store/${storeSlug}/order-success?code=${res.orderCode}`)
     } catch (err: any) {
       alert(err?.data?.message || err?.message || 'خطأ أثناء إنشاء الطلب')
     }
@@ -74,14 +75,33 @@ export default function CheckoutPage({ storeData, theme, cart, onSuccess }: Prop
           <div className="bg-white p-8 border rounded-lg">
             <h2 className="text-lg font-black mb-4">عنوان الشحن</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input {...register('customerName', { required: true })} placeholder="الاسم الكامل" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('customerPhone', { required: true })} placeholder="رقم الجوال" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('customerEmail')} placeholder="البريد الإلكتروني (اختياري)" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('city', { required: true })} placeholder="المدينة" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('region', { required: true })} placeholder="المنطقة" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('street', { required: true })} placeholder="الشارع" className="p-3 bg-slate-50 border rounded-lg" />
-              <input {...register('buildingNo')} placeholder="رقم المبنى (اختياري)" className="p-3 bg-slate-50 border rounded-lg md:col-span-2" />
-              <textarea {...register('notes')} placeholder="ملاحظات (اختياري)" className="w-full p-3 bg-slate-50 border rounded-lg h-24 md:col-span-2" />
+              <div className="space-y-1">
+                <input {...register('customerName')} placeholder="الاسم الكامل" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.customerName ? 'border-red-500' : ''}`} />
+                {errors.customerName && <p className="text-red-500 text-[10px] pr-2">{errors.customerName.message}</p>}
+              </div>
+              <div className="space-y-1">
+                <input {...register('customerPhone')} placeholder="رقم الجوال" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.customerPhone ? 'border-red-500' : ''}`} />
+                {errors.customerPhone && <p className="text-red-500 text-[10px] pr-2">{errors.customerPhone.message}</p>}
+              </div>
+              <div className="space-y-1">
+                <input {...register('customerEmail')} placeholder="البريد الإلكتروني (اختياري)" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.customerEmail ? 'border-red-500' : ''}`} />
+                {errors.customerEmail && <p className="text-red-500 text-[10px] pr-2">{errors.customerEmail.message}</p>}
+              </div>
+              <div className="space-y-1">
+                <input {...register('city')} placeholder="المدينة" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.city ? 'border-red-500' : ''}`} />
+                {errors.city && <p className="text-red-500 text-[10px] pr-2">{errors.city.message}</p>}
+              </div>
+              <div className="space-y-1">
+                <input {...register('region')} placeholder="المنطقة" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.region ? 'border-red-500' : ''}`} />
+                {errors.region && <p className="text-red-500 text-[10px] pr-2">{errors.region.message}</p>}
+              </div>
+              <div className="space-y-1">
+                <input {...register('street')} placeholder="الشارع" className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.street ? 'border-red-500' : ''}`} />
+                {errors.street && <p className="text-red-500 text-[10px] pr-2">{errors.street.message}</p>}
+              </div>
+              <div className="md:col-span-2 space-y-1">
+                <textarea {...register('notes')} placeholder="ملاحظات (اختياري)" className="w-full p-3 bg-slate-50 border rounded-lg h-24" />
+              </div>
             </div>
           </div>
 
@@ -100,12 +120,14 @@ export default function CheckoutPage({ storeData, theme, cart, onSuccess }: Prop
             <div className="space-y-4 mb-6">
               {cart.map((item: any) => (
                 <div key={item.id} className="flex gap-4 items-center">
-                  <div className="w-16 h-16 bg-slate-50 rounded-lg flex items-center justify-center">IMAGE</div>
+                  <div className="w-16 h-16 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center border">
+                    <img src={item.image || '/placeholder-product.png'} className="w-full h-full object-contain" alt={item.name} />
+                  </div>
                   <div className="flex-grow">
-                    <div className="text-xs font-black">{item.name}</div>
+                    <div className="text-xs font-black line-clamp-1">{item.name}</div>
                     <div className="text-[10px] text-slate-400">الكمية: {item.quantity}</div>
                   </div>
-                  <div className="text-xs font-black">{item.price} ر.س</div>
+                  <div className="text-xs font-black whitespace-nowrap">{item.price.toLocaleString()} ر.س</div>
                 </div>
               ))}
             </div>
@@ -113,19 +135,19 @@ export default function CheckoutPage({ storeData, theme, cart, onSuccess }: Prop
             <div className="space-y-3 border-t pt-4 mb-6">
               <div className="flex justify-between text-sm font-bold text-slate-400">
                 <span>المجموع الفرعي</span>
-                <span>{subtotal} ر.س</span>
+                <span>{subtotal.toLocaleString()} ر.س</span>
               </div>
               <div className="flex justify-between text-sm font-bold text-green-500">
                 <span>رسوم الشحن</span>
                 <span>مجاني</span>
               </div>
-              <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t">
+              <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t border-dashed">
                 <span>الإجمالي</span>
-                <span style={{ color: 'var(--p-color)' }}>{subtotal} ر.س</span>
+                <span className="text-[var(--p-color)]">{subtotal.toLocaleString()} ر.س</span>
               </div>
             </div>
 
-            <button disabled={isLoading} type="submit" className="w-full py-4 text-white font-black rounded-xl" style={{ backgroundColor: 'var(--p-color)' }}>
+            <button disabled={isLoading} type="submit" className="w-full py-4 text-white font-black rounded-xl bg-[var(--p-color)] hover:shadow-lg transition-all">
               {isLoading ? 'جاري المعالجة...' : 'إتمام الطلب'}
             </button>
           </div>
