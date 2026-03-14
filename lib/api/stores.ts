@@ -1,21 +1,12 @@
 export async function getStoreBySlug(slug: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
   const res = await fetch(`${apiUrl}/stores/${slug}`, { cache: 'no-store' })
-  // Log status for debugging
-  // eslint-disable-next-line no-console
-  console.log(`getStoreBySlug: fetching ${apiUrl}/stores/${slug} -> status ${res.status}`)
   let data: any
   try {
     data = await res.json()
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('getStoreBySlug: failed to parse json', err)
+  } catch {
     return null
   }
-
-  // Debug raw response
-  // eslint-disable-next-line no-console
-  console.log('getStoreBySlug raw data:', JSON.stringify(data))
 
   if (!data) return null
 
