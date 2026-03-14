@@ -90,12 +90,12 @@ export default function FiltersSection({
 
           <div className="space-y-4">
             <h4 className="font-bold text-sm">الفئة</h4>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 mb-4">
               {['الكل', ...categories.map(c => c.name)].map(cat => (
                 <button 
                   key={cat}
                   onClick={() => handleCategoryChange(cat)}
-                  className={`px-3 py-1.5 font-bold transition-all ${
+                  className={`px-3 py-1.5 font-bold transition-all whitespace-nowrap ${
                     selectedCategory === cat 
                       ? 'bg-[var(--p-color)] text-white shadow-md' 
                       : 'bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white'
@@ -156,12 +156,12 @@ export default function FiltersSection({
                           <h4 className="font-bold text-base">الفئة</h4>
                           <span onClick={() => { onReset(); setCurrentPage(1); }} className="text-xs text-gray-400 hover:text-red-500 font-bold cursor-pointer transition-colors">إعادة ضبط</span>
                         </div>
-                        <div className="flex flex-wrap gap-2 ">
+                        <div className="flex flex-wrap gap-2 mb-4">
                           {['الكل', ...categories.map(c => c.name)].map(cat => (
                             <button 
                               key={cat}
                               onClick={() => handleCategoryChange(cat)}
-                              className={`px-4 py-2 font-bold transition-all ${
+                              className={`px-4 py-2 font-bold transition-all whitespace-nowrap ${
                                 selectedCategory === cat 
                                   ? 'bg-[var(--p-color)] text-white shadow-md' 
                                   : 'bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white'
@@ -195,7 +195,7 @@ export default function FiltersSection({
               </Sheet>
             </div>
 
-              <div className="flex items-center gap-2 text-xs font-bold bg-white px-4 py-2 rounded-xl border">
+              <div className=" hidden lg:flex items-center gap-2 text-xs font-bold bg-white px-4 py-2 rounded-xl border">
                 <SlidersHorizontal size={14} /> ترتيب حسب: الأحدث
               </div>
             </div>

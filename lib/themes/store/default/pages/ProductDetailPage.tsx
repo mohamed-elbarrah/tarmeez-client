@@ -35,6 +35,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
 
   // Wishlist
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authModalType, setAuthModalType] = useState<'wishlist' | 'review'>('wishlist')
   const [toggleWishlist] = useToggleWishlistMutation()
   const [isWishlisted, setIsWishlisted] = useState(product.isWishlisted ?? false)
 
@@ -76,6 +77,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
 
   const handleWishlist = async () => {
     if (!customer) {
+      setAuthModalType('wishlist')
       setShowAuthModal(true)
       return
     }
@@ -121,6 +123,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
     '--t-color': theme.textColor,
     '--h-color': theme.headingColor,
     '--radius': theme.borderRadius,
+    '--font-family': theme.fontFamily,
   } as React.CSSProperties
 
   const savings =
@@ -136,7 +139,11 @@ export default function ProductDetailPage({ storeData, product }: Props) {
       : 0
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 font-sans" dir="rtl" style={themeStyles}>
+    <div 
+      className="max-w-6xl mx-auto p-4 md:p-8" 
+      dir="rtl" 
+      style={{ ...themeStyles, fontFamily: 'var(--font-family)' }}
+    >
       {/* Main Product Card */}
       <div
         className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 bg-white p-6 md:p-10 border border-slate-100 shadow-sm transition-all hover:shadow-md"
@@ -357,15 +364,20 @@ export default function ProductDetailPage({ storeData, product }: Props) {
       <section className="mt-16 space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black">التقييمات ({reviewsData?.totalReviews ?? 0})</h2>
-          {customer && (
-            <button
-              onClick={() => setShowReviewForm(!showReviewForm)}
-              className="px-6 py-3 text-white font-black text-sm rounded-xl"
-              style={{ backgroundColor: 'var(--p-color)' }}
-            >
-              أضف تقييمك
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (!customer) {
+                setAuthModalType('review')
+                setShowAuthModal(true)
+              } else {
+                setShowReviewForm(!showReviewForm)
+              }
+            }}
+            className="px-6 py-3 text-white font-black text-sm rounded-xl"
+            style={{ backgroundColor: 'var(--p-color)' }}
+          >
+            أضف تقييمك
+          </button>
         </div>
 
         {/* Average Rating Summary */}
@@ -500,13 +512,21 @@ export default function ProductDetailPage({ storeData, product }: Props) {
             className="bg-white p-8 max-w-sm w-full text-center space-y-6"
             style={{ borderRadius: 'calc(var(--radius) * 2)' }}
           >
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto">
-              <Heart size={32} className="text-red-400" />
+            <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+              {authModalType === 'review' ? (
+                <Star size={32} className="text-amber-400" fill="currentColor" />
+              ) : (
+                <Heart size={32} className="text-red-400" />
+              )}
             </div>
             <div>
-              <h3 className="text-xl font-black mb-2">أضف للمفضلة</h3>
+              <h3 className="text-xl font-black mb-2">
+                {authModalType === 'review' ? 'أضف تقييمك' : 'أضف للمفضلة'}
+              </h3>
               <p className="text-slate-500 text-sm font-medium">
-                يجب تسجيل الدخول أو إنشاء حساب لحفظ المنتجات في مفضلتك
+                {authModalType === 'review' 
+                  ? 'يجب تسجيل الدخول أو إنشاء حساب لمشاركة تجربتك مع المنتج'
+                  : 'يجب تسجيل الدخول أو إنشاء حساب لحفظ المنتجات في مفضلتك'}
               </p>
             </div>
             <div className="flex gap-3">
