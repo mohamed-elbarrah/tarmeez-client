@@ -44,8 +44,6 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
       customerPhone: data.customerPhone,
       customerEmail: data.customerEmail || undefined,
       shippingAddress: {
-        fullName: data.customerName,
-        phone: data.customerPhone,
         city: data.city,
         region: data.region,
         street: data.street,
@@ -61,7 +59,14 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
       dispatch(clearCart(storeSlug))
       router.push(`/store/${storeSlug}/order-success?code=${res.orderCode}`)
     } catch (err: any) {
-      alert(err?.data?.message || err?.message || 'خطأ أثناء إنشاء الطلب')
+      console.error('Order creation error:', err)
+      const errorMessage = Array.isArray(err?.data?.message) 
+        ? err.data.message.map((m: any) => 
+            typeof m === 'object' ? JSON.stringify(m) : m
+          ).join('\n')
+        : err?.data?.message || err?.message || 'خطأ أثناء إنشاء الطلب'
+      
+      alert(errorMessage)
     }
   }
 
