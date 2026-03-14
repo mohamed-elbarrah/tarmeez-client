@@ -44,3 +44,29 @@ export const baseQueryWithReauth: BaseQueryFn<
 
     return result
 }
+
+// Customer-specific base query that uses customer token refresh endpoint
+export const customerBaseQueryWithReauth: BaseQueryFn<
+    string | FetchArgs,
+    unknown,
+    FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+    let result = await baseQuery(args, api, extraOptions)
+
+    if (result.error && result.error.status === 401) {
+        const url = typeof args === 'string' ? args : args.url
+        if (url !== '/auth/customer/refresh' && url !== '/auth/customer/logout') {
+            const refreshResult = await baseQuery(
+                { url: '/auth/customer/refresh', method: 'POST' },
+                api,
+                extraOptions
+            )
+
+            if (refreshResult.data) {
+                result = await baseQuery(args, api, extraOptions)
+            }
+        }
+    }
+
+    return result
+}

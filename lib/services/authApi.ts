@@ -43,26 +43,10 @@ export const authApi = createApi({
 
     customerLogin: build.mutation<{ user: CurrentUser }, CustomerLoginPayload>({
       query: (body) => ({ url: '/auth/customer/login', method: 'POST', body }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled
-          if (data?.user) dispatch(setUser(data.user))
-        } catch (err) {
-          dispatch(clearUser())
-        }
-      },
     }),
 
     customerRegister: build.mutation<any, CustomerRegisterPayload>({
       query: (body) => ({ url: '/auth/customer/register', method: 'POST', body }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled
-          if (data?.user) dispatch(setUser(data.user))
-        } catch (err) {
-          dispatch(clearUser())
-        }
-      },
     }),
 
     getMe: build.query<CurrentUser | null, void>({

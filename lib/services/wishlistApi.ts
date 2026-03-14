@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithReauth } from './baseQuery'
+import { customerBaseQueryWithReauth } from './baseQuery'
 
 export interface WishlistProduct {
   id: string
@@ -20,7 +20,7 @@ export interface WishlistItem {
 
 export const wishlistApi = createApi({
   reducerPath: 'wishlistApi',
-  baseQuery: baseQueryWithReauth,
+  baseQuery: customerBaseQueryWithReauth,
   tagTypes: ['Wishlist'],
   endpoints: (builder) => ({
     toggleWishlist: builder.mutation<{ wishlisted: boolean }, { productId: string; storeSlug: string }>({

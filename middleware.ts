@@ -12,7 +12,8 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.includes('/account')) {
-    if (!accessToken) {
+    const customerToken = request.cookies.get('customer_access_token')
+    if (!customerToken) {
       const parts = pathname.split('/')
       const storeSlug = parts[2] || ''
       return NextResponse.redirect(new URL(`/store/${storeSlug}/login`, request.url))

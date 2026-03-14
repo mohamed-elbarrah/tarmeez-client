@@ -154,7 +154,7 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
           )}
 
       {view === 'account' && (
-        <AccountPage theme={theme} products={allProducts} />
+        <AccountPage theme={theme} storeSlug={storeData.slug} />
       )}
 
       <Footer

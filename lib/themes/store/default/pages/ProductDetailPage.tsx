@@ -9,10 +9,11 @@ import { StoreProduct, StoreData } from '@/lib/themes/types'
 import ProductCard from '@/lib/themes/store/default/components/ProductCard'
 import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 import StarRating from '@/lib/themes/store/default/components/StarRating'
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks'
+import { useAppDispatch } from '@/lib/store/hooks'
 import { addItem } from '@/lib/store/slices/cartSlice'
 import { useGetProductReviewsQuery, useCreateReviewMutation } from '@/lib/services/reviewsApi'
 import { useToggleWishlistMutation } from '@/lib/services/wishlistApi'
+import { useGetCustomerMeQuery } from '@/lib/services/customerApi'
 import { resolveTokens } from '@/lib/themes/store/default/config'
 
 interface Props {
@@ -27,8 +28,8 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   const products = storeData.products ?? []
   const theme = resolveTokens(storeData)
 
-  const user = useAppSelector((state) => state.auth.user)
-  const customer = user?.role === 'CUSTOMER' ? user : null
+  const { data: customerProfile } = useGetCustomerMeQuery()
+  const customer = customerProfile ?? null
 
   // Offers
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null)

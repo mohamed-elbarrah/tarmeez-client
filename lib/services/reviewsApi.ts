@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithReauth } from './baseQuery'
+import { customerBaseQueryWithReauth } from './baseQuery'
 
 export interface ReviewCustomer {
   fullName: string
@@ -33,7 +33,7 @@ export interface CreateReviewDto {
 
 export const reviewsApi = createApi({
   reducerPath: 'reviewsApi',
-  baseQuery: baseQueryWithReauth,
+  baseQuery: customerBaseQueryWithReauth,
   tagTypes: ['Reviews'],
   endpoints: (builder) => ({
     getProductReviews: builder.query<ReviewsResponse, { productId: string; storeSlug: string }>({

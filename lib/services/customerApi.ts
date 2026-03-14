@@ -1,9 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithReauth } from './baseQuery'
+import { customerBaseQueryWithReauth } from './baseQuery'
 
 export const customerApi = createApi({
   reducerPath: 'customerApi',
-  baseQuery: baseQueryWithReauth,
+  baseQuery: customerBaseQueryWithReauth,
   endpoints: (build) => ({
     // Profile
     getCustomerMe: build.query<any, void>({ query: () => ({ url: '/auth/customer/me', method: 'GET' }) }),
@@ -24,8 +24,8 @@ export const customerApi = createApi({
     // Orders
     getOrders: build.query<any[], void>({ query: () => ({ url: '/customer/orders', method: 'GET' }) }),
 
-    // Logout (helper)
-    customerLogout: build.mutation<any, void>({ query: () => ({ url: '/auth/logout', method: 'POST' }) }),
+    // Logout (uses customer-specific endpoint)
+    customerLogout: build.mutation<any, void>({ query: () => ({ url: '/auth/customer/logout', method: 'POST' }) }),
   }),
 })
 
