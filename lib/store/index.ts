@@ -10,6 +10,7 @@ import { ordersApi } from '@/lib/services/ordersApi'
 import { reviewsApi } from '@/lib/services/reviewsApi'
 import { wishlistApi } from '@/lib/services/wishlistApi'
 import { categoriesApi } from '@/lib/services/categoriesApi'
+import { pagesApi } from '@/lib/services/pagesApi'
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     [reviewsApi.reducerPath]: reviewsApi.reducer,
     [wishlistApi.reducerPath]: wishlistApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
+    [pagesApi.reducerPath]: pagesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -36,6 +38,7 @@ export const store = configureStore({
       reviewsApi.middleware,
       wishlistApi.middleware,
       categoriesApi.middleware,
+      pagesApi.middleware,
     ),
 })
 
