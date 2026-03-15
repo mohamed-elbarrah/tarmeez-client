@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { cn } from "@/lib/utils";
 import { Config } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
 import { puckConfig } from '../puck.config';
@@ -21,6 +22,16 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Sheet, 
   SheetContent, 
@@ -69,13 +80,19 @@ interface PageEditorProps {
 export default function PageEditor({ page: initialPage }: PageEditorProps) {
   const router = useRouter();
   const [page, setPage] = useState(initialPage);
-  const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved' | 'error'>('saved');
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [updatePage, { isLoading: isSavingManual }] = useUpdatePageMutation();
   const [updateStatus, { isLoading: isStatusChanging }] = useUpdatePageStatusMutation();
+  
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentPuckData, setCurrentPuckData] = useState(page.content?.puckData || { content: [], root: { props: {} } });
   
   // Puck state management
   const initialData = page.content?.puckData || { content: [], root: { props: {} } };
 
   const handleSave = useCallback(async (currentData: any, isAutoSave = false) => {
+    setSaveStatus('saving');
     try {
       const content = {
         version: 1,
@@ -91,26 +108,54 @@ export default function PageEditor({ page: initialPage }: PageEditorProps) {
         seoDescription: page.seoDescription
       }).unwrap();
 
+      setSaveStatus('saved');
       if (!isAutoSave) {
         toast.success('تم حفظ التعديلات بنجاح');
-      } else {
-        toast.info('تم الحفظ تلقائياً', { duration: 2000 });
       }
     } catch (error) {
+      setSaveStatus('error');
       if (!isAutoSave) toast.error('حدث خطأ أثناء الحفظ');
     }
   }, [page, updatePage]);
 
-  // Auto-save logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Note: We need the current puck state. 
-      // Puck doesn't expose state directly easily without a ref or external state manager,
-      // but we can use the onChange callback to keep a local copy.
+  // Handle puck data change
+  const onDataChange = useCallback((data: any) => {
+    setCurrentPuckData(data);
+    setSaveStatus('unsaved');
+    
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    
+    saveTimerRef.current = setTimeout(() => {
+      handleSave(data, true);
     }, 30000);
-
-    return () => clearInterval(interval);
   }, [handleSave]);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
+  // Browser level unsaved changes warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (saveStatus === 'unsaved') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [saveStatus]);
+
+  const onBack = () => {
+    if (saveStatus === 'unsaved') {
+      setShowExitDialog(true);
+    } else {
+      router.push('/merchant/pages');
+    }
+  };
 
   const onPublishToggle = async () => {
     try {
@@ -131,12 +176,21 @@ export default function PageEditor({ page: initialPage }: PageEditorProps) {
     setPage(prev => ({ ...prev, [key]: value }));
   };
 
+  const sanitizeSlugInput = (val: string) => {
+    return val
+      .toLowerCase()
+      .replace(/[\u0600-\u06FF]/g, '') // Remove Arabic
+      .replace(/[^a-z0-9-]/g, '')      // Keep only safe chars
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
   return (
     <div className="h-screen flex flex-col bg-background" dir="rtl">
       {/* Editor Toolbar */}
       <header className="h-16 border-b border-border bg-card px-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/merchant/pages')}>
+          <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowRight className="w-4 h-4 ml-2" />
             رجوع
           </Button>
@@ -145,6 +199,41 @@ export default function PageEditor({ page: initialPage }: PageEditorProps) {
           <Badge variant={page.status === 'PUBLISHED' ? 'default' : 'secondary'} className="mr-2">
             {page.status === 'PUBLISHED' ? 'منشورة' : 'مسودة'}
           </Badge>
+          
+          <div className="flex items-center gap-2 mr-4 bg-muted/50 px-3 py-1 rounded-full text-xs font-medium border border-border">
+            {saveStatus === 'saving' && (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                <span>جاري الحفظ...</span>
+              </>
+            )}
+            {saveStatus === 'saved' && (
+              <>
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span>تم الحفظ</span>
+              </>
+            )}
+            {saveStatus === 'unsaved' && (
+              <>
+                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                <span>تغييرات غير محفوظة</span>
+              </>
+            )}
+            {saveStatus === 'error' && (
+              <>
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-destructive">فشل الحفظ</span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
+                  onClick={() => handleSave(currentPuckData)}
+                >
+                  <Save className="w-3 h-3" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -185,28 +274,52 @@ export default function PageEditor({ page: initialPage }: PageEditorProps) {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">SEO</h3>
-                  <div className="space-y-2">
-                    <Label>عنوان محرك البحث (SEO Title)</Label>
-                    <Input 
-                      value={page.seoTitle || ''} 
-                      onChange={(e) => updateLocalSettings('seoTitle', e.target.value)}
-                      placeholder="اتركه فارغاً لاستخدام عنوان الصفحة"
-                    />
+                  <div className="space-y-4 border-b pb-6">
+                    <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">الرابط</h3>
+                    <div className="space-y-2">
+                      <Label>رابط الصفحة (Slug)</Label>
+                      <Input 
+                        value={page.slug || ''} 
+                        onChange={(e) => updateLocalSettings('slug', sanitizeSlugInput(e.target.value))}
+                        dir="ltr"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        يُستخدم في رابط الصفحة — أحرف إنجليزية وأرقام وشرطات فقط
+                      </p>
+                    </div>
                   </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">SEO</h3>
+                    <div className="space-y-2">
+                      <Label>عنوان محرك البحث (SEO Title)</Label>
+                      <Input 
+                        value={page.seoTitle || ''} 
+                        onChange={(e) => updateLocalSettings('seoTitle', e.target.value)}
+                        placeholder="اتركه فارغاً لاستخدام عنوان الصفحة"
+                      />
+                    </div>
                   <div className="space-y-2">
-                    <Label>وصف محرك البحث (SEO Description)</Label>
+                    <div className="flex justify-between items-center">
+                      <Label>وصف محرك البحث (SEO Description)</Label>
+                      <span className={cn(
+                        "text-[10px]",
+                        (page.seoDescription?.length || 0) > 160 ? "text-destructive" : "text-muted-foreground"
+                      )}>
+                        {page.seoDescription?.length || 0}/160
+                      </span>
+                    </div>
                     <Textarea 
                       value={page.seoDescription || ''} 
                       onChange={(e) => updateLocalSettings('seoDescription', e.target.value)}
                       placeholder="وصف مختصر للصفحة يظهر في نتائج البحث..."
                       rows={4}
+                      className={cn((page.seoDescription?.length || 0) > 160 && "border-destructive")}
                     />
                   </div>
                 </div>
                 
-                <Button className="w-full mt-4" onClick={() => handleSave(initialData)}>
+                <Button className="w-full mt-4" onClick={() => handleSave(currentPuckData)}>
                   حفظ الإعدادات
                 </Button>
               </div>
@@ -227,26 +340,53 @@ export default function PageEditor({ page: initialPage }: PageEditorProps) {
           </Button>
 
           <Button 
-            disabled={isSaving} 
+            disabled={saveStatus === 'saving'} 
             size="sm" 
-            onClick={() => handleSave(initialData)}
+            onClick={() => handleSave(currentPuckData)}
             className="bg-primary text-primary-foreground"
           >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Save className="w-4 h-4 ml-2" />}
+            {saveStatus === 'saving' ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Save className="w-4 h-4 ml-2" />}
             حفظ
           </Button>
         </div>
       </header>
 
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>لديك تغييرات غير محفوظة</AlertDialogTitle>
+            <AlertDialogDescription>
+              لقد أجريت تغييرات لم يتم حفظها بعد. هل تريد حفظها قبل المغادرة أم المغادرة بدون حفظ؟
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse gap-2">
+            <Button 
+              onClick={async () => {
+                await handleSave(currentPuckData);
+                router.push('/merchant/pages');
+              }}
+            >
+              احفظ وغادر
+            </Button>
+            <AlertDialogAction 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => router.push('/merchant/pages')}
+            >
+              غادر بدون حفظ
+            </AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Main Editor Area */}
       <div className="flex-1 overflow-hidden puck-editor-container">
         <Puck
           config={puckConfig as Config}
-          data={initialData}
+          data={currentPuckData}
           onPublish={(data) => handleSave(data)}
-          onChange={(data) => {
-            // We could update local state here to track dirty state
-          }}
+          onChange={onDataChange}
           headerTitle={page.title}
         />
       </div>

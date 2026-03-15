@@ -50,6 +50,7 @@ const templateMap: Record<string, any> = {
 
 const formSchema = z.object({
   title: z.string().min(2, 'العنوان يجب أن يكون حرفين على الأقل'),
+  slug: z.string().min(1, 'الرابط مطلوب').regex(/^[a-z0-9-]+$/, 'الرابط يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطات فقط'),
   type: z.enum(['LANDING', 'CUSTOM']),
   linkedProductId: z.string().optional(),
   template: z.enum(['blank', 'landing-product', 'promo-sale']),
@@ -77,11 +78,41 @@ export default function CreatePageModal({ isOpen, onClose }: CreatePageModalProp
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
+      slug: '',
       type: 'CUSTOM',
       linkedProductId: '',
       template: 'blank',
     },
   });
+
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^\w-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    form.setValue('title', val);
+    
+    // Only auto-generate slug if it was empty or matched previous title
+    const currentSlug = form.getValues('slug');
+    if (!currentSlug || currentSlug === generateSlug(form.getValues('title'))) {
+      form.setValue('slug', generateSlug(val));
+    }
+  };
+
+  const sanitizeSlugInput = (val: string) => {
+    return val
+      .toLowerCase()
+      .replace(/[\u0600-\u06FF]/g, '') // Remove Arabic
+      .replace(/[^a-z0-9-]/g, '')      // Keep only safe chars
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
 
   const pageType = form.watch('type');
 
@@ -96,6 +127,7 @@ export default function CreatePageModal({ isOpen, onClose }: CreatePageModalProp
       
       const newPage = await createPage({
         title: values.title,
+        slug: values.slug,
         type: values.type,
         linkedProductId: values.linkedProductId,
         content: initialContent,
@@ -125,8 +157,34 @@ export default function CreatePageModal({ isOpen, onClose }: CreatePageModalProp
                 <FormItem>
                   <FormLabel>عنوان الصفحة</FormLabel>
                   <FormControl>
-                    <Input placeholder="مثلاً: عرض الجمعة البيضاء" {...field} />
+                    <Input 
+                      placeholder="مثلاً: عرض الجمعة البيضاء" 
+                      {...field} 
+                      onChange={handleTitleChange}
+                    />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>رابط الصفحة (Slug)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="black-friday-offer" 
+                      {...field} 
+                      dir="ltr"
+                      onChange={(e) => field.onChange(sanitizeSlugInput(e.target.value))}
+                    />
+                  </FormControl>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    يُستخدم في رابط الصفحة — أحرف إنجليزية وأرقام وشرطات فقط
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

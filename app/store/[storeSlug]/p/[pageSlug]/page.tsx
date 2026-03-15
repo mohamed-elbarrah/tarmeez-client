@@ -17,8 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { storeSlug, pageSlug } = await params;
   
+  const store = await getStoreBySlug(storeSlug);
+  if (!store) return {};
+
   const res = await fetch(`${API_URL}/stores/${storeSlug}/pages/${pageSlug}`, {
-    next: { revalidate: 60 }
+    cache: 'no-store'
   });
 
   if (!res.ok) return { title: 'Page Not Found' };
@@ -27,6 +30,11 @@ export async function generateMetadata({
   return {
     title: page.seoTitle || page.title,
     description: page.seoDescription || `مرحباً بكم في ${page.title}`,
+    openGraph: {
+      title: page.seoTitle || page.title,
+      description: page.seoDescription || `مرحباً بكم في ${page.title}`,
+      siteName: store.name,
+    },
   };
 }
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetPagesQuery } from "@/lib/services/pagesApi";
 import { Button } from "@/components/ui/button";
 import {
   SidebarProvider,
@@ -54,6 +55,9 @@ const navigation = [
 
 export default function MerchantLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: pages } = useGetPagesQuery();
+  
+  const publishedCount = pages?.filter(p => p.status === 'PUBLISHED').length ?? 0;
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
@@ -77,9 +81,14 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
                 return (
                   <SidebarMenuItem key={item.name}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href} className="flex items-center gap-3 px-4 py-3">
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.name}</span>
+                      <Link href={item.href} className="flex items-center gap-3 px-4 py-3 w-full">
+                        <item.icon className="w-5 h-5 flex-shrink-0" />
+                        <span className="flex-1">{item.name}</span>
+                        {item.name === "صفحاتي" && publishedCount > 0 && (
+                          <span className="bg-[var(--p-color,theme(colors.primary.DEFAULT))] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            {publishedCount}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
