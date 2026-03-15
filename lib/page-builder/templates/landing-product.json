@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "puckData": {
+    "content": [
+      {
+        "type": "HeroBanner",
+        "props": {
+          "id": "hero-1",
+          "title": "عنوان منتجك هنا",
+          "subtitle": "وصف مختصر وجذاب للمنتج",
+          "backgroundImage": "https://placehold.co/1400x600/0f172a/ffffff?text=Hero",
+          "showButton": true,
+          "buttonLabel": "اشتري الآن",
+          "contentAlign": "center"
+        }
+      },
+      {
+        "type": "Section",
+        "props": {
+          "id": "section-1",
+          "paddingY": "lg",
+          "backgroundColor": "light"
+        }
+      },
+      {
+        "type": "ProductBlock",
+        "props": {
+          "id": "product-1",
+          "layout": "hero",
+          "checkoutMode": "both",
+          "showPrice": true,
+          "showDescription": true,
+          "showRating": true
+        }
+      },
+      {
+        "type": "CountdownTimer",
+        "props": {
+          "id": "timer-1",
+          "title": "ينتهي العرض خلال",
+          "align": "center"
+        }
+      }
+    ],
+    "root": { "props": {} }
+  },
+  "linkedProductId": null
+}

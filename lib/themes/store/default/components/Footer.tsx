@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
-import { ThemeTokens } from '../../types'
+import { ThemeTokens } from '../../../types'
 
 interface Props {
   storeSlug: string

@@ -32,6 +32,7 @@ import {
   Bell,
   ChevronDown,
   Menu,
+  Layout,
 } from "lucide-react";
 
 const navigation = [
@@ -42,7 +43,7 @@ const navigation = [
   { name: "العملاء", href: "/merchant/customers", icon: Users },
   { name: "التحليلات", href: "/merchant/analytics", icon: BarChart3 },
   { name: "التسويق", href: "/merchant/marketing", icon: Megaphone },
-  { name: "منشئ الصفحات", href: "/merchant/page-builder", icon: Palette },
+  { name: "صفحاتي", href: "/merchant/pages", icon: Layout },
   { name: "القوالب", href: "/merchant/themes", icon: Palette },
   { name: "التطبيقات", href: "/merchant/apps", icon: Puzzle },
   { name: "الإعدادات", href: "/merchant/settings", icon: Settings },

@@ -35,7 +35,6 @@ export interface MerchantDashboardData {
   store: StoreBrandInfo
 }
 export type UserRole = 'SUPERADMIN' | 'MERCHANT' | 'CUSTOMER'
-export type MerchantStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
 export interface MerchantInfo {
   status: MerchantStatus

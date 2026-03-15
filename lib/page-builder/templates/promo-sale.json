@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "puckData": {
+    "content": [
+      {
+        "type": "HeroBanner",
+        "props": {
+          "id": "hero-1",
+          "title": "تخفيضات حصرية",
+          "subtitle": "عروض لفترة محدودة",
+          "contentAlign": "center",
+          "backgroundColor": "primary"
+        }
+      },
+      {
+        "type": "CountdownTimer",
+        "props": {
+          "id": "timer-1",
+          "title": "ينتهي العرض خلال",
+          "align": "center"
+        }
+      },
+      {
+        "type": "Section",
+        "props": {
+          "id": "section-1",
+          "paddingY": "lg"
+        }
+      },
+      {
+        "type": "TextBlock",
+        "props": {
+          "id": "text-1",
+          "content": "أضف تفاصيل العرض هنا",
+          "align": "center",
+          "size": "lg"
+        }
+      }
+    ],
+    "root": { "props": {} }
+  },
+  "linkedProductId": null
+}

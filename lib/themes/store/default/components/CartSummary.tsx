@@ -4,7 +4,13 @@ import React from 'react'
 import Link from 'next/link'
 import { ThemeTokens, StoreProduct } from '@/lib/themes/types'
 
-interface CartItem extends StoreProduct { quantity: number }
+interface CartItem {
+  id: string | number
+  name: string
+  price: number
+  image?: string | null
+  quantity: number
+}
 
 interface Props {
   theme: ThemeTokens

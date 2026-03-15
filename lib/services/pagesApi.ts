@@ -28,6 +28,7 @@ export interface CreatePageDto {
   showFooter?: boolean
   seoTitle?: string
   seoDescription?: string
+  content?: Record<string, any>
 }
 
 export interface UpdatePageDto {

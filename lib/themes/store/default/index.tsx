@@ -15,7 +15,7 @@ import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 import OrderTrackingPage from './pages/OrderTrackingPage'
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks'
-import { addItem as addCartItem, removeItem as removeCartItem, updateQuantity as updateCartQuantity, clearCart as clearCartAction, setStoreSlug } from '@/lib/store/slices/cartSlice'
+import { addItem as addCartItem, removeItem as removeCartItem, updateQuantity as updateCartQuantity, clearCart as clearCartAction } from '@/lib/store/slices/cartSlice'
 
 // Cart stored in Redux uses `quantity` per item
 
@@ -34,12 +34,7 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
   const theme = resolveTokens(storeData)
   
   const [view, setView] = useState(initialView ?? 'home')
-  const [orderCode, setOrderCode] = useState<string | null>(null)
   const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(null)
-  const dispatch = useAppDispatch()
-  const cart = useAppSelector((s) => s.cart.items)
-  const currentStoreSlug = useAppSelector((s) => s.cart.storeSlug)
-  const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('الكل')
 
   const allProducts = storeData.products?.length 
@@ -51,22 +46,6 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
     setView(v)
     if (typeof window !== 'undefined') window.scrollTo(0, 0)
   }
-
-  useEffect(() => {
-    // set store slug in cart state when mounting
-    if (storeData?.slug && storeData?.slug !== currentStoreSlug) {
-      dispatch(setStoreSlug(storeData.slug))
-    }
-  }, [storeData?.slug, currentStoreSlug, dispatch])
-
-  const addToCart = (p: StoreProduct) => {
-    dispatch(addCartItem({ id: p.id, name: p.name, price: p.price as any, image: p.image || null, quantity: 1, slug: (p as any).slug || '' }))
-    navigate('cart')
-  }
-
-  const router = useRouter()
-
-  const cartCount = cart.reduce((s: number, i: any) => s + (i.quantity || 0), 0)
 
   return (
     <div
@@ -84,21 +63,18 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
       dir="rtl"
     >
       <Header
+        storeSlug={storeData.slug}
         storeName={storeData.name}
         logo={storeData.logo}
         theme={theme}
-        cartCount={cartCount}
-        searchQuery={searchQuery}
-        onSearchChange={(q) => { setSearchQuery(q); if (view !== 'products') setView('products') }}
-        onNavigate={navigate}
       />
 
       {view === 'home' && (
         <HomePage
           theme={theme}
           products={allProducts}
-          onNavigate={navigate}
-          onCategorySelect={(cat) => { setSelectedCategory(cat); navigate('products') }}
+          storeSlug={storeData.slug}
+          categories={storeData.categories}
         />
       )}
 
@@ -106,62 +82,51 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
         <ProductsPage
           theme={theme}
           products={allProducts}
-          initialSearch={searchQuery}
+          storeSlug={storeData.slug}
+          categories={storeData.categories || []}
+          initialSearch={""}
           initialCategory={selectedCategory}
-          onProductClick={(p) => navigate('product', p)}
         />
       )}
 
       {view === 'product' && selectedProduct && (
         <ProductDetailPage
-          theme={theme}
+          storeData={storeData}
           product={selectedProduct}
-          onAddToCart={addToCart}
-          onBack={() => navigate('products')}
         />
       )}
 
       {view === 'cart' && (
         <CartPage
           theme={theme}
-          cart={cart}
-          onUpdateQty={(id, delta) => dispatch(updateCartQuantity({ id, quantity: Math.max(1, (cart.find((x: any) => x.id === id)?.quantity || 1) + delta) }))}
-          onRemove={(id) => dispatch(removeCartItem(id))}
-          onContinueShopping={() => navigate('home')}
-          onCheckout={() => router.push(`/store/${storeData.slug}/checkout`)}
+          storeSlug={storeData.slug}
         />
       )}
 
-          {view === 'checkout' && (
-            <CheckoutPage
-              storeData={storeData}
-              theme={theme}
-              cart={cart}
-              onSuccess={(code: string) => {
-                setOrderCode(code)
-                dispatch(clearCartAction())
-                navigate('order-success')
-              }}
-            />
-          )}
+      {view === 'checkout' && (
+        <CheckoutPage
+          theme={theme}
+          storeSlug={storeData.slug}
+        />
+      )}
 
-          {view === 'order-success' && (
-            <OrderSuccessPage storeData={storeData} orderCode={orderCode} />
-          )}
+      {view === 'order-success' && (
+        <OrderSuccessPage storeSlug={storeData.slug} />
+      )}
 
-          {view === 'track' && (
-            <OrderTrackingPage storeData={storeData} />
-          )}
+      {view === 'track' && (
+        <OrderTrackingPage theme={theme} storeSlug={storeData.slug} />
+      )}
 
       {view === 'account' && (
         <AccountPage theme={theme} storeSlug={storeData.slug} />
       )}
 
       <Footer
+        storeSlug={storeData.slug}
         storeName={storeData.name}
         logo={storeData.logo}
         theme={theme}
-        onNavigate={navigate}
       />
     </div>
   )

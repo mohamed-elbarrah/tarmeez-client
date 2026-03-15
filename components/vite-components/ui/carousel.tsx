@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "./utils";
 import { Button } from "./button";
 
-type CarouselApi = UseEmblaCarouselType[1];
+type CarouselApi = any;
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
 type CarouselOptions = UseCarouselParameters[0];
 type CarouselPlugin = UseCarouselParameters[1];
@@ -53,7 +53,7 @@ function Carousel({
 }: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
     {
-      ...opts,
+      ...(opts || {}),
       axis: orientation === "horizontal" ? "x" : "y",
     },
     plugins,
@@ -110,8 +110,7 @@ function Carousel({
         carouselRef,
         api: api,
         opts,
-        orientation:
-          orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+        orientation: orientation || "horizontal",
         scrollPrev,
         scrollNext,
         canScrollPrev,
