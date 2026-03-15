@@ -1,7 +1,15 @@
 import React from 'react';
-import { Render } from '@puckeditor/core/rsc';
-import { puckConfig } from '../puck.config';
-import type { StoreProduct } from '@/lib/themes/types';
+import { HeroBanner } from '../components/widgets/HeroBanner';
+import { ProductBlock } from '../components/widgets/ProductBlock';
+import { CountdownTimer } from '../components/widgets/CountdownTimer';
+import { Section } from '../components/layout/Section';
+import { TwoColumns } from '../components/layout/TwoColumns';
+import { TextBlock } from '../components/basic/TextBlock';
+import { ImageBanner } from '../components/basic/ImageBanner';
+import { Button } from '../components/basic/Button';
+import { Spacer } from '../components/basic/Spacer';
+import { ensureVersion } from '../migrations';
+import type { StoreProduct, StoreData } from '@/lib/themes/types';
 
 interface PageRendererProps {
   page: {
@@ -11,61 +19,126 @@ interface PageRendererProps {
   };
   resolvedProducts: Record<string, StoreProduct>;
   storeSlug: string;
-  storeData: any; // Using any for now to avoid deep type issues, should match StoreData
+  storeData: StoreData;
 }
 
 /**
  * PageRenderer - Storefront component for rendering Puck JSON.
- * Uses @puckeditor/core/rsc for optimized, render-only execution without editor UI.
+ * Implementation: Option B (Custom Mapper).
+ * Zero imports from @puckeditor/core for maximum performance and bundle separation.
  */
-export default function PageRenderer({ 
-  page, 
-  resolvedProducts, 
-  storeSlug, 
-  storeData 
+export default function PageRenderer({
+  page,
+  resolvedProducts,
+  storeSlug,
+  storeData,
 }: PageRendererProps) {
-  const content = page.content || {};
-  const puckData = content.puckData || { content: [], root: { props: {} } };
-
-  // Note: Since we are in RSC, we pass the resolved data down.
-  // The components (HeroBanner, ProductBlock, etc.) should be able to receive
-  // their props directly. ProductBlock specifically needs the resolvedProduct.
-  
-  // We need to inject resolved products into the puckData content before rendering
-  // to satisfy Rule 6 (Data resolution at renderer wrapper level).
-  
-  const injectResolvedData = (components: any[]) => {
-    return components.map(component => {
-      const newComponent = { ...component };
-      if (newComponent.type === 'ProductBlock' && newComponent.props?.productId) {
-        newComponent.props = {
-          ...newComponent.props,
-          resolvedProduct: resolvedProducts[newComponent.props.productId],
-          storeSlug,
-          pageType: page.type
-        };
-      }
-      
-      if (newComponent.props?.zones) {
-        const newZones: Record<string, any[]> = {};
-        for (const [key, zone] of Object.entries(newComponent.props.zones)) {
-          newZones[key] = injectResolvedData(zone as any[]);
-        }
-        newComponent.props.zones = newZones;
-      }
-      
-      return newComponent;
-    });
+  const content = ensureVersion(page.content ?? {});
+  const puckData = content.puckData ?? {
+    content: [],
+    root: { props: {} }
   };
-
-  const resolvedPuckData = {
-    ...puckData,
-    content: injectResolvedData(puckData.content || [])
-  };
+  const components = Array.isArray(puckData.content)
+    ? puckData.content
+    : [];
 
   return (
-    <div className="puck-renderer">
-      <Render config={puckConfig as any} data={resolvedPuckData} />
+    <div className="puck-renderer-custom">
+      {components.map((component: any) =>
+        renderComponent(
+          component,
+          resolvedProducts,
+          storeSlug,
+          page.type
+        )
+      )}
     </div>
   );
+}
+
+function renderZone(
+  zone: any[],
+  resolvedProducts: Record<string, StoreProduct>,
+  storeSlug: string,
+  pageType: string
+) {
+  if (!Array.isArray(zone)) return null;
+  return zone.map(c =>
+    renderComponent(c, resolvedProducts, storeSlug, pageType)
+  );
+}
+
+function renderComponent(
+  component: any,
+  resolvedProducts: Record<string, StoreProduct>,
+  storeSlug: string,
+  pageType: string
+) {
+  if (!component?.type || !component?.props) return null;
+  const { type, props } = component;
+
+  switch (type) {
+    case 'HeroBanner':
+      return <HeroBanner key={props.id} {...props} />;
+
+    case 'ProductBlock':
+      return (
+        <ProductBlock
+          key={props.id}
+          {...props}
+          resolvedProduct={resolvedProducts[props.productId]}
+          storeSlug={storeSlug}
+          pageType={pageType}
+        />
+      );
+
+    case 'CountdownTimer':
+      return <CountdownTimer key={props.id} {...props} />;
+
+    case 'Section':
+      return (
+        <Section key={props.id} {...props}>
+          {renderZone(
+            props.zones?.content,
+            resolvedProducts,
+            storeSlug,
+            pageType
+          )}
+        </Section>
+      );
+
+    case 'TwoColumns':
+      return (
+        <TwoColumns key={props.id} {...props}>
+          {renderZone(
+            props.zones?.left,
+            resolvedProducts,
+            storeSlug,
+            pageType
+          )}
+          {renderZone(
+            props.zones?.right,
+            resolvedProducts,
+            storeSlug,
+            pageType
+          )}
+        </TwoColumns>
+      );
+
+    case 'TextBlock':
+      return <TextBlock key={props.id} {...props} />;
+
+    case 'ImageBanner':
+      return <ImageBanner key={props.id} {...props} />;
+
+    case 'Button':
+      return <Button key={props.id} {...props} />;
+
+    case 'Spacer':
+      return <Spacer key={props.id} {...props} />;
+
+    default:
+      console.warn('Unknown component type:', type);
+      return null;
+  }
 }

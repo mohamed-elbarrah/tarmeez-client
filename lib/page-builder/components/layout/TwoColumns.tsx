@@ -1,16 +1,14 @@
-'use client';
-
-import React from 'react';
-import { DropZone } from '@puckeditor/core';
+import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface TwoColumnsProps {
   split: '50-50' | '60-40' | '40-60' | '70-30' | '30-70';
   gap: 'sm' | 'md' | 'lg';
   reverseOnMobile: boolean;
+  children?: ReactNode[];
 }
 
-export const TwoColumns = ({ split, gap, reverseOnMobile }: TwoColumnsProps) => {
+export const TwoColumns = ({ split, gap, reverseOnMobile, children }: TwoColumnsProps) => {
   const gridClass = {
     '50-50': 'grid-cols-1 md:grid-cols-2',
     '60-40': 'grid-cols-1 md:grid-cols-[1.5fr_1fr]',
@@ -35,19 +33,13 @@ export const TwoColumns = ({ split, gap, reverseOnMobile }: TwoColumnsProps) => 
       )}
     >
       <div className="w-full">
-        <DropZone zone="left" />
+        {children?.[0]}
       </div>
       <div className="w-full">
-        <DropZone zone="right" />
+        {children?.[1]}
       </div>
     </div>
   );
-};
-
-TwoColumns.defaultProps = {
-  split: '50-50',
-  gap: 'md',
-  reverseOnMobile: true,
 };
 
 export default TwoColumns;

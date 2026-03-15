@@ -1,6 +1,7 @@
 'use client';
 
 import type { Config } from '@puckeditor/core';
+import { DropZone } from '@puckeditor/core';
 import Spacer from './components/basic/Spacer';
 import TextBlock from './components/basic/TextBlock';
 import Button from './components/basic/Button';
@@ -254,7 +255,11 @@ export const puckConfig: Config<PageBuilderComponents> = {
         paddingY: 'md',
         maxWidth: 'lg',
       },
-      render: (props: any) => <Section {...props} />,
+      render: (props: any) => (
+        <Section {...props}>
+          <DropZone zone="content" />
+        </Section>
+      ),
     },
     TwoColumns: {
       label: 'عمودان',
@@ -290,7 +295,12 @@ export const puckConfig: Config<PageBuilderComponents> = {
         gap: 'md',
         reverseOnMobile: true,
       },
-      render: (props: any) => <TwoColumns {...props} />,
+      render: (props: any) => (
+        <TwoColumns {...props}>
+          <DropZone zone="left" />
+          <DropZone zone="right" />
+        </TwoColumns>
+      ),
     },
     HeroBanner: {
       label: 'هيرو بانر',

@@ -1,16 +1,14 @@
-'use client';
-
-import React from 'react';
-import { DropZone } from '@puckeditor/core';
+import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface SectionProps {
   backgroundColor: 'transparent' | 'light' | 'dark' | 'primary';
   paddingY: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   maxWidth: 'sm' | 'md' | 'lg' | 'full';
+  children?: ReactNode;
 }
 
-export const Section = ({ backgroundColor, paddingY, maxWidth }: SectionProps) => {
+export const Section = ({ backgroundColor, paddingY, maxWidth, children }: SectionProps) => {
   const bgClass = {
     transparent: 'bg-transparent',
     light: 'bg-[var(--color-bg,#f8fafc)]',
@@ -36,16 +34,10 @@ export const Section = ({ backgroundColor, paddingY, maxWidth }: SectionProps) =
   return (
     <section className={cn(bgClass, paddingClass)}>
       <div className={cn(maxWidthClass, 'mx-auto px-4')}>
-        <DropZone zone="content" />
+        {children}
       </div>
     </section>
   );
-};
-
-Section.defaultProps = {
-  backgroundColor: 'transparent',
-  paddingY: 'md',
-  maxWidth: 'lg',
 };
 
 export default Section;

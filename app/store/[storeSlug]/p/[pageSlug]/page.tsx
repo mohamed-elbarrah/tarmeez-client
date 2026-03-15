@@ -8,6 +8,8 @@ import { resolveTokens } from '@/lib/themes/store/default/config';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
+const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
+
 export async function generateMetadata({
   params
 }: {
@@ -15,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { storeSlug, pageSlug } = await params;
   
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores/${storeSlug}/pages/${pageSlug}`, {
+  const res = await fetch(`${API_URL}/stores/${storeSlug}/pages/${pageSlug}`, {
     next: { revalidate: 60 }
   });
 
@@ -46,7 +48,7 @@ export default async function PublicPage({
 
   // 2. Fetch page (Handle Public vs Preview)
   const publicRes = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/stores/${storeSlug}/pages/${pageSlug}`,
+    `${API_URL}/stores/${storeSlug}/pages/${pageSlug}`,
     { cache: 'no-store' }
   );
 
@@ -55,14 +57,14 @@ export default async function PublicPage({
   } else if (preview === 'true') {
     // Preview mode: try to fetch via merchant endpoint
     const cookieStore = await cookies();
-    const token = cookieStore.get('accessToken')?.value;
+    const token = cookieStore.get('access_token')?.value;
 
     if (token) {
       // Find page by slug from merchant list
       const merchantRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/merchant/pages`,
+        `${API_URL}/merchant/pages`,
         {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 'Cookie': `access_token=${token}` },
           cache: 'no-store'
         }
       );
