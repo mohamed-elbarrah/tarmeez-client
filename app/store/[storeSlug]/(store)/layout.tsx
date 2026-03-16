@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Script from 'next/script'
 import { getStoreBySlug } from '@/lib/api/stores'
 import Header from "@/lib/themes/store/default/components/Header";
 import Footer from "@/lib/themes/store/default/components/Footer";
@@ -44,6 +45,12 @@ export default async function StoreLayout({
 
     return (
         <div style={cssVars} dir="rtl" className="min-h-screen bg-[#f8fafc] flex flex-col">
+            <Script
+                src="/tarmeez-tracker.js"
+                strategy="afterInteractive"
+                data-store-id={store.id}
+                data-endpoint={`${process.env.NEXT_PUBLIC_API_URL}/analytics/collect`}
+            />
             <Header 
                 storeSlug={storeSlug}
                 storeName={store.name}
