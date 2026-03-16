@@ -3,38 +3,38 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: rgb(255, 255, 255);
-  --foreground: rgb(10, 10, 10);
-  --card: rgb(255, 255, 255);
-  --card-foreground: rgb(10, 10, 10);
-  --popover: rgb(255, 255, 255);
-  --popover-foreground: rgb(10, 10, 10);
-  --primary: rgb(23, 23, 23);
-  --primary-foreground: rgb(250, 250, 250);
-  --secondary: rgb(245, 245, 245);
-  --secondary-foreground: rgb(23, 23, 23);
-  --muted: rgb(245, 245, 245);
-  --muted-foreground: rgb(115, 115, 115);
-  --accent: rgb(245, 245, 245);
-  --accent-foreground: rgb(23, 23, 23);
-  --destructive: rgb(231, 0, 11);
-  --destructive-foreground: rgb(255, 255, 255);
-  --border: rgb(229, 229, 229);
-  --input: rgb(229, 229, 229);
-  --ring: rgb(161, 161, 161);
-  --chart-1: rgb(145, 197, 255);
-  --chart-2: rgb(58, 129, 246);
-  --chart-3: rgb(37, 99, 239);
-  --chart-4: rgb(26, 78, 218);
-  --chart-5: rgb(31, 63, 173);
-  --sidebar: rgb(250, 250, 250);
-  --sidebar-foreground: rgb(10, 10, 10);
-  --sidebar-primary: rgb(23, 23, 23);
-  --sidebar-primary-foreground: rgb(250, 250, 250);
-  --sidebar-accent: rgb(245, 245, 245);
-  --sidebar-accent-foreground: rgb(23, 23, 23);
-  --sidebar-border: rgb(229, 229, 229);
-  --sidebar-ring: rgb(161, 161, 161);
+  --background: #f0f7ee;
+  --foreground: #0d2b1a;
+  --card: #ffffff;
+  --card-foreground: #0d2b1a;
+  --popover: #ffffff;
+  --popover-foreground: #0d2b1a;
+  --primary: #0d3b2e;
+  --primary-foreground: #c8f135;
+  --secondary: #ddf0d0;
+  --secondary-foreground: #0d2b1a;
+  --muted: #e4f0dc;
+  --muted-foreground: #4a7a5a;
+  --accent: #c8f135;
+  --accent-foreground: #0a1a0f;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #c5dfc0;
+  --input: #c5dfc0;
+  --ring: #0d3b2e;
+  --chart-1: #2d8a4e;
+  --chart-2: #c8f135;
+  --chart-3: #4a9e6b;
+  --chart-4: #8fd4a0;
+  --chart-5: #0d3b2e;
+  --sidebar: #0d3b2e;
+  --sidebar-foreground: #f0fae8;
+  --sidebar-primary: #c8f135;
+  --sidebar-primary-foreground: #0a1a0f;
+  --sidebar-accent: #1a5c3a;
+  --sidebar-accent-foreground: #f0fae8;
+  --sidebar-border: #1a5c3a;
+  --sidebar-ring: #c8f135;
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -55,45 +55,41 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
-  --brand: var(--primary);
-  --brand-foreground: var(--primary-foreground);
-  --chart-grid: rgb(240, 240, 240);
-  --chart-axis: rgb(153, 153, 153);
 }
 
 .dark {
-  --background: rgb(10, 10, 10);
-  --foreground: rgb(250, 250, 250);
-  --card: rgb(23, 23, 23);
-  --card-foreground: rgb(250, 250, 250);
-  --popover: rgb(38, 38, 38);
-  --popover-foreground: rgb(250, 250, 250);
-  --primary: rgb(229, 229, 229);
-  --primary-foreground: rgb(23, 23, 23);
-  --secondary: rgb(38, 38, 38);
-  --secondary-foreground: rgb(250, 250, 250);
-  --muted: rgb(38, 38, 38);
-  --muted-foreground: rgb(161, 161, 161);
-  --accent: rgb(64, 64, 64);
-  --accent-foreground: rgb(250, 250, 250);
-  --destructive: rgb(255, 100, 103);
-  --destructive-foreground: rgb(250, 250, 250);
-  --border: rgb(40, 40, 40);
-  --input: rgb(52, 52, 52);
-  --ring: rgb(115, 115, 115);
-  --chart-1: rgb(145, 197, 255);
-  --chart-2: rgb(58, 129, 246);
-  --chart-3: rgb(37, 99, 239);
-  --chart-4: rgb(26, 78, 218);
-  --chart-5: rgb(31, 63, 173);
-  --sidebar: rgb(23, 23, 23);
-  --sidebar-foreground: rgb(250, 250, 250);
-  --sidebar-primary: rgb(20, 71, 230);
-  --sidebar-primary-foreground: rgb(250, 250, 250);
-  --sidebar-accent: rgb(38, 38, 38);
-  --sidebar-accent-foreground: rgb(250, 250, 250);
-  --sidebar-border: rgb(40, 40, 40);
-  --sidebar-ring: rgb(82, 82, 82);
+  --background: #080f0a;
+  --foreground: #e8f5e2;
+  --card: #0f1f14;
+  --card-foreground: #e8f5e2;
+  --popover: #141f17;
+  --popover-foreground: #e8f5e2;
+  --primary: #c8f135;
+  --primary-foreground: #0a1a0f;
+  --secondary: #152b1c;
+  --secondary-foreground: #e8f5e2;
+  --muted: #152b1c;
+  --muted-foreground: #7ab88a;
+  --accent: #1e3d28;
+  --accent-foreground: #c8f135;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #1e3528;
+  --input: #1e3528;
+  --ring: #c8f135;
+  --chart-1: #c8f135;
+  --chart-2: #4a9e6b;
+  --chart-3: #8fd4a0;
+  --chart-4: #2d8a4e;
+  --chart-5: #1a5c3a;
+  --sidebar: #0f1f14;
+  --sidebar-foreground: #e8f5e2;
+  --sidebar-primary: #c8f135;
+  --sidebar-primary-foreground: #0a1a0f;
+  --sidebar-accent: #152b1c;
+  --sidebar-accent-foreground: #e8f5e2;
+  --sidebar-border: #1e3528;
+  --sidebar-ring: #c8f135;
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -112,10 +108,6 @@
   --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
   --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-  --brand: var(--primary);
-  --brand-foreground: var(--primary-foreground);
-  --chart-grid: rgb(64, 64, 64);
-  --chart-axis: rgb(161, 161, 161);
 }
 
 @theme inline {
@@ -152,11 +144,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
-  --color-chart-grid: var(--chart-grid);
-  --color-chart-axis: var(--chart-axis);
-
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
@@ -180,7 +167,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }

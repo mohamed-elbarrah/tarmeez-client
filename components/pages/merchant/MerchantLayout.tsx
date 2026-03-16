@@ -35,6 +35,7 @@ import {
   Menu,
   Layout,
 } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const navigation = [
   { name: "لوحة التحكم", href: "/merchant", icon: LayoutDashboard },
@@ -85,7 +86,7 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
                         <item.icon className="w-5 h-5 flex-shrink-0" />
                         <span className="flex-1">{item.name}</span>
                         {item.name === "صفحاتي" && publishedCount > 0 && (
-                          <span className="bg-[var(--p-color,theme(colors.primary.DEFAULT))] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                          <span className="bg-[var(--p-color,theme(colors.primary.DEFAULT))] text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                             {publishedCount}
                           </span>
                         )}
@@ -137,6 +138,7 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
             </div>
 
             <div className="flex items-center gap-2">
+                  <ModeToggle />
                   <Button variant="ghost" size="icon" className="relative">
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>

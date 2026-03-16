@@ -28,7 +28,7 @@ export default function Customers() {
           <h1 className="text-3xl font-bold mb-2">العملاء</h1>
           <p className="text-muted-foreground">إدارة قاعدة عملائك</p>
         </div>
-        <Button className="bg-accent text-black hover:bg-accent/90">
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Mail className="w-4 h-4 ml-2" />
           إرسال حملة بريدية
         </Button>
@@ -83,7 +83,7 @@ export default function Customers() {
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-                        <span className="font-bold text-black">{(customer.fullName||'؟')[0]}</span>
+                        <span className="font-bold text-accent-foreground">{(customer.fullName||'؟')[0]}</span>
                       </div>
                       <div>
                         <div className="font-medium">{customer.fullName}</div>

@@ -98,7 +98,7 @@ export default function Categories() {
           <p className="text-muted-foreground">إدارة فئات المنتجات في متجرك</p>
         </div>
         <Button
-          className="bg-accent text-black hover:bg-accent/90"
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
           onClick={() => { resetForm(); setShowForm(true); }}
         >
           <Plus className="w-4 h-4 ml-2" />
@@ -153,7 +153,7 @@ export default function Categories() {
           <div className="flex gap-2 mt-4 justify-end">
             <Button variant="outline" onClick={resetForm}>إلغاء</Button>
             <Button
-              className="bg-accent text-black hover:bg-accent/90"
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
               disabled={isCreating || isUpdating || !form.name.trim()}
               onClick={handleSave}
             >

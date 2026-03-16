@@ -46,7 +46,7 @@ export default function Billing() {
         <h3 className="text-lg font-bold mb-4">طريقة الدفع</h3>
         <div className="flex items-center justify-between p-4 bg-secondary rounded-lg mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-8 bg-white rounded border border-border"></div>
+            <div className="w-12 h-8 bg-card rounded border border-border"></div>
             <div>
               <div className="font-medium">فيزا •••• 4242</div>
               <div className="text-sm text-muted-foreground">تنتهي في 12/2026</div>

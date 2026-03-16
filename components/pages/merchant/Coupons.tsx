@@ -10,7 +10,7 @@ export default function Coupons() {
           <h1 className="text-3xl font-bold mb-2">كوبونات الخصم</h1>
           <p className="text-muted-foreground">إدارة أكواد الخصم</p>
         </div>
-        <Button className="bg-accent text-black hover:bg-accent/90">
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="w-4 h-4 ml-2" />
           إنشاء كوبون
         </Button>

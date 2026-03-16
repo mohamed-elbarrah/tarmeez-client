@@ -201,7 +201,7 @@ export default function ProductEditor() {
             {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
           </Button>
           <Button
-            className="bg-accent text-black hover:bg-accent/90"
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
             disabled={isLoading}
             onClick={() => handleSave("ACTIVE")}
           >
@@ -612,7 +612,7 @@ export default function ProductEditor() {
                 <Label htmlFor="category">الفئة</Label>
                 <select
                   id="category"
-                  className="w-full px-3 py-2 bg-white border border-border rounded-lg"
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg"
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                 >
@@ -733,7 +733,7 @@ function OffersSection({ productId }: { productId: string }) {
             </div>
             <div className="flex gap-2 mr-auto">
               <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>إلغاء</Button>
-              <Button size="sm" className="bg-accent text-black hover:bg-accent/90" disabled={isCreating || !offerForm.title} onClick={handleCreate}>
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={isCreating || !offerForm.title} onClick={handleCreate}>
                 {isCreating ? 'جاري الحفظ...' : 'حفظ العرض'}
               </Button>
             </div>
@@ -769,7 +769,7 @@ function OffersSection({ productId }: { productId: string }) {
                   <td className="py-3 px-2">{Number(offer.price)} ر.س</td>
                   <td className="py-3 px-2">{offer.badge || '—'}</td>
                   <td className="py-3 px-2">
-                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${offer.isActive ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${offer.isActive ? 'bg-green-50 text-green-600' : 'bg-muted text-muted-foreground'}`}>
                       {offer.isActive ? 'مفعّل' : 'معطّل'}
                     </span>
                   </td>

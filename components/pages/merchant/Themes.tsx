@@ -204,7 +204,7 @@ const BrandIdentitySection = () => {
 
   if (isLoading) return (
     <Card className="p-6 mt-8">
-      <div className="animate-pulse h-40 bg-gray-100 rounded" />
+      <div className="animate-pulse h-40 bg-muted rounded" />
     </Card>
   )
 
@@ -218,20 +218,20 @@ const BrandIdentitySection = () => {
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.5"/></svg>
               <div className="font-bold">تخصيص الهوية</div>
             </div>
-            <button title="إعادة" onClick={resetToDefaults} className="p-2 rounded hover:bg-gray-100">
+            <button title="إعادة" onClick={resetToDefaults} className="p-2 rounded hover:bg-muted">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 1 3 6.7" stroke="currentColor" strokeWidth="1.5"/></svg>
             </button>
           </div>
 
           <div className="space-y-4 overflow-auto" style={{ flex: 1 }}>
             <div>
-              <div className="text-xs text-gray-500 mb-2">المعلومات الأساسية</div>
+              <div className="text-xs text-muted-foreground mb-2">المعلومات الأساسية</div>
               <Label>اسم المتجر / العلامة التجارية</Label>
               <Input value={config.storeName} onChange={e => setConfig(prev => ({ ...prev, storeName: e.target.value }))} className="mt-1" />
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">الشعار</div>
+              <div className="text-xs text-muted-foreground mb-2">الشعار</div>
               <div className="p-3 rounded flex flex-col gap-2" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <label className="text-sm">رفع الشعار</label>
                 <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'logo')} />
@@ -256,7 +256,7 @@ const BrandIdentitySection = () => {
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">أيقونة المتجر</div>
+              <div className="text-xs text-muted-foreground mb-2">أيقونة المتجر</div>
               <div className="p-3 rounded flex items-center gap-3" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <input type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0]!, 'favicon')} />
                 <div className="w-8 h-8 flex items-center justify-center" style={{ backgroundColor: 'var(--color-secondary)' }}>
@@ -266,42 +266,42 @@ const BrandIdentitySection = () => {
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">الألوان</div>
+              <div className="text-xs text-muted-foreground mb-2">الألوان</div>
               <div className="space-y-3">
                 <div>
-                  <div className="text-sm">اللون الرئيسي <div className="text-xs text-gray-400">الروابط والحدود</div></div>
+                  <div className="text-sm">اللون الرئيسي <div className="text-xs text-muted-foreground">الروابط والحدود</div></div>
                   <AdvancedColorPicker value={config.primaryColor} onChange={v => setConfig(prev => ({ ...prev, primaryColor: v }))} />
                 </div>
 
                 <div>
-                  <div className="text-sm">لون الخلفيات <div className="text-xs text-gray-400">الهيدر والبانر</div></div>
+                  <div className="text-sm">لون الخلفيات <div className="text-xs text-muted-foreground">الهيدر والبانر</div></div>
                   <AdvancedColorPicker value={config.secondaryColor} onChange={v => setConfig(prev => ({ ...prev, secondaryColor: v }))} />
                 </div>
 
                 <div>
-                  <div className="text-sm">لون التمييز <div className="text-xs text-gray-400">النجوم والشارات</div></div>
+                  <div className="text-sm">لون التمييز <div className="text-xs text-muted-foreground">النجوم والشارات</div></div>
                   <AdvancedColorPicker value={config.accentColor} onChange={v => setConfig(prev => ({ ...prev, accentColor: v }))} />
                 </div>
 
                 <div>
-                  <div className="text-sm">لون الأزرار <div className="text-xs text-gray-400">خلفية الأزرار الرئيسية</div></div>
+                  <div className="text-sm">لون الأزرار <div className="text-xs text-muted-foreground">خلفية الأزرار الرئيسية</div></div>
                   <AdvancedColorPicker value={config.buttonColor} onChange={v => setConfig(prev => ({ ...prev, buttonColor: v }))} />
                 </div>
 
                 <div>
-                  <div className="text-sm">لون العناوين <div className="text-xs text-gray-400">عناوين المنتجات والأقسام</div></div>
+                  <div className="text-sm">لون العناوين <div className="text-xs text-muted-foreground">عناوين المنتجات والأقسام</div></div>
                   <AdvancedColorPicker value={config.headingColor} onChange={v => setConfig(prev => ({ ...prev, headingColor: v }))} />
                 </div>
 
                 <div>
-                  <div className="text-sm">لون النصوص <div className="text-xs text-gray-400">نصوص الوصف والتفاصيل</div></div>
+                  <div className="text-sm">لون النصوص <div className="text-xs text-muted-foreground">نصوص الوصف والتفاصيل</div></div>
                   <AdvancedColorPicker value={config.textColor} onChange={v => setConfig(prev => ({ ...prev, textColor: v }))} />
                 </div>
               </div>
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">الزوايا</div>
+              <div className="text-xs text-muted-foreground mb-2">الزوايا</div>
               <div className="p-3 rounded" style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                 <NumberInput value={parseInt(config.borderRadius || '0')} min={0} max={40} onChange={v => setConfig(prev => ({ ...prev, borderRadius: `${v}px` }))} suffix="px" />
                 <div className="flex gap-2 mt-3">
@@ -316,7 +316,7 @@ const BrandIdentitySection = () => {
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">الخط</div>
+              <div className="text-xs text-muted-foreground mb-2">الخط</div>
               <select value={config.fontFamily} onChange={e => setConfig(prev => ({ ...prev, fontFamily: e.target.value }))} className="w-full mt-1 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-input)', border: '1px solid var(--color-border)', color: 'var(--color-foreground)' }}>
                 <option value="'Cairo', sans-serif">Cairo</option>
                 <option value="'Tajawal', sans-serif">Tajawal</option>
@@ -331,7 +331,7 @@ const BrandIdentitySection = () => {
           </div>
 
           <div className="sticky bottom-0 p-4" style={{ backgroundColor: 'var(--color-card)', borderTop: '1px solid var(--color-border)' }}>
-            <button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 text-white py-2 rounded">
+            <button onClick={handleSave} disabled={isSaving} className="w-full bg-primary text-primary-foreground py-2 rounded">
               {isSaving ? 'جاري الحفظ...' : 'حفظ الهوية البصرية'}
             </button>
           </div>
@@ -357,7 +357,7 @@ export default function Themes() {
           <Button
             key={i}
             variant={i === 0 ? "default" : "outline"}
-            className={i === 0 ? "bg-accent text-black hover:bg-accent/90" : ""}
+            className={i === 0 ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}
           >
             {cat}
           </Button>
@@ -371,7 +371,7 @@ export default function Themes() {
         ].map((theme, i) => (
           <Card key={i} className="overflow-hidden">
             {theme.popular && (
-              <div className="bg-accent text-black px-4 py-1 text-xs font-bold text-center">
+              <div className="bg-accent text-accent-foreground px-4 py-1 text-xs font-bold text-center">
                 الأكثر شعبية
               </div>
             )}
@@ -386,7 +386,7 @@ export default function Themes() {
                   <Eye className="w-4 h-4 ml-1" />
                   معاينة
                 </Button>
-                <Button size="sm" className="flex-1 bg-accent text-black hover:bg-accent/90">
+                <Button size="sm" className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
                   <Download className="w-4 h-4 ml-1" />
                   تثبيت
                 </Button>

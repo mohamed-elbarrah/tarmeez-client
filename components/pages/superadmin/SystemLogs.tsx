@@ -23,7 +23,7 @@ export default function SystemLogs() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="بحث في السجلات..." className="pr-10" />
           </div>
-          <select className="px-4 py-2 bg-white border border-border rounded-lg">
+          <select className="px-4 py-2 bg-card border border-border rounded-lg">
             <option>جميع الأنواع</option>
             <option>تسجيل دخول</option>
             <option>إنشاء متجر</option>
@@ -46,7 +46,7 @@ export default function SystemLogs() {
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     log.level === "error" ? "bg-red-100 text-red-700" :
                     log.level === "warning" ? "bg-yellow-100 text-yellow-700" :
-                    log.level === "success" ? "bg-accent/10 text-black" :
+                    log.level === "success" ? "bg-accent/10 text-accent-foreground" :
                     "bg-blue-100 text-blue-700"
                   }`}>
                     {log.type}

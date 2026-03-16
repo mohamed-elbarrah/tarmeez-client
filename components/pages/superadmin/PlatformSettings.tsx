@@ -65,7 +65,7 @@ export default function PlatformSettings() {
                   <span className="font-medium">{gateway}</span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                   </label>
                 </div>
               ))}
@@ -84,7 +84,7 @@ export default function PlatformSettings() {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                 </label>
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function PlatformSettings() {
 
       <div className="flex justify-end gap-2">
         <Button variant="outline">إلغاء</Button>
-        <Button className="bg-accent text-black hover:bg-accent/90">حفظ التغييرات</Button>
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">حفظ التغييرات</Button>
       </div>
     </div>
   );

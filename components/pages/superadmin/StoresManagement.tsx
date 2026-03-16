@@ -60,7 +60,7 @@ export default function StoresManagement() {
                   <td className="py-4 px-4 font-medium">{store.revenue} ر.س</td>
                   <td className="py-4 px-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      store.status === "نشط" ? "bg-accent/10 text-black" : "bg-yellow-50 text-yellow-700"
+                      store.status === "نشط" ? "bg-accent/10 text-accent-foreground" : "bg-yellow-50 text-yellow-700"
                     }`}>
                       {store.status}
                     </span>

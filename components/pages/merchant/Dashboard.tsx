@@ -179,7 +179,7 @@ export default function Dashboard() {
         <div className="space-y-4">
           {topProducts.map((product, i) => (
             <div key={i} className="flex items-center gap-2 p-4 bg-secondary rounded-lg hover:shadow-sm transition-shadow">
-              <div className="w-12 h-12 bg-white rounded-lg border border-border"></div>
+              <div className="w-12 h-12 bg-card rounded-lg border border-border"></div>
               <div className="flex-1">
                 <div className="font-medium mb-1">{product.name}</div>
                 <div className="text-sm text-muted-foreground">{product.sales} مبيعة</div>

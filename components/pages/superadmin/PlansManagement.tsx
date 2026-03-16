@@ -20,7 +20,7 @@ export default function PlansManagement() {
         ].map((plan, i) => (
           <Card key={i} className={`p-6 ${plan.popular ? "border-accent border-2" : ""}`}>
             {plan.popular && (
-              <div className="bg-accent text-black px-3 py-1 rounded-full text-xs font-bold inline-block mb-4">
+              <div className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold inline-block mb-4">
                 الأكثر شعبية
               </div>
             )}

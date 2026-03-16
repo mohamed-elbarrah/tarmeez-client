@@ -284,7 +284,7 @@ export default function CreatePageModal({ isOpen, onClose }: CreatePageModalProp
 
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={onClose}>إلغاء</Button>
-              <Button type="submit" disabled={isCreating} className="bg-accent text-black hover:bg-accent/90">
+              <Button type="submit" disabled={isCreating} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 {isCreating ? 'جاري الإنشاء...' : 'بدء التصميم'}
               </Button>
             </DialogFooter>

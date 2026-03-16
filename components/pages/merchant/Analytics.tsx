@@ -36,7 +36,7 @@ export default function Analytics() {
           <p className="text-muted-foreground">تقارير شاملة عن أداء متجرك</p>
         </div>
         <div className="flex gap-2">
-          <select className="px-4 py-2 bg-white border border-border rounded-lg">
+          <select className="px-4 py-2 bg-card border border-border rounded-lg">
             <option>آخر 30 يوم</option>
             <option>آخر 7 أيام</option>
             <option>آخر 90 يوم</option>

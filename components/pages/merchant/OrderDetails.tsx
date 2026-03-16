@@ -27,7 +27,7 @@ const statusConfig: Record<string, { label: string, color: string, icon: any, de
   SHIPPED: { label: "تم الشحن", color: "text-purple-600 bg-purple-50", icon: Truck, description: "الطلب في طريقه للعميل" },
   DELIVERED: { label: "تم التوصيل", color: "text-green-600 bg-green-50", icon: CheckCircle2, description: "تم تسليم الطلب للعميل" },
   CANCELLED: { label: "ملغي", color: "text-red-600 bg-red-50", icon: XCircle, description: "تم إلغاء الطلب" },
-  REFUNDED: { label: "مسترجع", color: "text-gray-600 bg-gray-50", icon: AlertCircle, description: "تم استرجاع الطلب" },
+  REFUNDED: { label: "مسترجع", color: "text-muted-foreground bg-muted", icon: AlertCircle, description: "تم استرجاع الطلب" },
 };
 
 const formatDate = (dateString: string) => {
@@ -76,7 +76,7 @@ export default function OrderDetails() {
     );
   }
 
-  const currentStatus = statusConfig[order.status] || { label: order.status, color: "bg-gray-50", icon: Clock, description: "" };
+  const currentStatus = statusConfig[order.status] || { label: order.status, color: "bg-muted", icon: Clock, description: "" };
 
   // Define next logical status for the button
   const nextStatuses: Record<string, string> = {
@@ -109,7 +109,7 @@ export default function OrderDetails() {
           </Button>
           {nextStatus && (
             <Button 
-              className="bg-accent text-black hover:bg-accent/90"
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
               onClick={() => handleStatusUpdate(nextStatus)}
               disabled={isUpdating}
             >
@@ -263,7 +263,7 @@ export default function OrderDetails() {
               <div className="pt-3 border-t border-border">
                 <div className="text-sm text-muted-foreground mb-1">حالة الدفع</div>
                 <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                  order.paymentStatus === "PAID" ? "bg-accent/10 text-black" : 
+                  order.paymentStatus === "PAID" ? "bg-accent/10 text-accent-foreground" : 
                   order.paymentStatus === "PENDING" ? "bg-yellow-100 text-yellow-700" :
                   "bg-red-100 text-red-700"
                 }`}>

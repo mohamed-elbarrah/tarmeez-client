@@ -23,7 +23,7 @@ function DraggableSection({ type }: { type: typeof SECTION_TYPES[0] }) {
     return (
     <div
       ref={drag as any}
-      className={`p-4 bg-white border-2 border-dashed border-border rounded-lg cursor-move hover:border-accent transition-colors ${
+      className={`p-4 bg-card border-2 border-dashed border-border rounded-lg cursor-move hover:border-accent transition-colors ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -47,7 +47,7 @@ function Canvas() {
     return (
     <div
       ref={drop as any}
-      className={`min-h-[600px] bg-white border-2 border-dashed rounded-lg p-8 ${
+      className={`min-h-[600px] bg-card border-2 border-dashed rounded-lg p-8 ${
         isOver ? "border-accent bg-accent/5" : "border-border"
       }`}
     >
@@ -73,7 +73,7 @@ export default function PageBuilder() {
               <Sparkles className="w-4 h-4 ml-2" />
               إنشاء بالذكاء الاصطناعي
             </Button>
-            <Button className="bg-accent text-black hover:bg-accent/90">نشر الصفحة</Button>
+            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">نشر الصفحة</Button>
           </div>
         </div>
 

@@ -44,7 +44,7 @@ const statusMap: Record<string, { label: string; variant: "outline" | "default" 
 const typeMap: Record<string, { label: string; color: string }> = {
   LANDING: { label: 'هبوط', color: 'bg-amber-100 text-amber-700' },
   CUSTOM: { label: 'مخصصة', color: 'bg-blue-100 text-blue-700' },
-  POLICY: { label: 'سياسة', color: 'bg-gray-100 text-gray-700' },
+  POLICY: { label: 'سياسة', color: 'bg-muted text-muted-foreground' },
 };
 
 export default function PagesDashboard() {
@@ -93,7 +93,7 @@ export default function PagesDashboard() {
         </div>
         <Button 
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-accent text-black hover:bg-accent/90"
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
         >
           <Plus className="w-4 h-4 ml-2" />
           إنشاء صفحة جديدة

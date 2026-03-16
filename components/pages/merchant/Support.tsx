@@ -11,7 +11,7 @@ export default function Support() {
           <h1 className="text-3xl font-bold mb-2">الدعم</h1>
           <p className="text-muted-foreground">احصل على المساعدة التي تحتاجها</p>
         </div>
-        <Button className="bg-accent text-black hover:bg-accent/90">
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="w-4 h-4 ml-2" />
           تذكرة جديدة
         </Button>
@@ -77,9 +77,9 @@ export default function Support() {
                 <div className="text-sm text-muted-foreground">{ticket.id} • {ticket.date}</div>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                ticket.status === "مفتوحة" ? "bg-accent/10 text-black" :
+                ticket.status === "مفتوحة" ? "bg-accent/10 text-accent-foreground" :
                 ticket.status === "قيد المراجعة" ? "bg-blue-50 text-blue-700" :
-                "bg-gray-100 text-gray-600"
+                "bg-muted text-muted-foreground"
               }`}>
                 {ticket.status}
               </span>

@@ -13,7 +13,7 @@ export default function Apps() {
       <div className="flex gap-2">
         {["الكل", "المثبتة", "التسويق", "المبيعات", "الشحن"].map((tab, i) => (
           <Button key={i} variant={i === 0 ? "default" : "outline"}
-            className={i === 0 ? "bg-accent text-black hover:bg-accent/90" : ""}>
+            className={i === 0 ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}>
             {tab}
           </Button>
         ))}
@@ -47,7 +47,7 @@ export default function Apps() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{app.price}</span>
-              <Button size="sm" className="bg-accent text-black hover:bg-accent/90">
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
                 تثبيت
               </Button>
             </div>

@@ -16,7 +16,7 @@ export default function SupportTickets() {
           { label: "مفتوحة", value: "45", color: "bg-yellow-500" },
           { label: "قيد المعالجة", value: "28", color: "bg-blue-500" },
           { label: "محلولة", value: "892", color: "bg-accent" },
-          { label: "مغلقة", value: "1,234", color: "bg-gray-400" },
+          { label: "مغلقة", value: "1,234", color: "bg-muted-foreground" },
         ].map((stat, i) => (
           <Card key={i} className="p-4">
             <div className="flex items-center gap-3 mb-2">
@@ -62,7 +62,7 @@ export default function SupportTickets() {
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       ticket.status === "مفتوحة" ? "bg-yellow-50 text-yellow-700" :
                       ticket.status === "قيد المعالجة" ? "bg-blue-50 text-blue-700" :
-                      "bg-accent/10 text-black"
+                      "bg-accent/10 text-accent-foreground"
                     }`}>
                       {ticket.status}
                     </span>

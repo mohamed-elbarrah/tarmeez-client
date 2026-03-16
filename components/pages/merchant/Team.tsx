@@ -10,7 +10,7 @@ export default function Team() {
           <h1 className="text-3xl font-bold mb-2">الفريق</h1>
           <p className="text-muted-foreground">إدارة أعضاء الفريق والصلاحيات</p>
         </div>
-        <Button className="bg-accent text-black hover:bg-accent/90">
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="w-4 h-4 ml-2" />
           دعوة عضو
         </Button>
@@ -27,7 +27,7 @@ export default function Team() {
             <div key={i} className="flex items-center justify-between p-4 bg-secondary rounded-lg">
               <div className="flex items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
-                  <span className="font-bold text-black text-lg">{member.name[0]}</span>
+                  <span className="font-bold text-accent-foreground text-lg">{member.name[0]}</span>
                 </div>
                 <div>
                   <div className="font-medium mb-1">{member.name}</div>
@@ -45,7 +45,7 @@ export default function Team() {
                 <div className="text-left">
                   <div className="text-sm text-muted-foreground mb-1">الحالة</div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    member.status === "نشط" ? "bg-accent/10 text-black" : "bg-yellow-50 text-yellow-700"
+                    member.status === "نشط" ? "bg-accent/10 text-accent-foreground" : "bg-yellow-50 text-yellow-700"
                   }`}>
                     {member.status}
                   </span>

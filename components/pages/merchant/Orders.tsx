@@ -11,9 +11,9 @@ const statusTranslations: Record<string, { label: string, color: string }> = {
   CONFIRMED: { label: "مؤكد", color: "bg-blue-50 text-blue-700" },
   PROCESSING: { label: "قيد المعالجة", color: "bg-yellow-50 text-yellow-700" },
   SHIPPED: { label: "قيد التوصيل", color: "bg-blue-50 text-blue-700" },
-  DELIVERED: { label: "مكتمل", color: "bg-accent/10 text-black" },
+  DELIVERED: { label: "مكتمل", color: "bg-accent/10 text-accent-foreground" },
   CANCELLED: { label: "ملغي", color: "bg-red-50 text-red-700" },
-  REFUNDED: { label: "مسترجع", color: "bg-gray-100 text-gray-700" },
+  REFUNDED: { label: "مسترجع", color: "bg-muted text-muted-foreground" },
 };
 
 const formatDate = (dateString: string) => {
@@ -59,7 +59,7 @@ export default function Orders() {
           <h1 className="text-3xl font-bold mb-2">الطلبات</h1>
           <p className="text-muted-foreground">إدارة ومتابعة جميع طلباتك</p>
         </div>
-        <Button className="bg-accent text-black hover:bg-accent/90">
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Download className="w-4 h-4 ml-2" />
           تصدير الطلبات
         </Button>
@@ -124,7 +124,7 @@ export default function Orders() {
             </thead>
             <tbody>
               {items.map((order: any, i: number) => {
-                const status = statusTranslations[order.status] || { label: order.status, color: "bg-gray-100 text-gray-700" };
+                const status = statusTranslations[order.status] || { label: order.status, color: "bg-muted text-muted-foreground" };
                 return (
                   <tr key={i} className="border-b border-border hover:bg-secondary/50 transition-colors">
                     <td className="py-4 px-4">
@@ -189,7 +189,7 @@ export default function Orders() {
                     key={pageNum}
                     variant="outline" 
                     size="sm" 
-                    className={currentPage === pageNum ? "bg-accent text-black" : ""}
+                    className={currentPage === pageNum ? "bg-accent text-accent-foreground" : ""}
                     onClick={() => setCurrentPage(pageNum)}
                   >
                     {pageNum}

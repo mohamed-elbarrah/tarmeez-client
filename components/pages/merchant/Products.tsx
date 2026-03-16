@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const statusMap: Record<string, { label: string; class: string }> = {
-  ACTIVE: { label: "متوفر", class: "bg-accent/10 text-black" },
+  ACTIVE: { label: "متوفر", class: "bg-accent/10 text-accent-foreground" },
   DRAFT: { label: "مسودة", class: "bg-yellow-50 text-yellow-700" },
   ARCHIVED: { label: "نفذ", class: "bg-red-50 text-red-700" },
 };
@@ -41,7 +41,7 @@ export default function Products() {
           <p className="text-muted-foreground">إدارة كتالوج منتجاتك</p>
         </div>
         <Link href="/merchant/products/new">
-          <Button className="bg-accent text-black hover:bg-accent/90">
+          <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Plus className="w-4 h-4 ml-2" />
             إضافة منتج
           </Button>
@@ -165,7 +165,7 @@ export default function Products() {
                               <AlertDialogCancel>إلغاء</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() => deleteProduct(product.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
+                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                               >
                                 {isDeleting ? "جاري الحذف..." : "حذف"}
                               </AlertDialogAction>
