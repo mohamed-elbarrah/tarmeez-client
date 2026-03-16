@@ -1,7 +1,10 @@
-"use client";
+import type { Metadata } from 'next'
+import { AnalyticsDashboard } from '@/components/pages/merchant/Analytics'
 
-import Page from "@/components/pages/merchant/Analytics";
+export const metadata: Metadata = {
+  title: 'الإحصائيات — ترميز',
+}
 
-export default function RoutePage() {
-  return <Page />;
+export default function AnalyticsPage() {
+  return <AnalyticsDashboard />
 }
