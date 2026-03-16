@@ -5,6 +5,7 @@ import React from 'react'
 import { useGetMyStoreQuery } from '@/lib/services/merchantApi'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { OverviewTab } from '@/components/pages/merchant/analytics/tabs/OverviewTab'
 
 export default function MerchantPage() {
   const { data, isLoading, isError } = useGetMyStoreQuery()
@@ -27,7 +28,7 @@ export default function MerchantPage() {
   const { merchant, store } = data
 
   return (
-    <div className="p-6">
+    <div className="flex flex-col p-6 gap-6">
       <Card>
         <CardHeader>
           <CardTitle>مرحباً {merchant.fullName} 👋</CardTitle>
@@ -44,6 +45,9 @@ export default function MerchantPage() {
           </div>
         </CardContent>
       </Card>
+
+
+      <OverviewTab period={'7d'} />
     </div>
   )
 }

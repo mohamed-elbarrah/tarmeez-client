@@ -72,7 +72,8 @@ export function SalesTab({ period }: SalesTabProps) {
         />
       </div>
 
-      {/* Revenue AreaChart */}
+      <div className="flex clex-col gap-4">
+        {/* Revenue AreaChart */}
       <Card>
         <CardHeader>
           <CardTitle>الإيرادات اليومية</CardTitle>
@@ -185,6 +186,7 @@ export function SalesTab({ period }: SalesTabProps) {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }
