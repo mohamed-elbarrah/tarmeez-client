@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Star, ShoppingCart, Heart, Tag, Zap, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -11,6 +11,7 @@ import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 import StarRating from '@/lib/themes/store/default/components/StarRating'
 import { useAppDispatch } from '@/lib/store/hooks'
 import { addItem } from '@/lib/store/slices/cartSlice'
+import { productViewed } from '@/lib/store/analytics-listener'
 import { useGetProductReviewsQuery, useCreateReviewMutation } from '@/lib/services/reviewsApi'
 import { useToggleWishlistMutation } from '@/lib/services/wishlistApi'
 import { useGetCustomerMeQuery } from '@/lib/services/customerApi'
@@ -53,6 +54,12 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   // Image gallery
   const productImages = product.images?.length ? product.images : product.image ? [product.image] : []
   const [selectedImage, setSelectedImage] = useState(0)
+
+  // Track product view on mount (ANALYTICS-RULE 4)
+  useEffect(() => {
+    dispatch(productViewed({ productId: String(product.id), storeRef: storeSlug }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id])
 
   if (!product) return null
 

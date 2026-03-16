@@ -33,13 +33,15 @@
     } catch(e) { return '' }
   }
 
-  // Always use sendBeacon — never fetch (ANALYTICS-RULE 4)
+  // Always use sendBeacon with application/json Blob — never fetch (ANALYTICS-RULE 4)
+  // Plain-string sendBeacon uses text/plain → NestJS body parser ignores it
   function send(data) {
     try {
-      data.storeId = STORE_ID
+      data.storeRef = STORE_ID
       data.sessionId = SID
       data.ts = Date.now()
-      navigator.sendBeacon(ENDPOINT, JSON.stringify(data))
+      var payload = JSON.stringify(data)
+      navigator.sendBeacon(ENDPOINT, new Blob([payload], { type: 'application/json' }))
     } catch(e) {}  // Always silent (ANALYTICS-RULE 4)
   }
 

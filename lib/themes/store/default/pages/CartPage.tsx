@@ -1,12 +1,14 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { ThemeTokens } from '@/lib/themes/types'
 import CartSummary from '../components/CartSummary'
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks'
 import { removeItem, updateQuantity } from '@/lib/store/slices/cartSlice'
+import { cartAbandoned } from '@/lib/store/analytics-listener'
+import { store } from '@/lib/store'
 import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 
 interface Props {
@@ -17,6 +19,20 @@ interface Props {
 export default function CartPage({ theme, storeSlug }: Props) {
   const dispatch = useAppDispatch()
   const cart = useAppSelector(state => state.cart.carts[storeSlug]?.items || [])
+
+  // Fire cart_abandon ONLY when user leaves with items and did NOT go to checkout
+  useEffect(() => {
+    return () => {
+      const items = store.getState().cart.carts[storeSlug]?.items ?? []
+      if (
+        items.length > 0 &&
+        !window.location.pathname.includes('/checkout')
+      ) {
+        dispatch(cartAbandoned({ storeRef: storeSlug, itemCount: items.length }))
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const onUpdateQty = (id: string | number, delta: number) => {
     const item = cart.find(i => i.id === id)

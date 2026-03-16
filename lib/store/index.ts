@@ -11,6 +11,8 @@ import { reviewsApi } from '@/lib/services/reviewsApi'
 import { wishlistApi } from '@/lib/services/wishlistApi'
 import { categoriesApi } from '@/lib/services/categoriesApi'
 import { pagesApi } from '@/lib/services/pagesApi'
+import { analyticsApi } from '@/lib/services/analyticsApi'
+import { analyticsListenerMiddleware } from './analytics-listener'
 
 export const store = configureStore({
   reducer: {
@@ -26,20 +28,24 @@ export const store = configureStore({
     [wishlistApi.reducerPath]: wishlistApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [pagesApi.reducerPath]: pagesApi.reducer,
+    [analyticsApi.reducerPath]: analyticsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
-      authApi.middleware,
-      customerApi.middleware,
-      merchantApi.middleware,
-      ordersApi.middleware,
-      superadminApi.middleware,
-      productsApi.middleware,
-      reviewsApi.middleware,
-      wishlistApi.middleware,
-      categoriesApi.middleware,
-      pagesApi.middleware,
-    ),
+    getDefaultMiddleware()
+      .prepend(analyticsListenerMiddleware.middleware)
+      .concat(
+        authApi.middleware,
+        customerApi.middleware,
+        merchantApi.middleware,
+        ordersApi.middleware,
+        superadminApi.middleware,
+        productsApi.middleware,
+        reviewsApi.middleware,
+        wishlistApi.middleware,
+        categoriesApi.middleware,
+        pagesApi.middleware,
+        analyticsApi.middleware,
+      ),
 })
 
 export type RootState = ReturnType<typeof store.getState>

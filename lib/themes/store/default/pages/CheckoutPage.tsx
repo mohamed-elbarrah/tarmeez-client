@@ -1,12 +1,13 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useCreateOrderMutation } from '@/lib/services/ordersApi'
 import { useAppSelector, useAppDispatch } from '@/lib/store/hooks'
 import { clearCart } from '@/lib/store/slices/cartSlice'
+import { checkoutStarted } from '@/lib/store/analytics-listener'
 import { useRouter } from 'next/navigation'
 import { ThemeTokens } from '@/lib/themes/types'
 
@@ -35,6 +36,17 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
   const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || [])
   const dispatch = useAppDispatch()
   const router = useRouter()
+
+  // Track checkout start on mount (ANALYTICS-RULE 4 — sendBeacon via listener)
+  const cartRef = useRef(cart)
+  useEffect(() => {
+    const subtotal = cartRef.current.reduce(
+      (s: number, i: any) => s + i.price * i.quantity,
+      0,
+    )
+    dispatch(checkoutStarted({ storeRef: storeSlug, cartTotal: subtotal }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const onSubmit = async (data: CheckoutFormData) => {
     if (cart.length === 0) return alert('سلة الشراء فارغة')
