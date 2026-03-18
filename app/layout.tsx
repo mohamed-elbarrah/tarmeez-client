@@ -38,8 +38,8 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
         >
           <StoreProvider>{children}</StoreProvider>
           <Toaster position="top-center" richColors dir="rtl" />
