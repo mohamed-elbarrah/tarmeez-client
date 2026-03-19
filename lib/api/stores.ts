@@ -1,5 +1,7 @@
 export async function getStoreBySlug(slug: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  // API_URL is server-side only (SSR inside Docker uses container hostname).
+  // Falls back to NEXT_PUBLIC_API_URL for dev.
+  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
   const res = await fetch(`${apiUrl}/stores/${slug}`, { cache: 'no-store' })
   let data: any
   try {
@@ -49,7 +51,7 @@ export async function getStoreBySlug(slug: string) {
 }
 
 export async function getProductBySlug(storeId: string, productIdOrSlug: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
   const encodedSlug = encodeURIComponent(productIdOrSlug)
   const res = await fetch(`${apiUrl}/stores/${storeId}/products/${encodedSlug}`, { cache: 'no-store' })
   
