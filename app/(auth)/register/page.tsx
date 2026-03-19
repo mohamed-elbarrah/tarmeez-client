@@ -122,7 +122,7 @@ export default function RegisterPage() {
 
             const result = await merchantRegister(payload).unwrap()
             // redirect in component after successful registration
-            router.push(`/auth/pending?email=${encodeURIComponent(result.user.email)}`)
+            router.push('/merchant')
         } catch (err: any) {
             const status = err?.status
             const data = err?.data

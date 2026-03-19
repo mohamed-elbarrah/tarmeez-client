@@ -312,7 +312,7 @@ function WishlistTab({ items, storeSlug, onRemove }: { items: any[] | undefined;
             return (
               <div key={item.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-md transition-all">
                 <div className="relative">
-                  <Link href={`/store/${storeSlug}/product/${product.slug || product.id}`}>
+                  <Link href={`/store/${storeSlug}/product/${encodeURIComponent(product.slug || product.id)}`}>
                     <div className="aspect-square bg-gray-50 overflow-hidden">
                       {imageUrl ? (
                         <img src={imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
@@ -342,7 +342,7 @@ function WishlistTab({ items, storeSlug, onRemove }: { items: any[] | undefined;
                       {typeof product.category === 'object' ? product.category.name : product.category}
                     </span>
                   )}
-                  <Link href={`/store/${storeSlug}/product/${product.slug || product.id}`}>
+                  <Link href={`/store/${storeSlug}/product/${encodeURIComponent(product.slug || product.id)}`}>
                     <h3 className="font-bold text-sm line-clamp-2 hover:text-[var(--p-color)] transition-colors">{product.name}</h3>
                   </Link>
                   <div className="flex items-center gap-2">

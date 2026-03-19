@@ -541,7 +541,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
               <button
                 onClick={() =>
                   router.push(
-                    `/store/${storeSlug}/login?redirect=/store/${storeSlug}/product/${product.slug || product.id}`
+                    `/store/${storeSlug}/login?redirect=/store/${storeSlug}/product/${encodeURIComponent(product.slug || product.id)}`
                   )
                 }
                 className="flex-1 py-3 text-white font-black rounded-xl"

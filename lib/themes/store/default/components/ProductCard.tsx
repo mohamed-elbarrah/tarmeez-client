@@ -16,7 +16,7 @@ import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 
 export default function ProductCard({ product, theme, storeSlug }: Props) {
   const dispatch = useAppDispatch()
-  const productUrl = `/store/${storeSlug}/product/${product.slug || product.id}`
+  const productUrl = `/store/${storeSlug}/product/${encodeURIComponent(product.slug || product.id)}`
   const displayImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : null)
 
   const handleAddToCart = (e: React.MouseEvent) => {

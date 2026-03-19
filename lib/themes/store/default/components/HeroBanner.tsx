@@ -31,7 +31,7 @@ export default function HeroBanner({ theme, featuredProduct, storeSlug }: Props)
           اكتشف أفضل العروض والمنتجات الحصرية في متجرنا اليوم. جودة نضمنها لك في كل عملية شراء.
         </p>
         <Link 
-          href={`/store/${storeSlug}/product/${featuredProduct.slug || featuredProduct.id}`} 
+          href={`/store/${storeSlug}/product/${encodeURIComponent(featuredProduct.slug || featuredProduct.id)}`} 
           className="bg-white text-black px-10 py-3 font-bold shadow-lg hover:scale-105 transition-transform inline-block"
           style={{ borderRadius: 'var(--radius)' }}
         >

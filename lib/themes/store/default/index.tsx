@@ -20,15 +20,7 @@ import { addItem as addCartItem, removeItem as removeCartItem, updateQuantity as
 // Cart stored in Redux uses `quantity` per item
 
 const MOCK_PRODUCTS: StoreProduct[] = [
-  { id: 1, name: "Samsung Galaxy S24 Ultra, 512GB", price: 4499, oldPrice: 5399, discount: "20%", rating: 4.8, category: "جوالات", image: "https://m.media-amazon.com/images/I/71RZAucP-GL._AC_SL1500_.jpg" },
-  { id: 2, name: "Apple Watch Series 9 GPS 45mm", price: 1599, oldPrice: 1899, discount: "15%", rating: 4.9, category: "ساعات", image: "https://m.media-amazon.com/images/I/71YdE55GvOL._AC_SL1500_.jpg" },
-  { id: 3, name: "Sony WH-1000XM5 Wireless", price: 1249, oldPrice: 1499, rating: 4.7, category: "إلكترونيات", image: "https://m.media-amazon.com/images/I/51aXvjzcukL._AC_SL1200_.jpg" },
-  { id: 4, name: "Nike Jordan Brooklyn Hoodie", price: 350, rating: 4.5, category: "موضة", image: "https://m.media-amazon.com/images/I/61N9yD7M45L._AC_SX679_.jpg" },
-  { id: 5, name: "Inflatable Beanless Bag Chair", price: 190, oldPrice: 250, rating: 4.2, category: "منزل", image: "https://m.media-amazon.com/images/I/71KkLgG2x6L._AC_SL1500_.jpg" },
-  { id: 6, name: "iPhone 15 Pro Max 256GB", price: 4800, oldPrice: 5200, rating: 4.9, category: "جوالات", image: "https://m.media-amazon.com/images/I/81Os13RBOnL._AC_SL1500_.jpg" },
-  { id: 7, name: "عطر ديور سوفاج 100 مل", price: 550, rating: 4.7, category: "عطور", image: "https://m.media-amazon.com/images/I/61Iun9G8r3L._AC_SL1000_.jpg" },
-  { id: 8, name: "ماكينة قهوة نسبريسو", price: 899, oldPrice: 1100, rating: 4.6, category: "منزل", image: "https://m.media-amazon.com/images/I/61-9p0vV7SL._AC_SL1500_.jpg" },
-]
+  ]
 
 export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
   const theme = resolveTokens(storeData)
