@@ -9,12 +9,12 @@ export default function Error({
 }) {
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4 text-center">
-      <div className="max-w-md w-full bg-card p-8 rounded-3xl border border-border shadow-sm space-y-6">
-        <div className="w-16 h-16 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+      <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
           !
         </div>
-        <h2 className="text-2xl font-black">عذراً، حدث خطأ ما</h2>
-        <p className="text-muted-foreground font-medium">
+        <h2 className="text-2xl font-black text-gray-900">عذراً، حدث خطأ ما</h2>
+        <p className="text-gray-500 font-medium">
           {error.message || "لم نتمكن من تحميل الصفحة المطلوبة حالياً."}
         </p>
         <button

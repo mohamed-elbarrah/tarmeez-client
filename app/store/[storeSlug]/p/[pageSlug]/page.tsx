@@ -99,17 +99,19 @@ export default async function PublicPage({
     "--h-color": theme.headingColor,
     "--radius": theme.borderRadius,
     fontFamily: theme.fontFamily,
+    color: theme.textColor,
+    backgroundColor: "#ffffff",
   } as React.CSSProperties;
 
   return (
     <div
       style={cssVars}
       dir="rtl"
-      className="min-h-screen bg-background flex flex-col"
+      className="store-root light min-h-screen flex flex-col"
     >
       {/* Preview Banner */}
       {preview === "true" && (
-        <div className="bg-primary text-primary-foreground text-center py-2 px-4 text-sm font-bold sticky top-0 z-50">
+        <div className="bg-[var(--p-color)] text-white text-center py-2 px-4 text-sm font-bold sticky top-0 z-50">
           وضع المعاينة — هذه الصفحة غير منشورة للعملاء بعد
         </div>
       )}

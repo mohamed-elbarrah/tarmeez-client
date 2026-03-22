@@ -45,13 +45,15 @@ export default async function StoreLayout({
     "--h-color": theme.headingColor,
     "--radius": theme.borderRadius,
     fontFamily: theme.fontFamily,
+    color: theme.textColor,
+    backgroundColor: "#ffffff",
   } as React.CSSProperties;
 
   return (
     <div
       style={cssVars}
       dir="rtl"
-      className="min-h-screen bg-background flex flex-col"
+      className="store-root light min-h-screen flex flex-col"
     >
       <Script
         src="/tarmeez-tracker.js"

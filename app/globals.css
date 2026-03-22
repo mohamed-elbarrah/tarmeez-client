@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *):not(.light *, .light));
 
 :root {
   --background: oklch(1 0 0);
@@ -161,4 +161,36 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/*
+ * STOREFRONT ISOLATION LAYER
+ * Forces light mode and resets dashboard tokens to neutral values.
+ * Merchant CSS custom properties (--p-color, --s-color, etc.) are
+ * injected via inline styles and always take priority.
+ */
+.store-root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0.02 262);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.02 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.02 262);
+  --primary: oklch(0.42 0.16 262.4);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.01 260);
+  --secondary-foreground: oklch(0.25 0.04 262);
+  --muted: oklch(0.96 0.01 260);
+  --muted-foreground: oklch(0.48 0.03 262);
+  --accent: oklch(0.96 0.01 260);
+  --accent-foreground: oklch(0.25 0.04 262);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.01 260);
+  --input: oklch(0.92 0.01 260);
+  --ring: oklch(0.42 0.16 262.4);
+  --radius: 0.5rem;
+  color-scheme: light;
+  color: var(--foreground);
+  background-color: var(--background);
 }
