@@ -1,18 +1,22 @@
-'use client'
+"use client";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4 text-center">
-      <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">!</div>
+      <div className="max-w-md w-full bg-card p-8 rounded-3xl border border-border shadow-sm space-y-6">
+        <div className="w-16 h-16 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+          !
+        </div>
         <h2 className="text-2xl font-black">عذراً، حدث خطأ ما</h2>
-        <p className="text-gray-400 font-medium">{error.message || 'لم نتمكن من تحميل الصفحة المطلوبة حالياً.'}</p>
+        <p className="text-muted-foreground font-medium">
+          {error.message || "لم نتمكن من تحميل الصفحة المطلوبة حالياً."}
+        </p>
         <button
           onClick={() => reset()}
           className="w-full py-3 bg-[var(--p-color)] text-white rounded-xl font-bold hover:shadow-lg transition-all"
@@ -21,5 +25,5 @@ export default function Error({
         </button>
       </div>
     </div>
-  )
+  );
 }

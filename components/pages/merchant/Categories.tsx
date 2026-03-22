@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Loader2, GripVertical, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,13 +27,20 @@ import { toast } from "sonner";
 
 export default function Categories() {
   const { data: categories = [], isLoading } = useGetCategoriesQuery();
-  const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", slug: "", image: "", sortOrder: 0 });
+  const [form, setForm] = useState({
+    name: "",
+    slug: "",
+    image: "",
+    sortOrder: 0,
+  });
 
   const resetForm = () => {
     setForm({ name: "", slug: "", image: "", sortOrder: 0 });
@@ -42,12 +49,13 @@ export default function Categories() {
   };
 
   const generateSlug = (name: string) => {
-    return name
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\p{L}\p{N}_-]/gu, "")
-      || `category-${Date.now()}`;
+    return (
+      name
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\p{L}\p{N}_-]/gu, "") || `category-${Date.now()}`
+    );
   };
 
   const handleNameChange = (name: string) => {
@@ -55,7 +63,12 @@ export default function Categories() {
   };
 
   const handleEdit = (cat: Category) => {
-    setForm({ name: cat.name, slug: cat.slug, image: cat.image || "", sortOrder: cat.sortOrder });
+    setForm({
+      name: cat.name,
+      slug: cat.slug,
+      image: cat.image || "",
+      sortOrder: cat.sortOrder,
+    });
     setEditingId(cat.id);
     setShowForm(true);
   };
@@ -71,7 +84,10 @@ export default function Categories() {
         await updateCategory({ id: editingId, data: form }).unwrap();
         toast.success("تم تحديث الفئة بنجاح");
       } else {
-        await createCategory({ ...form, slug: form.slug || generateSlug(form.name) }).unwrap();
+        await createCategory({
+          ...form,
+          slug: form.slug || generateSlug(form.name),
+        }).unwrap();
         toast.success("تم إنشاء الفئة بنجاح");
       }
       resetForm();
@@ -94,14 +110,20 @@ export default function Categories() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">الفئات</h1>
-          <p className="text-muted-foreground">إدارة فئات المنتجات في متجرك</p>
+          <h1 className="text-2xl font-bold">الفئات</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            إدارة فئات المنتجات في متجرك
+          </p>
         </div>
         <Button
-          className="bg-accent text-accent-foreground hover:bg-accent/90"
-          onClick={() => { resetForm(); setShowForm(true); }}
+          size="sm"
+          className="gap-2"
+          onClick={() => {
+            resetForm();
+            setShowForm(true);
+          }}
         >
-          <Plus className="w-4 h-4 ml-2" />
+          <Plus className="w-4 h-4" />
           فئة جديدة
         </Button>
       </div>
@@ -110,8 +132,12 @@ export default function Categories() {
       {showForm && (
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">{editingId ? "تعديل الفئة" : "فئة جديدة"}</h3>
-            <button onClick={resetForm}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
+            <h3 className="text-lg font-bold">
+              {editingId ? "تعديل الفئة" : "فئة جديدة"}
+            </h3>
+            <button onClick={resetForm}>
+              <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
@@ -146,18 +172,25 @@ export default function Categories() {
                 type="number"
                 min={0}
                 value={form.sortOrder}
-                onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+                onChange={(e) =>
+                  setForm({ ...form, sortOrder: Number(e.target.value) })
+                }
               />
             </div>
           </div>
           <div className="flex gap-2 mt-4 justify-end">
-            <Button variant="outline" onClick={resetForm}>إلغاء</Button>
+            <Button variant="outline" onClick={resetForm}>
+              إلغاء
+            </Button>
             <Button
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
               disabled={isCreating || isUpdating || !form.name.trim()}
               onClick={handleSave}
             >
-              {(isCreating || isUpdating) ? "جاري الحفظ..." : editingId ? "تحديث" : "إنشاء"}
+              {isCreating || isUpdating
+                ? "جاري الحفظ..."
+                : editingId
+                  ? "تحديث"
+                  : "إنشاء"}
             </Button>
           </div>
         </Card>
@@ -166,14 +199,17 @@ export default function Categories() {
       {/* Categories List */}
       {isLoading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : categories.length === 0 ? (
         <Card className="p-12 text-center">
           <p className="text-muted-foreground mb-4">لا توجد فئات بعد</p>
           <Button
             variant="outline"
-            onClick={() => { resetForm(); setShowForm(true); }}
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
           >
             <Plus className="w-4 h-4 ml-2" />
             أضف أول فئة
@@ -194,20 +230,31 @@ export default function Categories() {
             </thead>
             <tbody className="divide-y">
               {categories.map((cat, idx) => (
-                <tr key={cat.id} className="group hover:bg-muted/20 transition-colors">
+                <tr
+                  key={cat.id}
+                  className="group hover:bg-muted/20 transition-colors"
+                >
                   <td className="p-4 text-muted-foreground">
                     <GripVertical className="w-4 h-4 inline-block ml-1" />
                     {idx + 1}
                   </td>
                   <td className="p-4">
                     {cat.image ? (
-                      <img src={cat.image} alt={cat.name} className="w-10 h-10 object-cover rounded-lg border" />
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
+                        className="w-10 h-10 object-cover rounded-lg border"
+                      />
                     ) : (
-                      <div className="w-10 h-10 bg-muted rounded-lg border flex items-center justify-center text-muted-foreground text-xs">—</div>
+                      <div className="w-10 h-10 bg-muted rounded-lg border flex items-center justify-center text-muted-foreground text-xs">
+                        —
+                      </div>
                     )}
                   </td>
                   <td className="p-4 font-medium">{cat.name}</td>
-                  <td className="p-4 text-muted-foreground text-sm" dir="ltr">{cat.slug}</td>
+                  <td className="p-4 text-muted-foreground text-sm" dir="ltr">
+                    {cat.slug}
+                  </td>
                   <td className="p-4">
                     <span className="bg-accent/10 text-sm font-bold px-2 py-1 rounded-full">
                       {cat._count?.products ?? 0}
@@ -235,7 +282,8 @@ export default function Categories() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>حذف الفئة</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أنت متأكد من حذف فئة "{cat.name}"؟ سيتم إلغاء ربط المنتجات المرتبطة بها.
+                              هل أنت متأكد من حذف فئة "{cat.name}"؟ سيتم إلغاء
+                              ربط المنتجات المرتبطة بها.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

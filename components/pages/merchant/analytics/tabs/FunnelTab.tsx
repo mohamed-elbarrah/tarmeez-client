@@ -1,49 +1,45 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TrendingUp, ShoppingCart, Package, CheckCircle } from 'lucide-react'
-import { useGetFunnelQuery } from '@/lib/services/analyticsApi'
-import type { AnalyticsPeriod } from '@/lib/types/analytics'
-import { StatCard } from '../StatCard'
-import { ChartSkeleton } from '../ChartSkeleton'
-import { EmptyState } from '../EmptyState'
-import { ErrorState } from '../ErrorState'
-import { formatNumber, formatPercent } from '../formatters'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp, ShoppingCart, Package, CheckCircle } from "lucide-react";
+import { useGetFunnelQuery } from "@/lib/services/analyticsApi";
+import type { AnalyticsPeriod } from "@/lib/types/analytics";
+import { StatCard } from "../StatCard";
+import { ChartSkeleton } from "../ChartSkeleton";
+import { EmptyState } from "../EmptyState";
+import { ErrorState } from "../ErrorState";
+import { formatNumber, formatPercent } from "../formatters";
 
 interface FunnelTabProps {
-  period: AnalyticsPeriod
+  period: AnalyticsPeriod;
 }
 
 const FUNNEL_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
-]
+  "var(--color-chart-1)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+];
 
 export function FunnelTab({ period }: FunnelTabProps) {
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetFunnelQuery({ period }, { pollingInterval: 60000 })
+  const { data, isLoading, isError, refetch } = useGetFunnelQuery(
+    { period },
+    { pollingInterval: 60000 },
+  );
 
-  const steps = data?.steps ?? []
-  const firstCount = steps[0]?.count ?? 0
-  const lastCount = steps[steps.length - 1]?.count ?? 0
-  const cartStep = steps[2]?.count ?? 0
+  const steps = data?.steps ?? [];
+  const firstCount = steps[0]?.count ?? 0;
+  const lastCount = steps[steps.length - 1]?.count ?? 0;
+  const cartStep = steps[2]?.count ?? 0;
 
   const conversionRate =
-    firstCount > 0 ? ((lastCount / firstCount) * 100).toFixed(1) : '0.0'
+    firstCount > 0 ? ((lastCount / firstCount) * 100).toFixed(1) : "0.0";
 
   const abandonRate =
-    cartStep > 0
-      ? ((1 - lastCount / cartStep) * 100).toFixed(1)
-      : '0.0'
+    cartStep > 0 ? ((1 - lastCount / cartStep) * 100).toFixed(1) : "0.0";
 
-  const checkoutCount = steps[3]?.count ?? 0
+  const checkoutCount = steps[3]?.count ?? 0;
 
   return (
     <div className="space-y-6">
@@ -66,14 +62,11 @@ export function FunnelTab({ period }: FunnelTabProps) {
             <div className="space-y-3">
               {steps.map((step, i) => {
                 const pct =
-                  firstCount > 0 ? (step.count / firstCount) * 100 : 0
+                  firstCount > 0 ? (step.count / firstCount) * 100 : 0;
                 const dropoff =
                   i > 0 && steps[i - 1].count > 0
-                    ? (
-                        (1 - step.count / steps[i - 1].count) *
-                        100
-                      ).toFixed(1)
-                    : null
+                    ? ((1 - step.count / steps[i - 1].count) * 100).toFixed(1)
+                    : null;
 
                 return (
                   <div key={i} className="space-y-1">
@@ -84,7 +77,7 @@ export function FunnelTab({ period }: FunnelTabProps) {
                       <span className="text-muted-foreground flex items-center gap-1">
                         {formatNumber(step.count)}
                         {dropoff !== null && (
-                          <span className="text-red-500 dark:text-red-400 ms-2 text-xs">
+                          <span className="text-destructive ms-2 text-xs">
                             -{dropoff}%
                           </span>
                         )}
@@ -95,12 +88,13 @@ export function FunnelTab({ period }: FunnelTabProps) {
                         className="h-full rounded-md transition-all duration-500"
                         style={{
                           width: `${pct}%`,
-                          backgroundColor: FUNNEL_COLORS[i % FUNNEL_COLORS.length],
+                          backgroundColor:
+                            FUNNEL_COLORS[i % FUNNEL_COLORS.length],
                         }}
                       />
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           )}
@@ -111,29 +105,29 @@ export function FunnelTab({ period }: FunnelTabProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="معدل تحويل الزيارة"
-          value={isLoading ? '—' : `${conversionRate}%`}
+          value={isLoading ? "—" : `${conversionRate}%`}
           icon={TrendingUp}
           loading={isLoading}
         />
         <StatCard
           title="نسبة إهمال السلة"
-          value={isLoading ? '—' : `${abandonRate}%`}
+          value={isLoading ? "—" : `${abandonRate}%`}
           icon={ShoppingCart}
           loading={isLoading}
         />
         <StatCard
           title="وصلوا للدفع"
-          value={isLoading ? '—' : formatNumber(checkoutCount)}
+          value={isLoading ? "—" : formatNumber(checkoutCount)}
           icon={Package}
           loading={isLoading}
         />
         <StatCard
           title="أتموا الشراء"
-          value={isLoading ? '—' : formatNumber(lastCount)}
+          value={isLoading ? "—" : formatNumber(lastCount)}
           icon={CheckCircle}
           loading={isLoading}
         />
       </div>
     </div>
-  )
+  );
 }

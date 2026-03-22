@@ -37,31 +37,73 @@ export default function StoresManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">المتجر</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">التاجر</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">الخطة</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">الطلبات</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">الإيرادات</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">الحالة</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">إجراءات</th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  المتجر
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  التاجر
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  الخطة
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  الطلبات
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  الإيرادات
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  الحالة
+                </th>
+                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                  إجراءات
+                </th>
               </tr>
             </thead>
             <tbody>
               {[
-                { store: "متجر الإلكترونيات", merchant: "أحمد محمد", plan: "النمو", orders: 234, revenue: "45,230", status: "نشط" },
-                { store: "بوتيك الأزياء", merchant: "فاطمة علي", plan: "الاحترافي", orders: 189, revenue: "32,140", status: "نشط" },
-                { store: "متجر الرياضة", merchant: "محمد خالد", plan: "المبتدئ", orders: 67, revenue: "8,920", status: "تجريبي" },
+                {
+                  store: "متجر الإلكترونيات",
+                  merchant: "أحمد محمد",
+                  plan: "النمو",
+                  orders: 234,
+                  revenue: "45,230",
+                  status: "نشط",
+                },
+                {
+                  store: "بوتيك الأزياء",
+                  merchant: "فاطمة علي",
+                  plan: "الاحترافي",
+                  orders: 189,
+                  revenue: "32,140",
+                  status: "نشط",
+                },
+                {
+                  store: "متجر الرياضة",
+                  merchant: "محمد خالد",
+                  plan: "المبتدئ",
+                  orders: 67,
+                  revenue: "8,920",
+                  status: "تجريبي",
+                },
               ].map((store, i) => (
-                <tr key={i} className="border-b border-border hover:bg-secondary/50 transition-colors">
+                <tr
+                  key={i}
+                  className="border-b border-border hover:bg-secondary/50 transition-colors"
+                >
                   <td className="py-4 px-4 font-medium">{store.store}</td>
                   <td className="py-4 px-4">{store.merchant}</td>
                   <td className="py-4 px-4">{store.plan}</td>
                   <td className="py-4 px-4">{store.orders}</td>
                   <td className="py-4 px-4 font-medium">{store.revenue} ر.س</td>
                   <td className="py-4 px-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      store.status === "نشط" ? "bg-accent/10 text-accent-foreground" : "bg-yellow-50 text-yellow-700"
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        store.status === "نشط"
+                          ? "bg-accent/10 text-accent-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
                       {store.status}
                     </span>
                   </td>

@@ -1,20 +1,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useGetPagesQuery } from "@/lib/services/pagesApi";
+import { useGetMyStoreQuery } from "@/lib/services/merchantApi";
 import { Button } from "@/components/ui/button";
 import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarRail,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -31,8 +27,9 @@ import {
   HelpCircle,
   Search,
   Bell,
-  ChevronDown,
-  Menu,
+  PanelRightClose,
+  PanelRightOpen,
+  ExternalLink,
   Layout,
 } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -48,112 +45,255 @@ const navigation = [
   { name: "صفحاتي", href: "/merchant/pages", icon: Layout },
   { name: "القوالب", href: "/merchant/themes", icon: Palette },
   { name: "التطبيقات", href: "/merchant/apps", icon: Puzzle },
+];
+
+const bottomNavigation = [
   { name: "الإعدادات", href: "/merchant/settings", icon: Settings },
   { name: "الفريق", href: "/merchant/team", icon: UsersRound },
   { name: "الفواتير", href: "/merchant/billing", icon: CreditCard },
   { name: "الدعم", href: "/merchant/support", icon: HelpCircle },
 ];
 
-export default function MerchantLayout({ children }: { children: React.ReactNode }) {
+const EXPANDED_WIDTH = "16rem";
+const COLLAPSED_WIDTH = "4.5rem";
+
+export default function MerchantLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
+  const [expanded, setExpanded] = useState(true);
   const { data: pages } = useGetPagesQuery();
-  
-  const publishedCount = pages?.filter(p => p.status === 'PUBLISHED').length ?? 0;
+  const { data: storeData } = useGetMyStoreQuery();
+
+  const publishedCount =
+    pages?.filter((p) => p.status === "PUBLISHED").length ?? 0;
+  const merchantName = storeData?.merchant?.fullName ?? "";
+  const storeName = storeData?.store?.name ?? "";
+  const storeSlug = storeData?.store?.slug ?? "";
+  const initials = merchantName ? merchantName.charAt(0) : "ت";
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      <SidebarProvider style={{ ["--sidebar-width" as any]: "16rem" } as any}>
-        <Sidebar side="right" collapsible="icon">
-          <SidebarHeader>
-            <div className="flex items-center justify-between p-0 px-2">
-              <Link href="/" className="flex items-center gap-2 p-4">
-                <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
-                  <span className="text-background font-bold text-lg">ت</span>
-                </div>
-                <span className="text-lg font-bold">ترميز</span>
-              </Link>
-            </div>
-          </SidebarHeader>
-
-          <SidebarContent>
-            <SidebarMenu className="p-2">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href} className="flex items-center gap-3 px-4 py-3 w-full">
-                        <item.icon className="w-5 h-5 flex-shrink-0" />
-                        <span className="flex-1">{item.name}</span>
-                        {item.name === "صفحاتي" && publishedCount > 0 && (
-                          <span className="bg-[var(--p-color,theme(colors.primary.DEFAULT))] text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                            {publishedCount}
-                          </span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarContent>
-
-          <SidebarFooter>
-            <div className="p-4">
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                  <span className="font-bold text-primary-foreground">أ</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">أحمد محمد</div>
-                  <div className="text-sm text-muted-foreground truncate">متجري</div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+    <TooltipProvider delayDuration={0}>
+      <div className="flex min-h-screen bg-background" dir="rtl">
+        {/* ─── Sidebar ─── */}
+        <motion.aside
+          layout
+          className="sticky top-0 h-screen flex flex-col border-l border-sidebar-border bg-sidebar z-40 overflow-hidden"
+          animate={{ width: expanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          {/* Logo */}
+          <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0">
+            <Link href="/merchant" className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 shrink-0 rounded-lg bg-sidebar-primary flex items-center justify-center">
+                <span className="text-sidebar-primary-foreground font-bold text-lg">
+                  ت
+                </span>
               </div>
-            </div>
-          </SidebarFooter>
+              <AnimatePresence>
+                {expanded && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-lg font-bold text-sidebar-foreground whitespace-nowrap overflow-hidden"
+                  >
+                    ترميز
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          </div>
 
-          <SidebarRail />
-        </Sidebar>
+          {/* Main Nav */}
+          <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
+            {navigation.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/merchant" && pathname.startsWith(item.href));
+              return (
+                <SidebarLink
+                  key={item.href}
+                  item={item}
+                  isActive={isActive}
+                  expanded={expanded}
+                  badge={
+                    item.name === "صفحاتي" && publishedCount > 0
+                      ? publishedCount
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </nav>
 
-      {/* Main Content */}
-      <SidebarInset>
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-card border-b border-border">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="flex-1 max-w-2xl">
+          {/* Bottom Nav */}
+          <div className="border-t border-sidebar-border py-3 px-2 space-y-1 shrink-0">
+            {bottomNavigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <SidebarLink
+                  key={item.href}
+                  item={item}
+                  isActive={isActive}
+                  expanded={expanded}
+                />
+              );
+            })}
+          </div>
 
-              <div className="flex items-center ">
-                <SidebarTrigger />
-                <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          {/* User Profile */}
+          <div className="border-t border-sidebar-border p-3 shrink-0">
+            <Link
+              href="/merchant/settings"
+              className="flex items-center gap-3 rounded-lg p-2 hover:bg-sidebar-accent transition-colors"
+            >
+              <div className="w-9 h-9 shrink-0 rounded-full bg-sidebar-primary flex items-center justify-center">
+                <span className="font-bold text-sidebar-primary-foreground text-sm">
+                  {initials}
+                </span>
+              </div>
+              <AnimatePresence>
+                {expanded && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex-1 min-w-0 overflow-hidden"
+                  >
+                    <div className="text-sm font-medium text-sidebar-foreground truncate">
+                      {merchantName}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {storeName}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Link>
+          </div>
+        </motion.aside>
+
+        {/* ─── Main Area ─── */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="sticky top-0 z-30 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-6 shrink-0">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setExpanded((v) => !v)}
+                className="shrink-0 text-muted-foreground hover:text-foreground"
+              >
+                {expanded ? (
+                  <PanelRightClose className="w-5 h-5" />
+                ) : (
+                  <PanelRightOpen className="w-5 h-5" />
+                )}
+              </Button>
+              <div className="relative max-w-md flex-1">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <input
                   type="text"
                   placeholder="بحث..."
-                  className="w-full pr-10 pl-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pr-10 pl-4 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                 />
               </div>
-              </div>
-              
             </div>
 
-            <div className="flex items-center gap-2">
-                  <ModeToggle />
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
-                  </Button>
-                  <Button variant="outline">زيارة المتجر</Button>
+            <div className="flex items-center gap-1">
+              <ModeToggle />
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
+              </Button>
+              {storeSlug && (
+                <Button variant="outline" size="sm" className="gap-2" asChild>
+                  <Link href={`/store/${storeSlug}`} target="_blank">
+                    زيارة المتجر
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </Button>
+              )}
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Page Content */}
-        <main className="p-8">
-          {children}
-        </main>
-      </SidebarInset>
-      </SidebarProvider>
-    </div>
+          {/* Page Content */}
+          <main className="flex-1 p-6">{children}</main>
+        </div>
+      </div>
+    </TooltipProvider>
   );
+}
+
+/* ─── Sidebar Link Component ─── */
+function SidebarLink({
+  item,
+  isActive,
+  expanded,
+  badge,
+}: {
+  item: {
+    name: string;
+    href: string;
+    icon: React.ComponentType<{ className?: string }>;
+  };
+  isActive: boolean;
+  expanded: boolean;
+  badge?: number;
+}) {
+  const Icon = item.icon;
+
+  const link = (
+    <Link
+      href={item.href}
+      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+        isActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+      } ${!expanded ? "justify-center" : ""}`}
+    >
+      <Icon className="w-5 h-5 shrink-0" />
+      <AnimatePresence>
+        {expanded && (
+          <motion.span
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{ duration: 0.15 }}
+            className="whitespace-nowrap overflow-hidden flex-1"
+          >
+            {item.name}
+          </motion.span>
+        )}
+      </AnimatePresence>
+      {expanded && badge !== undefined && (
+        <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+          {badge}
+        </span>
+      )}
+    </Link>
+  );
+
+  if (!expanded) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side="left" sideOffset={8}>
+          <span>{item.name}</span>
+          {badge !== undefined && (
+            <span className="mr-2 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              {badge}
+            </span>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return link;
 }

@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
+import { TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
-  title: string
-  value: string | number
-  trend?: number
-  trendLabel?: string
-  icon: LucideIcon
-  iconColor?: string
-  loading?: boolean
-  prefix?: string
-  suffix?: string
+  title: string;
+  value: string | number;
+  trend?: number;
+  trendLabel?: string;
+  icon: LucideIcon;
+  iconColor?: string;
+  loading?: boolean;
+  prefix?: string;
+  suffix?: string;
 }
 
 export function StatCard({
@@ -40,11 +40,11 @@ export function StatCard({
           <Skeleton className="h-8 w-32" />
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const isPositive = trend !== undefined && trend >= 0
-  const isNegative = trend !== undefined && trend < 0
+  const isPositive = trend !== undefined && trend >= 0;
+  const isNegative = trend !== undefined && trend < 0;
 
   return (
     <Card>
@@ -52,7 +52,7 @@ export function StatCard({
         <div className="flex items-start justify-between mb-4">
           <div
             className={cn(
-              'w-12 h-12 rounded-lg flex items-center justify-center bg-muted',
+              "w-12 h-12 rounded-lg flex items-center justify-center bg-muted",
               iconColor,
             )}
           >
@@ -61,10 +61,8 @@ export function StatCard({
           {trend !== undefined && (
             <div
               className={cn(
-                'flex items-center gap-1 text-sm font-medium',
-                isPositive
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400',
+                "flex items-center gap-1 text-sm font-medium",
+                isPositive ? "text-primary" : "text-destructive",
               )}
             >
               {isPositive ? (
@@ -73,7 +71,7 @@ export function StatCard({
                 <TrendingDown className="h-4 w-4" />
               )}
               <span>
-                {isPositive ? '+' : ''}
+                {isPositive ? "+" : ""}
                 {trend.toFixed(1)}%
               </span>
             </div>
@@ -90,5 +88,5 @@ export function StatCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,34 +8,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { cn } from '@/lib/utils'
-import { useGetPagesQuery } from '@/lib/services/analyticsApi'
-import type { AnalyticsPeriod } from '@/lib/types/analytics'
-import { ChartSkeleton } from '../ChartSkeleton'
-import { EmptyState } from '../EmptyState'
-import { ErrorState } from '../ErrorState'
-import { formatNumber, formatDuration, formatPercent } from '../formatters'
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { useGetPagesQuery } from "@/lib/services/analyticsApi";
+import type { AnalyticsPeriod } from "@/lib/types/analytics";
+import { ChartSkeleton } from "../ChartSkeleton";
+import { EmptyState } from "../EmptyState";
+import { ErrorState } from "../ErrorState";
+import { formatNumber, formatDuration, formatPercent } from "../formatters";
 
 interface PagesTabProps {
-  period: AnalyticsPeriod
+  period: AnalyticsPeriod;
 }
 
 function bounceRateColor(rate: number): string {
-  if (rate > 70) return 'text-red-600 dark:text-red-400'
-  if (rate > 40) return 'text-yellow-600 dark:text-yellow-400'
-  return 'text-green-600 dark:text-green-400'
+  if (rate > 70) return "text-destructive";
+  if (rate > 40) return "text-muted-foreground";
+  return "text-primary";
 }
 
 export function PagesTab({ period }: PagesTabProps) {
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetPagesQuery({ period }, { pollingInterval: 60000 })
+  const { data, isLoading, isError, refetch } = useGetPagesQuery(
+    { period },
+    { pollingInterval: 60000 },
+  );
 
-  const sortedPages = [...(data?.pages ?? [])].sort((a, b) => b.views - a.views)
+  const sortedPages = [...(data?.pages ?? [])].sort(
+    (a, b) => b.views - a.views,
+  );
 
   return (
     <div className="space-y-6">
@@ -70,7 +70,12 @@ export function PagesTab({ period }: PagesTabProps) {
                       <TableCell>{formatNumber(page.views)}</TableCell>
                       <TableCell>{formatDuration(page.avgDuration)}</TableCell>
                       <TableCell>
-                        <span className={cn('font-medium', bounceRateColor(page.bounceRate))}>
+                        <span
+                          className={cn(
+                            "font-medium",
+                            bounceRateColor(page.bounceRate),
+                          )}
+                        >
                           {formatPercent(page.bounceRate)}
                         </span>
                       </TableCell>
@@ -83,5 +88,5 @@ export function PagesTab({ period }: PagesTabProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

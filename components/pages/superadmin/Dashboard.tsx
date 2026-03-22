@@ -1,6 +1,22 @@
 import { Card } from "@/components/ui/card";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Store, Users, DollarSign, TrendingUp, ShoppingCart } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Store,
+  Users,
+  DollarSign,
+  TrendingUp,
+  ShoppingCart,
+} from "lucide-react";
 
 const revenueData = [
   { month: "يناير", revenue: 125000 },
@@ -30,11 +46,36 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-5 gap-6">
         {[
-          { label: "إجمالي المتاجر", value: "1,847", change: "+12.3%", icon: Store },
-          { label: "التجار النشطون", value: "1,234", change: "+8.7%", icon: Users },
-          { label: "إيرادات المنصة", value: "245,670 ر.س", change: "+23.4%", icon: DollarSign },
-          { label: "الطلبات اليوم", value: "892", change: "+15.2%", icon: ShoppingCart },
-          { label: "معدل النمو", value: "34.5%", change: "+5.1%", icon: TrendingUp },
+          {
+            label: "إجمالي المتاجر",
+            value: "1,847",
+            change: "+12.3%",
+            icon: Store,
+          },
+          {
+            label: "التجار النشطون",
+            value: "1,234",
+            change: "+8.7%",
+            icon: Users,
+          },
+          {
+            label: "إيرادات المنصة",
+            value: "245,670 ر.س",
+            change: "+23.4%",
+            icon: DollarSign,
+          },
+          {
+            label: "الطلبات اليوم",
+            value: "892",
+            change: "+15.2%",
+            icon: ShoppingCart,
+          },
+          {
+            label: "معدل النمو",
+            value: "34.5%",
+            change: "+5.1%",
+            icon: TrendingUp,
+          },
         ].map((stat, i) => (
           <Card key={i} className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -42,9 +83,12 @@ export default function Dashboard() {
                 <stat.icon className="w-6 h-6" />
               </div>
               <div className="flex items-center gap-1 text-sm text-primary">
-                {stat.change}</div>
+                {stat.change}
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground mb-1">{stat.label}</div>
+            <div className="text-sm text-muted-foreground mb-1">
+              {stat.label}
+            </div>
             <div className="text-2xl font-bold">{stat.value}</div>
           </Card>
         ))}
@@ -55,11 +99,17 @@ export default function Dashboard() {
           <h3 className="text-lg font-bold mb-6">إيرادات المنصة</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
-              <XAxis dataKey="month" stroke="var(--chart-axis)" />
-              <YAxis stroke="var(--chart-axis)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="month" stroke="var(--muted-foreground)" />
+              <YAxis stroke="var(--muted-foreground)" />
               <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} dot={{ fill: "var(--primary)" }} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="var(--primary)"
+                strokeWidth={3}
+                dot={{ fill: "var(--primary)" }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -68,11 +118,15 @@ export default function Dashboard() {
           <h3 className="text-lg font-bold mb-6">نمو المتاجر</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={storesGrowth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
-              <XAxis dataKey="month" stroke="var(--chart-axis)" />
-              <YAxis stroke="var(--chart-axis)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="month" stroke="var(--muted-foreground)" />
+              <YAxis stroke="var(--muted-foreground)" />
               <Tooltip />
-              <Bar dataKey="revenue" fill="var(--primary)" radius={[8, 8, 0, 0]} />
+              <Bar
+                dataKey="stores"
+                fill="var(--primary)"
+                radius={[8, 8, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -84,25 +138,55 @@ export default function Dashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">المتجر</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">التاجر</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">الخطة</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">الطلبات</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">تاريخ الإنشاء</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                  المتجر
+                </th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                  التاجر
+                </th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                  الخطة
+                </th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                  الطلبات
+                </th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                  تاريخ الإنشاء
+                </th>
               </tr>
             </thead>
             <tbody>
               {[
-                { store: "متجر الإلكترونيات", merchant: "أحمد محمد", plan: "النمو", orders: 234, date: "6 مارس 2026" },
-                { store: "بوتيك الأزياء", merchant: "فاطمة علي", plan: "الاحترافي", orders: 189, date: "5 مارس 2026" },
-                { store: "متجر الرياضة", merchant: "محمد خالد", plan: "المبتدئ", orders: 67, date: "5 مارس 2026" },
+                {
+                  store: "متجر الإلكترونيات",
+                  merchant: "أحمد محمد",
+                  plan: "النمو",
+                  orders: 234,
+                  date: "6 مارس 2026",
+                },
+                {
+                  store: "بوتيك الأزياء",
+                  merchant: "فاطمة علي",
+                  plan: "الاحترافي",
+                  orders: 189,
+                  date: "5 مارس 2026",
+                },
+                {
+                  store: "متجر الرياضة",
+                  merchant: "محمد خالد",
+                  plan: "المبتدئ",
+                  orders: 67,
+                  date: "5 مارس 2026",
+                },
               ].map((store, i) => (
                 <tr key={i} className="border-b border-border">
                   <td className="py-3 px-4 font-medium">{store.store}</td>
                   <td className="py-3 px-4">{store.merchant}</td>
                   <td className="py-3 px-4">{store.plan}</td>
                   <td className="py-3 px-4">{store.orders}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{store.date}</td>
+                  <td className="py-3 px-4 text-muted-foreground">
+                    {store.date}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,30 +1,30 @@
-import { notFound } from 'next/navigation';
-import { getStoreBySlug } from '@/lib/api/stores';
-import PageRenderer from '@/lib/page-builder/renderer/PageRenderer';
-import { resolvePageProducts } from '@/lib/page-builder/renderer/resolveProducts';
-import Header from '@/lib/themes/store/default/components/Header';
-import Footer from '@/lib/themes/store/default/components/Footer';
-import { resolveTokens } from '@/lib/themes/store/default/config';
-import { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { notFound } from "next/navigation";
+import { getStoreBySlug } from "@/lib/api/stores";
+import PageRenderer from "@/lib/page-builder/renderer/PageRenderer";
+import { resolvePageProducts } from "@/lib/page-builder/renderer/resolveProducts";
+import Header from "@/lib/themes/store/default/components/Header";
+import Footer from "@/lib/themes/store/default/components/Footer";
+import { resolveTokens } from "@/lib/themes/store/default/config";
+import { Metadata } from "next";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
 export async function generateMetadata({
-  params
+  params,
 }: {
-  params: Promise<{ storeSlug: string, pageSlug: string }>
+  params: Promise<{ storeSlug: string; pageSlug: string }>;
 }): Promise<Metadata> {
   const { storeSlug, pageSlug } = await params;
-  
+
   const store = await getStoreBySlug(storeSlug);
   if (!store) return {};
 
   const res = await fetch(`${API_URL}/stores/${storeSlug}/pages/${pageSlug}`, {
-    cache: 'no-store'
+    cache: "no-store",
   });
 
-  if (!res.ok) return { title: 'Page Not Found' };
+  if (!res.ok) return { title: "Page Not Found" };
   const page = await res.json();
 
   return {
@@ -42,7 +42,7 @@ export default async function PublicPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ storeSlug: string, pageSlug: string }>;
+  params: Promise<{ storeSlug: string; pageSlug: string }>;
   searchParams: Promise<{ preview?: string }>;
 }) {
   const { storeSlug, pageSlug } = await params;
@@ -57,25 +57,22 @@ export default async function PublicPage({
   // 2. Fetch page (Handle Public vs Preview)
   const publicRes = await fetch(
     `${API_URL}/stores/${storeSlug}/pages/${pageSlug}`,
-    { cache: 'no-store' }
+    { cache: "no-store" },
   );
 
   if (publicRes.ok) {
     page = await publicRes.json();
-  } else if (preview === 'true') {
+  } else if (preview === "true") {
     // Preview mode: try to fetch via merchant endpoint
     const cookieStore = await cookies();
-    const token = cookieStore.get('access_token')?.value;
+    const token = cookieStore.get("access_token")?.value;
 
     if (token) {
       // Find page by slug from merchant list
-      const merchantRes = await fetch(
-        `${API_URL}/merchant/pages`,
-        {
-          headers: { 'Cookie': `access_token=${token}` },
-          cache: 'no-store'
-        }
-      );
+      const merchantRes = await fetch(`${API_URL}/merchant/pages`, {
+        headers: { Cookie: `access_token=${token}` },
+        cache: "no-store",
+      });
       if (merchantRes.ok) {
         const pages = await merchantRes.json();
         page = pages.find((p: any) => p.slug === pageSlug) ?? null;
@@ -88,34 +85,38 @@ export default async function PublicPage({
   // 3. Resolve product data (Rule 6)
   const resolvedProducts = resolvePageProducts(
     page.content,
-    (store.products as any[]) || []
+    (store.products as any[]) || [],
   );
 
   // 4. Branding & Styles
   const theme = resolveTokens(store);
   const cssVars = {
-    '--p-color': theme.primary,
-    '--s-color': theme.secondary,
-    '--a-color': theme.accent,
-    '--b-color': theme.buttonColor,
-    '--t-color': theme.textColor,
-    '--h-color': theme.headingColor,
-    '--radius': theme.borderRadius,
+    "--p-color": theme.primary,
+    "--s-color": theme.secondary,
+    "--a-color": theme.accent,
+    "--b-color": theme.buttonColor,
+    "--t-color": theme.textColor,
+    "--h-color": theme.headingColor,
+    "--radius": theme.borderRadius,
     fontFamily: theme.fontFamily,
   } as React.CSSProperties;
 
   return (
-    <div style={cssVars} dir="rtl" className="min-h-screen bg-background flex flex-col">
+    <div
+      style={cssVars}
+      dir="rtl"
+      className="min-h-screen bg-background flex flex-col"
+    >
       {/* Preview Banner */}
-      {preview === 'true' && (
-        <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-bold sticky top-0 z-50">
+      {preview === "true" && (
+        <div className="bg-primary text-primary-foreground text-center py-2 px-4 text-sm font-bold sticky top-0 z-50">
           وضع المعاينة — هذه الصفحة غير منشورة للعملاء بعد
         </div>
       )}
 
       {/* Conditional Header (Rule 13) */}
       {page.showHeader && (
-        <Header 
+        <Header
           storeSlug={storeSlug}
           storeName={store.name}
           logo={store.logo}
@@ -124,7 +125,7 @@ export default async function PublicPage({
       )}
 
       <main className="flex-grow">
-        <PageRenderer 
+        <PageRenderer
           page={page}
           resolvedProducts={resolvedProducts}
           storeSlug={storeSlug}
@@ -134,7 +135,7 @@ export default async function PublicPage({
 
       {/* Conditional Footer (Rule 13) */}
       {page.showFooter && (
-        <Footer 
+        <Footer
           storeSlug={storeSlug}
           storeName={store.name}
           logo={store.logo}

@@ -34,26 +34,66 @@ export default function SystemLogs() {
 
         <div className="space-y-2">
           {[
-            { type: "إنشاء", message: "تم إنشاء متجر جديد 'متجر الإلكترونيات'", user: "ahmad@example.com", time: "منذ 5 دقائق", level: "info" },
-            { type: "تحديث", message: "تم ترقية خطة 'بوتيك الأزياء' إلى الاحترافي", user: "fatima@example.com", time: "منذ 15 دقيقة", level: "success" },
-            { type: "دخول", message: "تسجيل دخول ناجح", user: "mohammed@example.com", time: "منذ 30 دقيقة", level: "info" },
-            { type: "خطأ", message: "فشل معالجة الدفع", user: "sarah@example.com", time: "منذ ساعة", level: "error" },
-            { type: "حذف", message: "تم حذف منتج من المتجر", user: "khalid@example.com", time: "منذ ساعتين", level: "warning" },
+            {
+              type: "إنشاء",
+              message: "تم إنشاء متجر جديد 'متجر الإلكترونيات'",
+              user: "ahmad@example.com",
+              time: "منذ 5 دقائق",
+              level: "info",
+            },
+            {
+              type: "تحديث",
+              message: "تم ترقية خطة 'بوتيك الأزياء' إلى الاحترافي",
+              user: "fatima@example.com",
+              time: "منذ 15 دقيقة",
+              level: "success",
+            },
+            {
+              type: "دخول",
+              message: "تسجيل دخول ناجح",
+              user: "mohammed@example.com",
+              time: "منذ 30 دقيقة",
+              level: "info",
+            },
+            {
+              type: "خطأ",
+              message: "فشل معالجة الدفع",
+              user: "sarah@example.com",
+              time: "منذ ساعة",
+              level: "error",
+            },
+            {
+              type: "حذف",
+              message: "تم حذف منتج من المتجر",
+              user: "khalid@example.com",
+              time: "منذ ساعتين",
+              level: "warning",
+            },
           ].map((log, i) => (
-            <div key={i} className="p-4 bg-secondary rounded-lg hover:bg-accent/5 transition-colors">
+            <div
+              key={i}
+              className="p-4 bg-secondary rounded-lg hover:bg-accent/5 transition-colors"
+            >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    log.level === "error" ? "bg-red-100 text-red-700" :
-                    log.level === "warning" ? "bg-yellow-100 text-yellow-700" :
-                    log.level === "success" ? "bg-accent/10 text-accent-foreground" :
-                    "bg-blue-100 text-blue-700"
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      log.level === "error"
+                        ? "bg-destructive/10 text-destructive"
+                        : log.level === "warning"
+                          ? "bg-muted text-muted-foreground"
+                          : log.level === "success"
+                            ? "bg-primary/10 text-primary"
+                            : "bg-secondary text-secondary-foreground"
+                    }`}
+                  >
                     {log.type}
                   </span>
                   <span className="font-medium">{log.message}</span>
                 </div>
-                <span className="text-sm text-muted-foreground">{log.time}</span>
+                <span className="text-sm text-muted-foreground">
+                  {log.time}
+                </span>
               </div>
               <div className="text-sm text-muted-foreground">{log.user}</div>
             </div>

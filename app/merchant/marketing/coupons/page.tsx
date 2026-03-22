@@ -1,7 +1,7 @@
-"use client";
-
-import Page from "@/components/pages/merchant/Coupons";
-
-export default function RoutePage() {
-  return <Page />;
+export default function CouponsPage() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <h1 className="text-2xl font-bold text-muted-foreground">الكوبونات</h1>
+    </div>
+  );
 }
