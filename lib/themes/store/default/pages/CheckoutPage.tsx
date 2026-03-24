@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useCreateOrderMutation } from '@/lib/services/ordersApi'
+import { useValidateCouponMutation } from '@/lib/services/couponsApi'
 import { useAppSelector, useAppDispatch } from '@/lib/store/hooks'
 import { clearCart } from '@/lib/store/slices/cartSlice'
 import { checkoutStarted } from '@/lib/store/analytics-listener'
@@ -33,9 +34,19 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
     resolver: zodResolver(checkoutSchema)
   })
   const [createOrder, { isLoading }] = useCreateOrderMutation()
+  const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation()
   const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || [])
+  const storeData = useAppSelector((s: any) => s.cart.carts[storeSlug]?.storeData)
   const dispatch = useAppDispatch()
   const router = useRouter()
+
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    discount: number; message: string; code: string;
+    freeProduct?: { id: string; name: string; qty: number };
+  } | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
 
   // Track checkout start on mount (ANALYTICS-RULE 4 — sendBeacon via listener)
   const cartRef = useRef(cart)
@@ -64,6 +75,7 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
       items: cart.map((i: any) => ({ productId: String(i.id), quantity: i.quantity })),
       notes: data.notes,
       storeSlug: String(storeSlug),
+      ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
     }
 
     try {
@@ -150,17 +162,93 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
             </div>
 
             <div className="space-y-3 border-t pt-4 mb-6">
+              {/* Coupon input */}
+              <div className="space-y-2 pb-3 border-b border-dashed">
+                <label className="text-xs font-bold text-slate-500">كوبون الخصم</label>
+                <div className="flex gap-2">
+                  <input
+                    value={couponCode}
+                    onChange={e => { setCouponCode(e.target.value); setCouponError(null); }}
+                    placeholder="أدخل كود الخصم"
+                    disabled={!!appliedCoupon}
+                    className="flex-1 p-2.5 bg-slate-50 border rounded-lg text-sm font-mono uppercase"
+                    dir="ltr"
+                  />
+                  {appliedCoupon ? (
+                    <button
+                      type="button"
+                      onClick={() => { setAppliedCoupon(null); setCouponCode(''); setCouponError(null); }}
+                      className="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      إزالة
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!couponCode.trim()) return;
+                        setCouponError(null);
+                        try {
+                          const storeId = storeData?.id;
+                          if (!storeId) { setCouponError('معرّف المتجر غير متاح'); return; }
+                          const result = await validateCoupon({
+                            code: couponCode.trim(),
+                            storeId,
+                            orderTotal: subtotal,
+                            productIds: cart.map((i: any) => String(i.id)),
+                          }).unwrap();
+                          if (result.valid) {
+                            setAppliedCoupon({
+                              discount: result.discount,
+                              message: result.message || 'تم تطبيق الكوبون',
+                              code: couponCode.trim().toUpperCase(),
+                              freeProduct: result.freeProduct,
+                            });
+                          } else {
+                            setCouponError(result.message || 'كود الخصم غير صالح');
+                          }
+                        } catch (err: any) {
+                          setCouponError(err?.data?.message || 'حدث خطأ أثناء التحقق');
+                        }
+                      }}
+                      disabled={!couponCode.trim() || isValidating}
+                      className="px-4 py-2 text-sm font-bold text-white rounded-lg bg-[var(--p-color)] hover:shadow-md transition-all disabled:opacity-50"
+                    >
+                      {isValidating ? '...' : 'تطبيق'}
+                    </button>
+                  )}
+                </div>
+                {appliedCoupon && (
+                  <p className="text-xs font-bold text-green-600 flex items-center gap-1">
+                    ✓ {appliedCoupon.message}
+                  </p>
+                )}
+                {couponError && (
+                  <p className="text-xs font-bold text-red-500">
+                    {couponError}
+                  </p>
+                )}
+              </div>
+
               <div className="flex justify-between text-sm font-bold text-slate-400">
                 <span>المجموع الفرعي</span>
                 <span>{subtotal.toLocaleString()} ر.س</span>
               </div>
+              {appliedCoupon && appliedCoupon.discount > 0 && (
+                <div className="flex justify-between text-sm font-bold text-green-500">
+                  <span>الخصم</span>
+                  <span>- {appliedCoupon.discount.toLocaleString()} ر.س</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm font-bold text-green-500">
                 <span>رسوم الشحن</span>
                 <span>مجاني</span>
               </div>
               <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t border-dashed">
                 <span>الإجمالي</span>
-                <span className="text-[var(--p-color)]">{subtotal.toLocaleString()} ر.س</span>
+                <span className="text-[var(--p-color)]">
+                  {(subtotal - (appliedCoupon?.discount || 0)).toLocaleString()} ر.س
+                </span>
               </div>
             </div>
 

@@ -12,6 +12,7 @@ import { wishlistApi } from '@/lib/services/wishlistApi'
 import { categoriesApi } from '@/lib/services/categoriesApi'
 import { pagesApi } from '@/lib/services/pagesApi'
 import { analyticsApi } from '@/lib/services/analyticsApi'
+import { couponsApi } from '@/lib/services/couponsApi'
 import { analyticsListenerMiddleware } from './analytics-listener'
 
 export const store = configureStore({
@@ -29,6 +30,7 @@ export const store = configureStore({
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [pagesApi.reducerPath]: pagesApi.reducer,
     [analyticsApi.reducerPath]: analyticsApi.reducer,
+    [couponsApi.reducerPath]: couponsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -45,6 +47,7 @@ export const store = configureStore({
         categoriesApi.middleware,
         pagesApi.middleware,
         analyticsApi.middleware,
+        couponsApi.middleware,
       ),
 })
 
