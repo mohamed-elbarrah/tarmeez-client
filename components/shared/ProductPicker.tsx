@@ -13,7 +13,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useGetProductsQuery } from "@/lib/services/productsApi";
 
@@ -110,14 +114,18 @@ export default function ProductPicker(props: ProductPickerProps) {
                     ) : (
                       <Package className="h-4 w-4 text-muted-foreground shrink-0" />
                     )}
-                    <span className="flex-1 truncate text-sm">{product.name}</span>
+                    <span className="flex-1 truncate text-sm">
+                      {product.name}
+                    </span>
                     <span className="text-xs text-muted-foreground shrink-0">
                       {product.price.toLocaleString("ar-SA")} ر.س
                     </span>
                     <Check
                       className={cn(
                         "h-4 w-4 shrink-0 transition-opacity",
-                        value === product.id ? "opacity-100 text-primary" : "opacity-0",
+                        value === product.id
+                          ? "opacity-100 text-primary"
+                          : "opacity-0",
                       )}
                     />
                   </CommandItem>
@@ -134,7 +142,9 @@ export default function ProductPicker(props: ProductPickerProps) {
   const { value, onChange, placeholder = "اختر منتجات", disabled } = props;
 
   const toggle = (id: string) =>
-    onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
+    onChange(
+      value.includes(id) ? value.filter((v) => v !== id) : [...value, id],
+    );
 
   return (
     <div className="space-y-2">
@@ -186,7 +196,9 @@ export default function ProductPicker(props: ProductPickerProps) {
                     ) : (
                       <Package className="h-4 w-4 text-muted-foreground shrink-0" />
                     )}
-                    <span className="flex-1 truncate text-sm">{product.name}</span>
+                    <span className="flex-1 truncate text-sm">
+                      {product.name}
+                    </span>
                     <span className="text-xs text-muted-foreground shrink-0">
                       {product.price.toLocaleString("ar-SA")} ر.س
                     </span>

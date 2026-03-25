@@ -907,7 +907,11 @@ export default function CouponFormDialog({
                   <ChevronLeft className="h-4 w-4 me-1" />
                 </Button>
               ) : (
-                <Button type="button" onClick={() => handleSubmit()} disabled={isSaving}>
+                <Button
+                  type="button"
+                  onClick={() => handleSubmit()}
+                  disabled={isSaving}
+                >
                   {isSaving ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin me-2" />
