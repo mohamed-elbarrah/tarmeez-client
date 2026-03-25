@@ -3,9 +3,26 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, Download } from "lucide-react";
-import { useUpdateStoreCustomizationMutation, useUploadStoreImageMutation } from '@/lib/services/productsApi';
-import { useGetMyStoreQuery } from '@/lib/services/merchantApi';
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Eye, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  useUpdateStoreCustomizationMutation,
+  useUploadStoreImageMutation,
+} from '@/lib/services/productsApi';
+import {
+  useGetMyStoreQuery,
+  useGetAvailableThemesQuery,
+  useSwitchThemeMutation,
+} from '@/lib/services/merchantApi';
 import React from "react";
 
 const AdvancedColorPicker: React.FC<{
@@ -344,57 +361,268 @@ const BrandIdentitySection = () => {
   )
 }
 
+// ─── Theme Grid ─────────────────────────────────────────────────────────────
+
+interface ThemeRecord {
+  id: string
+  slug: string
+  name: string
+  previewImage: string | null
+}
+
+/** Skeleton placeholder shown while fetching themes */
+const ThemeCardSkeleton = () => (
+  <Card className="overflow-hidden">
+    <Skeleton className="aspect-4/3 w-full" />
+    <div className="p-4 space-y-3">
+      <Skeleton className="h-5 w-1/2" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 flex-1" />
+        <Skeleton className="h-8 flex-1" />
+      </div>
+    </div>
+  </Card>
+)
+
+/** Single theme card */
+const ThemeCard = ({
+  theme,
+  isActive,
+  onActivate,
+  isSwitching,
+}: {
+  theme: ThemeRecord
+  isActive: boolean
+  onActivate: (theme: ThemeRecord) => void
+  isSwitching: boolean
+}) => {
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  return (
+    <>
+      <Card className={`overflow-hidden transition-all ${isActive ? 'ring-2 ring-primary' : ''}`}>
+        {/* Preview image / placeholder */}
+        <div
+          className="aspect-4/3 bg-muted flex items-center justify-center relative cursor-pointer group border-b border-border"
+          onClick={() => theme.previewImage && setPreviewOpen(true)}
+        >
+          {theme.previewImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={theme.previewImage}
+              alt={theme.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-xs text-muted-foreground">{theme.name}</span>
+          )}
+          {theme.previewImage && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <Eye className="w-6 h-6 text-white" />
+            </div>
+          )}
+          {isActive && (
+            <div className="absolute top-2 right-2">
+              <Badge className="bg-green-500/90 text-white text-xs gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                نشط
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-sm">{theme.name}</h3>
+            {isActive && (
+              <Badge variant="outline" className="text-xs text-green-600 border-green-500">
+                مفعّل
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            {/* Preview — only shown when a previewImage exists */}
+            {theme.previewImage && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => setPreviewOpen(true)}
+              >
+                <Eye className="w-4 h-4 ml-1" />
+                معاينة
+              </Button>
+            )}
+
+            <Button
+              size="sm"
+              className="flex-1"
+              disabled={isActive || isSwitching}
+              onClick={() => onActivate(theme)}
+            >
+              {isSwitching ? (
+                <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+              ) : isActive ? (
+                'مفعّل'
+              ) : (
+                'تفعيل'
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Preview Modal */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-3xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>{theme.name}</DialogTitle>
+          </DialogHeader>
+          {theme.previewImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={theme.previewImage}
+              alt={theme.name}
+              className="w-full rounded-lg"
+            />
+          )}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">إغلاق</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
+
+/** Confirmation dialog before switching themes */
+const ConfirmSwitchDialog = ({
+  open,
+  theme,
+  onConfirm,
+  onCancel,
+  isSwitching,
+}: {
+  open: boolean
+  theme: ThemeRecord | null
+  onConfirm: () => void
+  onCancel: () => void
+  isSwitching: boolean
+}) => (
+  <Dialog open={open} onOpenChange={(v) => { if (!v) onCancel() }}>
+    <DialogContent dir="rtl">
+      <DialogHeader>
+        <DialogTitle>تغيير القالب</DialogTitle>
+      </DialogHeader>
+      <p className="text-sm text-muted-foreground">
+        هل أنت متأكد من تغيير القالب إلى &quot;{theme?.name}&quot;؟ قد تتغير بعض إعدادات الألوان الافتراضية.
+      </p>
+      <DialogFooter className="flex-row-reverse gap-2">
+        <Button onClick={onConfirm} disabled={isSwitching}>
+          {isSwitching ? <Loader2 className="w-4 h-4 animate-spin ml-1" /> : null}
+          تأكيد التغيير
+        </Button>
+        <DialogClose asChild>
+          <Button variant="outline" onClick={onCancel}>إلغاء</Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)
+
+/** Theme gallery section */
+const ThemeGallery = () => {
+  const { data: storeData } = useGetMyStoreQuery()
+  const { data: themes, isLoading, isError } = useGetAvailableThemesQuery()
+  const [switchTheme, { isLoading: isSwitching }] = useSwitchThemeMutation()
+
+  const [pendingTheme, setPendingTheme] = useState<ThemeRecord | null>(null)
+  const activeThemeId = storeData?.store?.themeId ?? null
+
+  const handleActivate = (theme: ThemeRecord) => {
+    setPendingTheme(theme)
+  }
+
+  const handleConfirm = async () => {
+    if (!pendingTheme) return
+    try {
+      await switchTheme({ themeId: pendingTheme.id }).unwrap()
+      const { toast } = await import('sonner')
+      toast.success(`تم تفعيل قالب "${pendingTheme.name}" بنجاح ✓`)
+    } catch {
+      const { toast } = await import('sonner')
+      toast.error('فشل تغيير القالب، يرجى المحاولة مجدداً')
+    } finally {
+      setPendingTheme(null)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <ThemeCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-destructive text-sm mb-3">تعذّر تحميل القوالب</p>
+        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+          إعادة المحاولة
+        </Button>
+      </Card>
+    )
+  }
+
+  if (!themes || themes.length === 0) {
+    return (
+      <Card className="p-8 text-center text-muted-foreground text-sm">
+        لا توجد قوالب متاحة حالياً
+      </Card>
+    )
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {(themes as ThemeRecord[]).map((theme) => (
+          <ThemeCard
+            key={theme.id}
+            theme={theme}
+            isActive={theme.id === activeThemeId}
+            onActivate={handleActivate}
+            isSwitching={isSwitching && pendingTheme?.id === theme.id}
+          />
+        ))}
+      </div>
+
+      <ConfirmSwitchDialog
+        open={!!pendingTheme}
+        theme={pendingTheme}
+        onConfirm={handleConfirm}
+        onCancel={() => setPendingTheme(null)}
+        isSwitching={isSwitching}
+      />
+    </>
+  )
+}
+
 export default function Themes() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-3xl font-bold mb-2">القوالب</h1>
         <p className="text-muted-foreground">اختر قالب احترافي لمتجرك</p>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {["الكل", "أزياء", "إلكترونيات", "طعام", "رياضة"].map((cat, i) => (
-          <Button
-            key={i}
-            variant={i === 0 ? "default" : "outline"}
-            className={i === 0 ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}
-          >
-            {cat}
-          </Button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-3 gap-6">
-        {[
-          { name: "Modern Shop", price: "مجاني", popular: false },
-          { name: "Sports Elite", price: "399 ر.س", popular: false },
-        ].map((theme, i) => (
-          <Card key={i} className="overflow-hidden">
-            {theme.popular && (
-              <div className="bg-accent text-accent-foreground px-4 py-1 text-xs font-bold text-center">
-                الأكثر شعبية
-              </div>
-            )}
-            <div className="aspect-[4/3] bg-secondary border-b border-border"></div>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold">{theme.name}</h3>
-                <span className="text-sm font-medium">{theme.price}</span>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Eye className="w-4 h-4 ml-1" />
-                  معاينة
-                </Button>
-                <Button size="sm" className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-                  <Download className="w-4 h-4 ml-1" />
-                  تثبيت
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <ThemeGallery />
 
       <BrandIdentitySection />
     </div>

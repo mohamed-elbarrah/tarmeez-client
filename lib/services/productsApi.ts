@@ -68,20 +68,6 @@ export const productsApi = createApi({
       }),
       invalidatesTags: ["Store"],
     }),
-    switchTheme: builder.mutation<
-      { storeId: string; themeId: string },
-      { themeId: string }
-    >({
-      query: (body) => ({
-        url: "/merchant/store/theme",
-        method: "PATCH",
-        body,
-      }),
-      invalidatesTags: ["Store"],
-    }),
-    getAvailableThemes: builder.query<any[], void>({
-      query: () => "/themes",
-    }),
 
     // ── Offers ──
     getProductOffers: builder.query<any[], string>({
@@ -125,8 +111,6 @@ export const {
   useDeleteProductMutation,
   useUpdateStoreCustomizationMutation,
   useUploadStoreImageMutation,
-  useSwitchThemeMutation,
-  useGetAvailableThemesQuery,
   useGetProductOffersQuery,
   useCreateOfferMutation,
   useUpdateOfferMutation,

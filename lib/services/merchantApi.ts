@@ -37,6 +37,15 @@ export const merchantApi = createApi({
     updateCustomerStatus: build.mutation<any, { id: string; status: 'ACTIVE' | 'BANNED' }>({
       query: ({ id, status }) => ({ url: `/merchant/customers/${id}/status`, method: 'PATCH', body: { status } }),
     }),
+    /** PATCH /merchant/store/theme — switches the active theme for the store */
+    switchTheme: build.mutation<{ storeId: string; themeId: string }, { themeId: string }>({
+      query: (body) => ({ url: '/merchant/store/theme', method: 'PATCH', body }),
+      invalidatesTags: ['Merchant'],
+    }),
+    /** GET /themes — public list of all available themes */
+    getAvailableThemes: build.query<any[], void>({
+      query: () => '/themes',
+    }),
   }),
 })
 
@@ -46,7 +55,9 @@ export const {
   useUpdateCustomerStatusMutation,
   useGetOrdersQuery,
   useGetOrderByCodeQuery,
-  useUpdateOrderStatusMutation
+  useUpdateOrderStatusMutation,
+  useSwitchThemeMutation,
+  useGetAvailableThemesQuery,
 } = merchantApi
 
 export default merchantApi
