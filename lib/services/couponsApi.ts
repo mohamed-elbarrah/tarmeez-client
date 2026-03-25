@@ -1,13 +1,18 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "./baseQuery";
 
 export interface Coupon {
   id: string;
   code: string;
   name: string;
   description?: string;
-  type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING' | 'FREE_PRODUCT' | 'PRODUCT_DISCOUNT';
-  status: 'ACTIVE' | 'INACTIVE' | 'EXPIRED' | 'DEPLETED';
+  type:
+    | "PERCENTAGE"
+    | "FIXED_AMOUNT"
+    | "FREE_SHIPPING"
+    | "FREE_PRODUCT"
+    | "PRODUCT_DISCOUNT";
+  status: "ACTIVE" | "INACTIVE" | "EXPIRED" | "DEPLETED";
   discountValue?: number;
   maxDiscountAmount?: number;
   freeProductId?: string;
@@ -51,78 +56,87 @@ export interface CouponValidation {
 }
 
 export const couponsApi = createApi({
-  reducerPath: 'couponsApi',
+  reducerPath: "couponsApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Coupons'],
+  tagTypes: ["Coupons"],
   endpoints: (builder) => ({
-    getCoupons: builder.query<CouponsResponse, { status?: string; page?: number }>({
+    getCoupons: builder.query<
+      CouponsResponse,
+      { status?: string; page?: number }
+    >({
       query: ({ status, page = 1 }) => {
         const params = new URLSearchParams();
-        if (status && status !== 'all') params.append('status', status);
-        params.append('page', String(page));
+        if (status && status !== "all") params.append("status", status);
+        params.append("page", String(page));
         return `/merchant/coupons?${params}`;
       },
-      providesTags: ['Coupons'],
+      providesTags: ["Coupons"],
     }),
 
     getCouponById: builder.query<Coupon, string>({
       query: (id) => `/merchant/coupons/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Coupons', id }],
+      providesTags: (result, error, id) => [{ type: "Coupons", id }],
     }),
 
     createCoupon: builder.mutation<Coupon, Partial<Coupon>>({
       query: (body) => ({
-        url: '/merchant/coupons',
-        method: 'POST',
+        url: "/merchant/coupons",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['Coupons'],
+      invalidatesTags: ["Coupons"],
     }),
 
-    updateCoupon: builder.mutation<Coupon, { id: string; data: Partial<Coupon> }>({
+    updateCoupon: builder.mutation<
+      Coupon,
+      { id: string; data: Partial<Coupon> }
+    >({
       query: ({ id, data }) => ({
         url: `/merchant/coupons/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ['Coupons'],
+      invalidatesTags: ["Coupons"],
     }),
 
     toggleCouponStatus: builder.mutation<Coupon, string>({
       query: (id) => ({
         url: `/merchant/coupons/${id}/toggle`,
-        method: 'PATCH',
+        method: "PATCH",
       }),
-      invalidatesTags: ['Coupons'],
+      invalidatesTags: ["Coupons"],
     }),
 
     deleteCoupon: builder.mutation<void, string>({
       query: (id) => ({
         url: `/merchant/coupons/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Coupons'],
+      invalidatesTags: ["Coupons"],
     }),
 
     generateCode: builder.mutation<{ code: string }, { prefix?: string }>({
       query: (body) => ({
-        url: '/merchant/coupons/generate-code',
-        method: 'POST',
+        url: "/merchant/coupons/generate-code",
+        method: "POST",
         body,
       }),
     }),
 
-    validateCoupon: builder.mutation<CouponValidation, {
-      code: string;
-      storeId?: string;
-      storeSlug?: string;
-      orderTotal: number;
-      customerId?: string;
-      productIds?: string[];
-    }>({
+    validateCoupon: builder.mutation<
+      CouponValidation,
+      {
+        code: string;
+        storeId?: string;
+        storeSlug?: string;
+        orderTotal: number;
+        customerId?: string;
+        productIds?: string[];
+      }
+    >({
       query: (body) => ({
-        url: '/coupons/validate',
-        method: 'POST',
+        url: "/coupons/validate",
+        method: "POST",
         body,
       }),
     }),
