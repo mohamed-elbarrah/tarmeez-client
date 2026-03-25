@@ -1,20 +1,22 @@
-import { getStoreBySlug } from '@/lib/api/stores'
-import { notFound } from 'next/navigation'
-import HomePage from '@/lib/themes/store/default/pages/HomePage'
-import { resolveTokens } from '@/lib/themes/store/default/config'
+import { getStoreBySlug } from "@/lib/api/stores";
+import { notFound } from "next/navigation";
+import { ThemeEngine, getTheme } from "@/lib/themes";
 
 export default async function StorePage({
-    params,
+  params,
 }: {
-    params: Promise<{ storeSlug: string }>;
+  params: Promise<{ storeSlug: string }>;
 }) {
-    const { storeSlug } = await params;
-    const store = await getStoreBySlug(storeSlug);
-    if (!store) notFound();
+  const { storeSlug } = await params;
+  const store = await getStoreBySlug(storeSlug);
+  if (!store) notFound();
 
-    const theme = resolveTokens(store);
-    const products = store.products ?? [];
-    const categories = store.categories ?? [];
+  // Resolve the active theme slug: prefer the linked theme record, then themeId
+  // string as a bare slug fallback, then 'default'
+  const themeSlug = store.theme?.slug ?? store.themeId ?? "default";
+  const ThemeComponent = getTheme(themeSlug);
 
-    return <HomePage theme={theme} products={products} storeSlug={storeSlug} categories={categories} />
+  // ThemeComponent is the full theme entry-point (DefaultTheme or ModernTheme).
+  // We pass storeData directly; the component calls ThemeEngine internally.
+  return <ThemeComponent storeData={store} />;
 }

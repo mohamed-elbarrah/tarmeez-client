@@ -54,12 +54,12 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
       className="min-h-screen bg-[#f8fafc] text-right text-gray-900"
       dir="rtl"
     >
-      <Header
+      {/* <Header
         storeSlug={storeData.slug}
         storeName={storeData.name}
         logo={storeData.logo}
         theme={theme}
-      />
+      /> */}
 
       {view === 'home' && (
         <HomePage
@@ -114,12 +114,12 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
         <AccountPage theme={theme} storeSlug={storeData.slug} />
       )}
 
-      <Footer
+      {/* <Footer
         storeSlug={storeData.slug}
         storeName={storeData.name}
         logo={storeData.logo}
         theme={theme}
-      />
+      /> */}
     </div>
   )
 }
