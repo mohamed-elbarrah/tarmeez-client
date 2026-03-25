@@ -1,21 +1,24 @@
 export async function getStoreBySlug(slug: string) {
   // API_URL is server-side only (SSR inside Docker uses container hostname).
   // Falls back to NEXT_PUBLIC_API_URL for dev.
-  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
-  const res = await fetch(`${apiUrl}/stores/${slug}`, { cache: 'no-store' })
-  let data: any
+  const apiUrl =
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:8000/api";
+  const res = await fetch(`${apiUrl}/stores/${slug}`, { cache: "no-store" });
+  let data: any;
   try {
-    data = await res.json()
+    data = await res.json();
   } catch {
-    return null
+    return null;
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   // Support both shapes: { store: {...} } and flat {...}
-  const s = data.store ?? data
+  const s = data.store ?? data;
 
-  if (!s || !s.id) return null
+  if (!s || !s.id) return null;
 
   const storeData = {
     id: s.id,
@@ -42,27 +45,36 @@ export async function getStoreBySlug(slug: string) {
     merchant: s.merchant ?? null,
     products: s.products ?? [],
     categories: s.categories ?? [],
-  }
+  };
 
   if (!storeData.slug) {
-    throw new Error(`Store with id ${s.id} is missing a slug.`)
+    throw new Error(`Store with id ${s.id} is missing a slug.`);
   }
 
-  return storeData
+  return storeData;
 }
 
-export async function getProductBySlug(storeId: string, productIdOrSlug: string) {
-  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
-  const encodedSlug = encodeURIComponent(productIdOrSlug)
-  const res = await fetch(`${apiUrl}/stores/${storeId}/products/${encodedSlug}`, { cache: 'no-store' })
-  
-  if (!res.ok) return null
-  
+export async function getProductBySlug(
+  storeId: string,
+  productIdOrSlug: string,
+) {
+  const apiUrl =
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:8000/api";
+  const encodedSlug = encodeURIComponent(productIdOrSlug);
+  const res = await fetch(
+    `${apiUrl}/stores/${storeId}/products/${encodedSlug}`,
+    { cache: "no-store" },
+  );
+
+  if (!res.ok) return null;
+
   try {
-    return await res.json()
+    return await res.json();
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error('getProductBySlug: failed to parse json', err)
-    return null
+    console.error("getProductBySlug: failed to parse json", err);
+    return null;
   }
 }

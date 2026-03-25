@@ -35,7 +35,7 @@ export default async function StoreLayout({
   }
 
   const engine = new ThemeEngine(store, store.theme ?? null);
-  const theme   = engine.getComputedConfig();
+  const theme = engine.getComputedConfig();
   const cssVars = {
     ...engine.getStyleObject(),
     color: theme.textColor,
