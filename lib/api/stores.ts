@@ -23,7 +23,7 @@ export async function getStoreBySlug(slug: string) {
   const storeData = {
     id: s.id,
     slug: s.slug ?? slug,
-    name: s.name,
+    name: s.storeName ?? s.name,
     customDomain: s.customDomain ?? null,
     domainStatus: s.domainStatus ?? null,
     themeId: s.themeId ?? null,

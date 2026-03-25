@@ -13,7 +13,17 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Eye, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  Eye,
+  CheckCircle2,
+  Loader2,
+  Save,
+  Upload,
+  ImageIcon,
+  Palette,
+  RotateCcw,
+} from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   useUpdateStoreCustomizationMutation,
   useUploadStoreImageMutation,
@@ -131,55 +141,14 @@ const AdvancedColorPicker: React.FC<{
   );
 };
 
-const NumberInput: React.FC<{
-  value: number | string;
-  min: number;
-  max: number;
-  onChange: (v: number) => void;
-  suffix?: string;
-}> = ({ value, min, max, onChange, suffix }) => {
-  const num = Number(value || 0);
-  return (
-    <div>
-      <input
-        className="w-full"
-        type="range"
-        min={min}
-        max={max}
-        value={num}
-        onChange={(e) => onChange(Number(e.target.value))}
-      />
-      <div className="flex items-center gap-2 mt-2">
-        <input
-          type="number"
-          value={num}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-20 rounded px-2 py-1"
-          style={{
-            backgroundColor: "var(--color-input)",
-            border: "1px solid var(--color-border)",
-            color: "var(--color-foreground)",
-          }}
-        />
-        {suffix && (
-          <div
-            className="text-sm"
-            style={{ color: "var(--color-muted-foreground)" }}
-          >
-            {suffix}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const BrandIdentitySection = () => {
   const { data, isLoading } = useGetMyStoreQuery();
   const [updateCustomization, { isLoading: isSaving }] =
     useUpdateStoreCustomizationMutation();
   const [uploadStoreImage] = useUploadStoreImageMutation();
-  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const [uploadingKey, setUploadingKey] = useState<"logo" | "favicon" | null>(
+    null,
+  );
 
   const [config, setConfig] = useState({
     storeName: "",
@@ -242,14 +211,21 @@ const BrandIdentitySection = () => {
     key: "logo" | "favicon" = "logo",
   ) => {
     if (!file) return;
+    setUploadingKey(key);
     try {
       const form = new FormData();
       form.append("file", file);
       const res = await uploadStoreImage(form).unwrap();
       setConfig((prev) => ({ ...prev, [key]: res.url }));
-    } catch (err) {
-      console.error(err);
-      alert("فشل رفع الصورة");
+      const { toast } = await import("sonner");
+      toast.success(
+        key === "logo" ? "تم رفع الشعار بنجاح ✓" : "تم رفع الأيقونة بنجاح ✓",
+      );
+    } catch {
+      const { toast } = await import("sonner");
+      toast.error("فشل رفع الصورة");
+    } finally {
+      setUploadingKey(null);
     }
   };
 
@@ -271,18 +247,19 @@ const BrandIdentitySection = () => {
         fontFamily: config.fontFamily,
         borderRadius: config.borderRadius,
       }).unwrap();
-      // use Sonner toast
       const { toast } = await import("sonner");
       toast.success("تم حفظ الهوية البصرية بنجاح ✓");
-    } catch (err) {
-      console.error(err);
-      alert("فشل الحفظ");
+    } catch {
+      const { toast } = await import("sonner");
+      toast.error("فشل الحفظ، يرجى المحاولة مجدداً");
     }
   };
 
   const resetToDefaults = () => {
     setConfig({
-      storeName: "",
+      storeName: data?.store
+        ? ((data.store as any).storeName ?? (data.store as any).name ?? "")
+        : "",
       logo: "",
       logoWidth: 120,
       logoHeight: 40,
@@ -299,6 +276,31 @@ const BrandIdentitySection = () => {
     });
   };
 
+  const colorFields: {
+    key: keyof typeof config;
+    label: string;
+    desc: string;
+  }[] = [
+    {
+      key: "primaryColor",
+      label: "اللون الرئيسي",
+      desc: "الروابط والحدود والأزرار",
+    },
+    { key: "secondaryColor", label: "لون الخلفية", desc: "الهيدر والبانر" },
+    { key: "accentColor", label: "لون التمييز", desc: "النجوم والشارات" },
+    {
+      key: "buttonColor",
+      label: "لون الأزرار",
+      desc: "خلفية الأزرار الرئيسية",
+    },
+    {
+      key: "headingColor",
+      label: "لون العناوين",
+      desc: "عناوين المنتجات والأقسام",
+    },
+    { key: "textColor", label: "لون النصوص", desc: "نصوص الوصف والتفاصيل" },
+  ];
+
   if (isLoading)
     return (
       <Card className="p-6 mt-8">
@@ -307,161 +309,162 @@ const BrandIdentitySection = () => {
     );
 
   return (
-    <Card className="p-6 mt-8">
+    <Card className="mt-8 overflow-hidden" dir="rtl">
+      {/* ── Sticky header with save button ─────────────────────── */}
       <div
-        className="flex rounded-2xl overflow-hidden"
+        className="sticky top-0 z-10 flex items-center justify-between px-5 py-3 border-b"
         style={{
-          backgroundColor: "var(--color-background)",
-          border: "1px solid var(--color-border)",
+          backgroundColor: "var(--color-card)",
+          borderColor: "var(--color-border)",
         }}
       >
-        {/* RIGHT: Controls (rtl) */}
-        <aside
-          className="m-auto flex flex-col p-4"
-          dir="rtl"
-          style={{
-            backgroundColor: "var(--color-card)",
-            borderLeft: "1px solid var(--color-border)",
-          }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2L2 7l10 5 10-5-10-5z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-              <div className="font-bold">تخصيص الهوية</div>
-            </div>
-            <button
-              title="إعادة"
-              onClick={resetToDefaults}
-              className="p-2 rounded hover:bg-muted"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M3 12a9 9 0 1 1 3 6.7"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <Palette className="w-5 h-5 text-primary" />
+          <h2 className="font-bold text-base">تخصيص الهوية البصرية</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetToDefaults}
+            title="إعادة الضبط الافتراضي"
+            className="text-muted-foreground"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving} size="sm">
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin ml-1" />
+            ) : (
+              <Save className="w-4 h-4 ml-1" />
+            )}
+            حفظ التغييرات
+          </Button>
+        </div>
+      </div>
 
-          <div className="space-y-4 overflow-auto" style={{ flex: 1 }}>
+      {/* ── Tabs ───────────────────────────────────────────────── */}
+      <div className="p-5">
+        <Tabs defaultValue="general">
+          <TabsList className="mb-6">
+            <TabsTrigger value="general">عام</TabsTrigger>
+            <TabsTrigger value="colors">الألوان</TabsTrigger>
+            <TabsTrigger value="typography">الخطوط والزوايا</TabsTrigger>
+          </TabsList>
+
+          {/* ── Tab 1: General ─────────────────────────────────── */}
+          <TabsContent value="general" className="space-y-6">
+            {/* Store name */}
             <div>
-              <div className="text-xs text-muted-foreground mb-2">
-                المعلومات الأساسية
-              </div>
-              <Label>اسم المتجر / العلامة التجارية</Label>
+              <Label className="mb-2 block font-medium">
+                اسم المتجر / العلامة التجارية
+              </Label>
               <Input
                 value={config.storeName}
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, storeName: e.target.value }))
                 }
-                className="mt-1"
+                placeholder="أدخل اسم متجرك"
               />
             </div>
 
+            {/* Logo upload */}
             <div>
-              <div className="text-xs text-muted-foreground mb-2">الشعار</div>
+              <Label className="mb-3 block font-medium">شعار المتجر</Label>
               <div
-                className="p-3 rounded flex flex-col gap-2"
+                className="rounded-xl p-4"
                 style={{
-                  backgroundColor: "var(--color-card)",
+                  backgroundColor: "var(--color-muted)",
                   border: "1px solid var(--color-border)",
                 }}
               >
-                <label className="text-sm">رفع الشعار</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleUpload(e.target.files?.[0]!, "logo")}
-                />
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-4">
+                  {/* Preview thumbnail */}
                   <div
-                    className="w-32 h-12 flex items-center justify-center"
-                    style={{ backgroundColor: "var(--color-secondary)" }}
+                    className="shrink-0 w-28 h-16 rounded-lg flex items-center justify-center overflow-hidden"
+                    style={{
+                      backgroundColor: "var(--color-card)",
+                      border: "1px solid var(--color-border)",
+                    }}
                   >
                     {config.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={config.logo}
-                        alt="logo"
+                        alt="logo preview"
                         style={{
                           width: config.logoWidth,
                           height: config.logoHeight,
                           objectFit: "contain",
+                          maxWidth: "100%",
+                          maxHeight: "100%",
                         }}
                       />
                     ) : (
-                      <div
-                        className="text-xs"
-                        style={{ color: "var(--color-muted-foreground)" }}
-                      >
-                        رفع الشعار
-                      </div>
+                      <ImageIcon className="w-8 h-8 text-muted-foreground/40" />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <div className="text-xs">عرض الشعار</div>
-                    <NumberInput
-                      value={config.logoWidth}
-                      min={40}
-                      max={300}
-                      onChange={(v) =>
-                        setConfig((prev) => ({ ...prev, logoWidth: v }))
-                      }
-                    />
-                    <div className="text-xs mt-2">ارتفاع الشعار</div>
-                    <NumberInput
-                      value={config.logoHeight}
-                      min={20}
-                      max={150}
-                      onChange={(v) =>
-                        setConfig((prev) => ({ ...prev, logoHeight: v }))
-                      }
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={() =>
-                          setConfig((prev) => ({
-                            ...prev,
-                            logoWidth: 80,
-                            logoHeight: 30,
-                          }))
+
+                  <div className="flex-1 space-y-3">
+                    {/* Upload button */}
+                    <label className="cursor-pointer inline-block">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleUpload(e.target.files?.[0], "logo")
                         }
-                        className="px-2 py-1 border rounded text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        disabled={uploadingKey === "logo"}
                       >
-                        صغير
-                      </button>
-                      <button
-                        onClick={() =>
-                          setConfig((prev) => ({
-                            ...prev,
-                            logoWidth: 120,
-                            logoHeight: 40,
-                          }))
-                        }
-                        className="px-2 py-1 border rounded text-sm"
-                      >
-                        متوسط
-                      </button>
-                      <button
-                        onClick={() =>
-                          setConfig((prev) => ({
-                            ...prev,
-                            logoWidth: 180,
-                            logoHeight: 60,
-                          }))
-                        }
-                        className="px-2 py-1 border rounded text-sm"
-                      >
-                        كبير
-                      </button>
+                        <span>
+                          {uploadingKey === "logo" ? (
+                            <Loader2 className="w-4 h-4 animate-spin ml-1" />
+                          ) : (
+                            <Upload className="w-4 h-4 ml-1" />
+                          )}
+                          رفع الشعار
+                        </span>
+                      </Button>
+                    </label>
+
+                    {/* Size presets */}
+                    <div className="flex gap-2 flex-wrap">
+                      {(
+                        [
+                          { w: 80, h: 30, label: "صغير" },
+                          { w: 120, h: 40, label: "متوسط" },
+                          { w: 180, h: 60, label: "كبير" },
+                        ] as const
+                      ).map(({ w, h, label }) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() =>
+                            setConfig((prev) => ({
+                              ...prev,
+                              logoWidth: w,
+                              logoHeight: h,
+                            }))
+                          }
+                          className={`px-3 py-1 text-xs rounded-md border transition-colors ${
+                            config.logoWidth === w
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "border-border hover:bg-muted"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
                     </div>
-                    <label className="flex items-center gap-2 mt-2 text-sm">
+
+                    {/* Show store name toggle */}
+                    <label className="flex items-center gap-2 cursor-pointer select-none text-sm">
                       <input
                         type="checkbox"
                         checked={config.showStoreName}
@@ -471,210 +474,169 @@ const BrandIdentitySection = () => {
                             showStoreName: e.target.checked,
                           }))
                         }
-                      />{" "}
+                      />
                       إظهار الاسم بجانب الشعار
                     </label>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <div className="text-xs text-muted-foreground mb-2">
-                أيقونة المتجر
-              </div>
-              <div
-                className="p-3 rounded flex items-center gap-3"
-                style={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleUpload(e.target.files?.[0]!, "favicon")
-                  }
-                />
-                <div
-                  className="w-8 h-8 flex items-center justify-center"
-                  style={{ backgroundColor: "var(--color-secondary)" }}
-                >
-                  {config.favicon ? (
-                    <img
-                      src={config.favicon}
-                      alt="favicon"
-                      width={32}
-                      height={32}
-                    />
-                  ) : (
-                    <div
-                      className="text-xs"
-                      style={{ color: "var(--color-muted-foreground)" }}
-                    >
-                      32x32
+                {/* Dimension sliders */}
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">
+                      العرض ({config.logoWidth}px)
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-xs text-muted-foreground mb-2">الألوان</div>
-              <div className="space-y-3">
-                <div>
-                  <div className="text-sm">
-                    اللون الرئيسي{" "}
-                    <div className="text-xs text-muted-foreground">
-                      الروابط والحدود
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.primaryColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, primaryColor: v }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="text-sm">
-                    لون الخلفيات{" "}
-                    <div className="text-xs text-muted-foreground">
-                      الهيدر والبانر
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.secondaryColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, secondaryColor: v }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="text-sm">
-                    لون التمييز{" "}
-                    <div className="text-xs text-muted-foreground">
-                      النجوم والشارات
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.accentColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, accentColor: v }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="text-sm">
-                    لون الأزرار{" "}
-                    <div className="text-xs text-muted-foreground">
-                      خلفية الأزرار الرئيسية
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.buttonColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, buttonColor: v }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="text-sm">
-                    لون العناوين{" "}
-                    <div className="text-xs text-muted-foreground">
-                      عناوين المنتجات والأقسام
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.headingColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, headingColor: v }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="text-sm">
-                    لون النصوص{" "}
-                    <div className="text-xs text-muted-foreground">
-                      نصوص الوصف والتفاصيل
-                    </div>
-                  </div>
-                  <AdvancedColorPicker
-                    value={config.textColor}
-                    onChange={(v) =>
-                      setConfig((prev) => ({ ...prev, textColor: v }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-xs text-muted-foreground mb-2">الزوايا</div>
-              <div
-                className="p-3 rounded"
-                style={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                <NumberInput
-                  value={parseInt(config.borderRadius || "0")}
-                  min={0}
-                  max={40}
-                  onChange={(v) =>
-                    setConfig((prev) => ({ ...prev, borderRadius: `${v}px` }))
-                  }
-                  suffix="px"
-                />
-                <div className="flex gap-2 mt-3">
-                  {[
-                    { value: "0px", label: "حاد" },
-                    { value: "8px", label: "خفيف" },
-                    { value: "16px", label: "متوسط" },
-                    { value: "20px", label: "افتراضي" },
-                    { value: "32px", label: "دائري" },
-                    { value: "9999px", label: "كامل" },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() =>
+                    <input
+                      type="range"
+                      min={40}
+                      max={300}
+                      value={config.logoWidth}
+                      onChange={(e) =>
                         setConfig((prev) => ({
                           ...prev,
-                          borderRadius: opt.value,
+                          logoWidth: Number(e.target.value),
                         }))
                       }
-                      className="p-2 border rounded flex items-center gap-2"
-                    >
-                      <div
-                        style={{
-                          width: 36,
-                          height: 18,
-                          borderRadius: opt.value,
-                          background: "#eee",
-                        }}
-                      />
-                      <div className="text-xs">{opt.label}</div>
-                    </button>
-                  ))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">
+                      الارتفاع ({config.logoHeight}px)
+                    </div>
+                    <input
+                      type="range"
+                      min={20}
+                      max={150}
+                      value={config.logoHeight}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          logoHeight: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Favicon upload */}
             <div>
-              <div className="text-xs text-muted-foreground mb-2">الخط</div>
+              <Label className="mb-3 block font-medium">
+                أيقونة المتجر (Favicon)
+              </Label>
+              <div
+                className="rounded-xl p-4 flex items-center gap-4"
+                style={{
+                  backgroundColor: "var(--color-muted)",
+                  border: "1px solid var(--color-border)",
+                }}
+              >
+                {/* 32×32 preview */}
+                <div
+                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden"
+                  style={{
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                  }}
+                >
+                  {config.favicon ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={config.favicon}
+                      alt="favicon preview"
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <ImageIcon className="w-5 h-5 text-muted-foreground/40" />
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    يُعرض في تبويب المتصفح · الحجم المثالي 32×32 أو 64×64
+                  </p>
+                  <label className="cursor-pointer inline-block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) =>
+                        handleUpload(e.target.files?.[0], "favicon")
+                      }
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      disabled={uploadingKey === "favicon"}
+                    >
+                      <span>
+                        {uploadingKey === "favicon" ? (
+                          <Loader2 className="w-4 h-4 animate-spin ml-1" />
+                        ) : (
+                          <Upload className="w-4 h-4 ml-1" />
+                        )}
+                        رفع الأيقونة
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ── Tab 2: Colors ──────────────────────────────────── */}
+          <TabsContent value="colors">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {colorFields.map(({ key, label, desc }) => (
+                <div
+                  key={key}
+                  className="rounded-xl p-4"
+                  style={{
+                    backgroundColor: "var(--color-muted)",
+                    border: "1px solid var(--color-border)",
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                      <div className="font-medium text-sm">{label}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {desc}
+                      </div>
+                    </div>
+                    <AdvancedColorPicker
+                      value={config[key] as string}
+                      onChange={(v) =>
+                        setConfig((prev) => ({ ...prev, [key]: v }))
+                      }
+                    />
+                  </div>
+                  {/* Color swatch bar */}
+                  <div
+                    className="h-1.5 rounded-full"
+                    style={{ backgroundColor: config[key] as string }}
+                  />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ── Tab 3: Typography & Style ──────────────────────── */}
+          <TabsContent value="typography" className="space-y-6">
+            {/* Font family */}
+            <div>
+              <Label className="mb-2 block font-medium">خط المتجر</Label>
               <select
                 value={config.fontFamily}
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, fontFamily: e.target.value }))
                 }
-                className="w-full mt-1 px-3 py-2 rounded-lg"
+                className="w-full px-3 py-2 rounded-lg"
                 style={{
                   backgroundColor: "var(--color-input)",
                   border: "1px solid var(--color-border)",
@@ -689,36 +651,84 @@ const BrandIdentitySection = () => {
                 <option value="'Inter', sans-serif">Inter</option>
                 <option value="'Poppins', sans-serif">Poppins</option>
               </select>
+              {/* Live font preview */}
               <div
-                className="mt-3 p-3 rounded"
+                className="mt-3 p-4 rounded-xl text-sm"
                 style={{
                   fontFamily: config.fontFamily,
-                  backgroundColor: "var(--color-card)",
+                  backgroundColor: "var(--color-muted)",
                   border: "1px solid var(--color-border)",
                   color: "var(--color-card-foreground)",
                 }}
               >
-                مرحبياً بكم في متجرنا – Welcome
+                مرحباً بكم في متجرنا – Welcome to our store
               </div>
             </div>
-          </div>
 
-          <div
-            className="sticky bottom-0 p-4"
-            style={{
-              backgroundColor: "var(--color-card)",
-              borderTop: "1px solid var(--color-border)",
-            }}
-          >
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full bg-primary text-primary-foreground py-2 rounded"
-            >
-              {isSaving ? "جاري الحفظ..." : "حفظ الهوية البصرية"}
-            </button>
-          </div>
-        </aside>
+            {/* Border radius */}
+            <div>
+              <Label className="mb-3 block font-medium">
+                استدارة الزوايا – {parseInt(config.borderRadius || "0")}px
+              </Label>
+              <input
+                type="range"
+                min={0}
+                max={40}
+                value={parseInt(config.borderRadius || "0")}
+                onChange={(e) =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    borderRadius: `${e.target.value}px`,
+                  }))
+                }
+                className="w-full mb-4"
+              />
+              {/* Shape presets */}
+              <div className="flex gap-2 flex-wrap">
+                {(
+                  [
+                    { value: "0px", label: "حاد" },
+                    { value: "8px", label: "خفيف" },
+                    { value: "16px", label: "متوسط" },
+                    { value: "20px", label: "افتراضي" },
+                    { value: "32px", label: "دائري" },
+                    { value: "9999px", label: "كامل" },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        borderRadius: opt.value,
+                      }))
+                    }
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md transition-colors ${
+                      config.borderRadius === opt.value
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border hover:bg-muted"
+                    }`}
+                  >
+                    <div
+                      style={{
+                        width: 28,
+                        height: 14,
+                        borderRadius: opt.value,
+                        backgroundColor:
+                          config.borderRadius === opt.value
+                            ? "currentColor"
+                            : "var(--color-muted-foreground)",
+                        opacity: 0.4,
+                      }}
+                    />
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </Card>
   );
