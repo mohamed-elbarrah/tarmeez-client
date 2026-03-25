@@ -36,7 +36,6 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
   const [createOrder, { isLoading }] = useCreateOrderMutation()
   const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation()
   const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || [])
-  const storeData = useAppSelector((s: any) => s.cart.carts[storeSlug]?.storeData)
   const dispatch = useAppDispatch()
   const router = useRouter()
 
@@ -189,11 +188,9 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
                         if (!couponCode.trim()) return;
                         setCouponError(null);
                         try {
-                          const storeId = storeData?.id;
-                          if (!storeId) { setCouponError('معرّف المتجر غير متاح'); return; }
                           const result = await validateCoupon({
                             code: couponCode.trim(),
-                            storeId,
+                            storeSlug: storeSlug,
                             orderTotal: subtotal,
                             productIds: cart.map((i: any) => String(i.id)),
                           }).unwrap();

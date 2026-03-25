@@ -114,7 +114,8 @@ export const couponsApi = createApi({
 
     validateCoupon: builder.mutation<CouponValidation, {
       code: string;
-      storeId: string;
+      storeId?: string;
+      storeSlug?: string;
       orderTotal: number;
       customerId?: string;
       productIds?: string[];
