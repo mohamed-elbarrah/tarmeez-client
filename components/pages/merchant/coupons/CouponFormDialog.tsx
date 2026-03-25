@@ -1,14 +1,25 @@
 "use client";
+
 import { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -21,9 +32,24 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  RefreshCw, ChevronLeft, ChevronRight, Check,
-  Percent, DollarSign, Truck, Gift, Tag,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Percent,
+  DollarSign,
+  Truck,
+  Gift,
+  Tag,
+  CalendarIcon,
+  Loader2,
 } from "lucide-react";
 import {
   useCreateCouponMutation,
@@ -31,8 +57,11 @@ import {
   useGenerateCodeMutation,
   type Coupon,
 } from "@/lib/services/couponsApi";
+import ProductPicker from "@/components/shared/ProductPicker";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+/* ─── Constants ─── */
 const TYPE_OPTIONS = [
   { value: "PERCENTAGE", label: "خصم نسبة مئوية", icon: Percent },
   { value: "FIXED_AMOUNT", label: "خصم مبلغ ثابت", icon: DollarSign },
@@ -41,558 +70,859 @@ const TYPE_OPTIONS = [
   { value: "PRODUCT_DISCOUNT", label: "خصم على منتجات محددة", icon: Tag },
 ] as const;
 
-const STEP_LABELS = ["المعلومات الأساسية", "إعدادات الخصم", "القيود", "مراجعة وإنشاء"];
+const STEP_LABELS = [
+  "المعلومات الأساسية",
+  "إعدادات الخصم",
+  "القيود",
+  "مراجعة وإنشاء",
+];
 
+/* ─── Zod Schema ─── */
+const couponSchema = z
+  .object({
+    name: z.string().trim().min(1, "اسم الكوبون مطلوب"),
+    code: z.string().trim().min(1, "كود الكوبون مطلوب"),
+    description: z.string().optional(),
+    type: z.enum([
+      "PERCENTAGE",
+      "FIXED_AMOUNT",
+      "FREE_SHIPPING",
+      "FREE_PRODUCT",
+      "PRODUCT_DISCOUNT",
+    ]),
+    discountValue: z.number().min(0).optional(),
+    maxDiscountAmount: z.number().min(0).optional(),
+    freeProductId: z.string().optional(),
+    freeProductQty: z.number().int().min(1),
+    applicableProductIds: z.array(z.string()),
+    applicableCategoryIds: z.array(z.string()),
+    minOrderAmount: z.number().min(0).optional(),
+    maxUsageCount: z.number().int().min(1).optional(),
+    perCustomerLimit: z.number().int().min(1),
+    customerIds: z.array(z.string()),
+    startsAt: z.date().optional(),
+    expiresAt: z.date().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === "PERCENTAGE" || data.type === "PRODUCT_DISCOUNT") {
+      if (
+        !data.discountValue ||
+        data.discountValue < 1 ||
+        data.discountValue > 100
+      )
+        ctx.addIssue({
+          code: "custom",
+          message: "نسبة الخصم يجب أن تكون بين 1 و 100",
+          path: ["discountValue"],
+        });
+    }
+    if (data.type === "FIXED_AMOUNT") {
+      if (!data.discountValue || data.discountValue <= 0)
+        ctx.addIssue({
+          code: "custom",
+          message: "مبلغ الخصم مطلوب ويجب أن يكون أكبر من الصفر",
+          path: ["discountValue"],
+        });
+    }
+    if (data.type === "FREE_PRODUCT" && !data.freeProductId?.trim())
+      ctx.addIssue({
+        code: "custom",
+        message: "يجب تحديد المنتج المجاني",
+        path: ["freeProductId"],
+      });
+    if (data.type === "PRODUCT_DISCOUNT" && !data.applicableProductIds.length)
+      ctx.addIssue({
+        code: "custom",
+        message: "يجب تحديد منتج واحد على الأقل",
+        path: ["applicableProductIds"],
+      });
+    if (data.startsAt && data.expiresAt && data.expiresAt <= data.startsAt)
+      ctx.addIssue({
+        code: "custom",
+        message: "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء",
+        path: ["expiresAt"],
+      });
+  });
+
+type FormValues = z.infer<typeof couponSchema>;
+
+type CouponType = FormValues["type"];
+
+/* step → fields to validate before advancing */
+const STEP_TRIGGERS: Record<number, (keyof FormValues)[]> = {
+  0: ["name", "code"],
+  1: ["discountValue", "freeProductId", "applicableProductIds"],
+  2: ["minOrderAmount", "maxUsageCount", "startsAt", "expiresAt"],
+  3: [],
+};
+
+const DEFAULT_VALUES: FormValues = {
+  name: "",
+  code: "",
+  description: "",
+  type: "PERCENTAGE",
+  discountValue: 10,
+  freeProductQty: 1,
+  applicableProductIds: [],
+  applicableCategoryIds: [],
+  customerIds: [],
+  perCustomerLimit: 1,
+};
+
+/* ─── Helpers ─── */
+function getTypeLabel(type: string) {
+  return TYPE_OPTIONS.find((t) => t.value === type)?.label ?? type;
+}
+
+function formatDiscountPreview(values: Partial<FormValues>): string {
+  switch (values.type) {
+    case "PERCENTAGE":
+      return `خصم ${values.discountValue ?? 0}%${values.minOrderAmount ? ` على الطلبات فوق ${values.minOrderAmount} ر.س` : ""}`;
+    case "FIXED_AMOUNT":
+      return `خصم ${values.discountValue ?? 0} ر.س${values.minOrderAmount ? ` على الطلبات فوق ${values.minOrderAmount} ر.س` : ""}`;
+    case "FREE_SHIPPING":
+      return "شحن مجاني";
+    case "FREE_PRODUCT":
+      return `منتج مجاني × ${values.freeProductQty ?? 1}`;
+    case "PRODUCT_DISCOUNT":
+      return `خصم ${values.discountValue ?? 0}% على منتجات محددة`;
+    default:
+      return "—";
+  }
+}
+
+/* ─── Date Picker sub-component ─── */
+function DatePickerField({
+  label,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  value?: Date;
+  onChange: (d: Date | undefined) => void;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="space-y-1.5">
+      <span className="text-sm font-medium leading-none">{label}</span>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={disabled}
+            className={cn(
+              "w-full justify-start text-right font-normal",
+              !value && "text-muted-foreground",
+            )}
+          >
+            <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            {value
+              ? value.toLocaleDateString("ar-SA", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : "اختر تاريخاً"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={(d: Date | undefined) => {
+              onChange(d);
+              setOpen(false);
+            }}
+            disabled={(d: Date) =>
+              d < new Date(new Date().setHours(0, 0, 0, 0))
+            }
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+/* ─── Props ─── */
 interface CouponFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingCoupon?: Coupon | null;
 }
 
-const defaultForm = {
-  name: "",
-  code: "",
-  description: "",
-  type: "PERCENTAGE" as Coupon["type"],
-  discountValue: 10,
-  maxDiscountAmount: undefined as number | undefined,
-  freeProductId: "",
-  freeProductQty: 1,
-  applicableProductIds: [] as string[],
-  applicableCategoryIds: [] as string[],
-  minOrderAmount: undefined as number | undefined,
-  maxUsageCount: undefined as number | undefined,
-  perCustomerLimit: 1,
-  customerIds: [] as string[],
-  startsAt: "",
-  expiresAt: "",
-};
-
+/* ─── Main Component ─── */
 export default function CouponFormDialog({
   open,
   onOpenChange,
   editingCoupon,
 }: CouponFormDialogProps) {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState(defaultForm);
 
   const [createCoupon, { isLoading: isCreating }] = useCreateCouponMutation();
   const [updateCoupon, { isLoading: isUpdating }] = useUpdateCouponMutation();
   const [generateCode, { isLoading: isGenerating }] = useGenerateCodeMutation();
 
+  const isSaving = isCreating || isUpdating;
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(couponSchema),
+    defaultValues: DEFAULT_VALUES,
+    mode: "onChange",
+  });
+
+  const watchedValues = form.watch();
+  const currentType = watchedValues.type as CouponType;
+
+  /* ── Reset / prefill on open ── */
   useEffect(() => {
+    if (!open) return;
     if (editingCoupon) {
-      setForm({
+      form.reset({
         name: editingCoupon.name,
         code: editingCoupon.code,
-        description: editingCoupon.description || "",
+        description: editingCoupon.description ?? "",
         type: editingCoupon.type,
         discountValue: editingCoupon.discountValue ?? 10,
         maxDiscountAmount: editingCoupon.maxDiscountAmount,
-        freeProductId: editingCoupon.freeProductId || "",
+        freeProductId: editingCoupon.freeProductId ?? "",
         freeProductQty: editingCoupon.freeProductQty ?? 1,
-        applicableProductIds: editingCoupon.applicableProductIds || [],
-        applicableCategoryIds: editingCoupon.applicableCategoryIds || [],
+        applicableProductIds: editingCoupon.applicableProductIds ?? [],
+        applicableCategoryIds: editingCoupon.applicableCategoryIds ?? [],
         minOrderAmount: editingCoupon.minOrderAmount,
         maxUsageCount: editingCoupon.maxUsageCount,
         perCustomerLimit: editingCoupon.perCustomerLimit ?? 1,
-        customerIds: editingCoupon.customerIds || [],
+        customerIds: editingCoupon.customerIds ?? [],
         startsAt: editingCoupon.startsAt
-          ? new Date(editingCoupon.startsAt).toISOString().slice(0, 16)
-          : "",
+          ? new Date(editingCoupon.startsAt)
+          : undefined,
         expiresAt: editingCoupon.expiresAt
-          ? new Date(editingCoupon.expiresAt).toISOString().slice(0, 16)
-          : "",
+          ? new Date(editingCoupon.expiresAt)
+          : undefined,
       });
-      setStep(0);
     } else {
-      setForm(defaultForm);
-      setStep(0);
+      form.reset(DEFAULT_VALUES);
     }
-  }, [editingCoupon, open]);
+    setStep(0);
+  }, [open, editingCoupon]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── Generate random code ── */
   const handleGenerateCode = async () => {
     try {
-      const result = await generateCode({}).unwrap();
-      setForm({ ...form, code: result.code });
+      const { code } = await generateCode({}).unwrap();
+      form.setValue("code", code, { shouldValidate: true });
     } catch {
       toast.error("حدث خطأ أثناء توليد الكود");
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const payload: any = { ...form };
-      if (payload.startsAt) payload.startsAt = new Date(payload.startsAt).toISOString();
-      else delete payload.startsAt;
-      if (payload.expiresAt) payload.expiresAt = new Date(payload.expiresAt).toISOString();
-      else delete payload.expiresAt;
-      if (!payload.maxDiscountAmount) delete payload.maxDiscountAmount;
-      if (!payload.minOrderAmount) delete payload.minOrderAmount;
-      if (!payload.maxUsageCount) delete payload.maxUsageCount;
-      if (!payload.freeProductId) delete payload.freeProductId;
-      if (!payload.description) delete payload.description;
-      if (payload.applicableProductIds?.length === 0) delete payload.applicableProductIds;
-      if (payload.applicableCategoryIds?.length === 0) delete payload.applicableCategoryIds;
-      if (payload.customerIds?.length === 0) delete payload.customerIds;
+  /* ── Advance step with validation ── */
+  const handleNext = async () => {
+    const fields = STEP_TRIGGERS[step] ?? [];
+    const valid = fields.length === 0 || (await form.trigger(fields as any));
+    if (valid) setStep((s) => s + 1);
+  };
 
+  /* ── Submit ── */
+  const handleSubmit = form.handleSubmit(async (values) => {
+    const payload: Record<string, unknown> = {
+      name: values.name,
+      code: values.code,
+      type: values.type,
+      freeProductQty: values.freeProductQty,
+      applicableProductIds: values.applicableProductIds,
+      applicableCategoryIds: values.applicableCategoryIds,
+      customerIds: values.customerIds,
+      perCustomerLimit: values.perCustomerLimit,
+    };
+    if (values.description) payload.description = values.description;
+    if (values.discountValue !== undefined)
+      payload.discountValue = values.discountValue;
+    if (values.maxDiscountAmount)
+      payload.maxDiscountAmount = values.maxDiscountAmount;
+    if (values.freeProductId) payload.freeProductId = values.freeProductId;
+    if (values.minOrderAmount) payload.minOrderAmount = values.minOrderAmount;
+    if (values.maxUsageCount) payload.maxUsageCount = values.maxUsageCount;
+    if (values.startsAt) payload.startsAt = values.startsAt.toISOString();
+    if (values.expiresAt) payload.expiresAt = values.expiresAt.toISOString();
+
+    try {
       if (editingCoupon) {
-        await updateCoupon({ id: editingCoupon.id, data: payload }).unwrap();
+        await updateCoupon({
+          id: editingCoupon.id,
+          data: payload as any,
+        }).unwrap();
         toast.success("تم تحديث الكوبون بنجاح");
       } else {
-        await createCoupon(payload).unwrap();
+        await createCoupon(payload as any).unwrap();
         toast.success("تم إنشاء الكوبون بنجاح");
       }
       onOpenChange(false);
     } catch (err: any) {
-      const msg = err?.data?.message || "حدث خطأ أثناء حفظ الكوبون";
-      toast.error(msg);
+      toast.error(err?.data?.message ?? "حدث خطأ أثناء حفظ الكوبون");
     }
-  };
+  });
 
-  const canProceed = () => {
-    if (step === 0) return form.name.trim() && form.code.trim();
-    if (step === 1) {
-      if (form.type === "PERCENTAGE") return form.discountValue > 0 && form.discountValue <= 100;
-      if (form.type === "FIXED_AMOUNT") return (form.discountValue ?? 0) > 0;
-      if (form.type === "FREE_PRODUCT") return !!form.freeProductId;
-      if (form.type === "PRODUCT_DISCOUNT") return (form.discountValue ?? 0) > 0;
-      return true; // FREE_SHIPPING
-    }
-    return true;
-  };
+  /* ─── Step 1: Basic Info ─── */
+  function renderStepBasicInfo() {
+    return (
+      <div className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>اسم الكوبون</FormLabel>
+              <FormControl>
+                <Input placeholder="مثال: خصم الصيف" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-  const getTypeLabel = (type: string) =>
-    TYPE_OPTIONS.find((t) => t.value === type)?.label || type;
+        <FormField
+          control={form.control}
+          name="code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>كود الكوبون</FormLabel>
+              <FormControl>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="SUMMER2026"
+                    className="font-mono"
+                    dir="ltr"
+                    disabled={!!editingCoupon}
+                    {...field}
+                    onChange={(e) =>
+                      field.onChange(e.target.value.toUpperCase())
+                    }
+                  />
+                  {!editingCoupon && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleGenerateCode}
+                      disabled={isGenerating}
+                      title="توليد كود عشوائي"
+                    >
+                      <RefreshCw
+                        className={cn(
+                          "h-4 w-4",
+                          isGenerating && "animate-spin",
+                        )}
+                      />
+                    </Button>
+                  )}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-  const formatDiscount = () => {
-    if (form.type === "PERCENTAGE") return `${form.discountValue}%`;
-    if (form.type === "FIXED_AMOUNT") return `${form.discountValue} ر.س`;
-    if (form.type === "FREE_SHIPPING") return "شحن مجاني";
-    if (form.type === "FREE_PRODUCT") return "منتج مجاني";
-    if (form.type === "PRODUCT_DISCOUNT") return `${form.discountValue}%`;
-    return "—";
-  };
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>نوع الكوبون</FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={!!editingCoupon}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TYPE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        <span className="flex items-center gap-2">
+                          <opt.icon className="h-4 w-4" />
+                          {opt.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>الوصف (اختياري)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="وصف مختصر للكوبون..."
+                  rows={2}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    );
+  }
+
+  /* ─── Step 2: Discount Settings ─── */
+  function renderStepDiscountSettings() {
+    return (
+      <div className="space-y-5">
+        {/* PERCENTAGE or PRODUCT_DISCOUNT: slider + cap */}
+        {(currentType === "PERCENTAGE" ||
+          currentType === "PRODUCT_DISCOUNT") && (
+          <>
+            <FormField
+              control={form.control}
+              name="discountValue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نسبة الخصم (%)</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-4 mt-1">
+                      <Slider
+                        value={[field.value ?? 10]}
+                        onValueChange={([v]) => field.onChange(v)}
+                        min={1}
+                        max={100}
+                        step={1}
+                        className="flex-1"
+                      />
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={100}
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                          className="w-16 text-center"
+                          dir="ltr"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="maxDiscountAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الحد الأقصى للخصم (ر.س) — اختياري</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="بدون حد"
+                      dir="ltr"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : undefined,
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Product selector for PRODUCT_DISCOUNT */}
+            {currentType === "PRODUCT_DISCOUNT" && (
+              <FormField
+                control={form.control}
+                name="applicableProductIds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>المنتجات المؤهلة للخصم</FormLabel>
+                    <FormControl>
+                      <ProductPicker
+                        mode="multi"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </>
+        )}
+
+        {/* FIXED_AMOUNT */}
+        {currentType === "FIXED_AMOUNT" && (
+          <FormField
+            control={form.control}
+            name="discountValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>مبلغ الخصم (ر.س)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    placeholder="50"
+                    dir="ltr"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* FREE_SHIPPING */}
+        {currentType === "FREE_SHIPPING" && (
+          <Card className="p-6 text-center bg-primary/5 border-primary/20">
+            <Truck className="h-12 w-12 mx-auto text-primary mb-3" />
+            <p className="font-medium">شحن مجاني بالكامل</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              سيتم إعفاء العميل من رسوم الشحن تلقائياً عند تطبيق هذا الكوبون
+            </p>
+          </Card>
+        )}
+
+        {/* FREE_PRODUCT */}
+        {currentType === "FREE_PRODUCT" && (
+          <>
+            <FormField
+              control={form.control}
+              name="freeProductId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>المنتج المجاني</FormLabel>
+                  <FormControl>
+                    <ProductPicker
+                      mode="single"
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="freeProductQty"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الكمية المجانية</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      dir="ltr"
+                      value={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
+      </div>
+    );
+  }
+
+  /* ─── Step 3: Restrictions ─── */
+  function renderStepRestrictions() {
+    return (
+      <div className="space-y-4">
+        <FormField
+          control={form.control}
+          name="minOrderAmount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>الحد الأدنى للطلب (ر.س) — اختياري</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="بدون حد أدنى"
+                  dir="ltr"
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="maxUsageCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الاستخدامات الكلية</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    placeholder="بلا حدود"
+                    dir="ltr"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="perCustomerLimit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الحد لكل عميل</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    dir="ltr"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Controller
+            control={form.control}
+            name="startsAt"
+            render={({ field }) => (
+              <DatePickerField
+                label="تاريخ البدء (اختياري)"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="expiresAt"
+            render={({ field }) => (
+              <DatePickerField
+                label="تاريخ الانتهاء (اختياري)"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+        {form.formState.errors.expiresAt && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.expiresAt.message}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  /* ─── Step 4: Review ─── */
+  function renderStepReview() {
+    const values = form.getValues();
+    const rows: Array<{ label: string; value: React.ReactNode }> = [
+      {
+        label: "الاسم",
+        value: <span className="font-medium">{values.name}</span>,
+      },
+      {
+        label: "الكود",
+        value: (
+          <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
+            {values.code}
+          </code>
+        ),
+      },
+      {
+        label: "النوع",
+        value: <Badge variant="secondary">{getTypeLabel(values.type)}</Badge>,
+      },
+      {
+        label: "الخصم",
+        value: (
+          <span className="font-bold text-primary">
+            {formatDiscountPreview(values)}
+          </span>
+        ),
+      },
+    ];
+    if (values.maxDiscountAmount)
+      rows.push({
+        label: "حد الخصم",
+        value: `${values.maxDiscountAmount} ر.س`,
+      });
+    if (values.minOrderAmount)
+      rows.push({
+        label: "حد أدنى للطلب",
+        value: `${values.minOrderAmount} ر.س`,
+      });
+    rows.push({
+      label: "الاستخدامات",
+      value: values.maxUsageCount ?? "بلا حدود",
+    });
+    if (values.expiresAt)
+      rows.push({
+        label: "ينتهي في",
+        value: (
+          <span dir="ltr">{values.expiresAt.toLocaleDateString("ar-SA")}</span>
+        ),
+      });
+
+    return (
+      <div className="space-y-3">
+        {/* Preview card */}
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Tag className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold">{values.name || "—"}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatDiscountPreview(values)}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 space-y-2.5">
+          {rows.map((row, i) => (
+            <div key={i}>
+              {i > 0 && <Separator className="mb-2.5" />}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  {row.label}
+                </span>
+                <span>{row.value}</span>
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    );
+  }
+
+  /* ─── Render ─── */
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg" dir="rtl">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {editingCoupon ? "تعديل الكوبون" : "إنشاء كوبون جديد"}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Step indicator */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* ─── Step Indicator ─── */}
+        <div className="flex items-center gap-1.5 mb-2">
           {STEP_LABELS.map((label, i) => (
-            <div key={i} className="flex items-center gap-1 flex-1">
+            <div key={i} className="flex items-center gap-1 flex-1 min-w-0">
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                className={cn(
+                  "h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors",
                   i < step
                     ? "bg-primary text-primary-foreground"
                     : i === step
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                }`}
+                      ? "bg-primary text-primary-foreground ring-2 ring-primary/30"
+                      : "bg-muted text-muted-foreground",
+                )}
               >
-                {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
               </div>
-              <span className="text-xs text-muted-foreground hidden sm:inline truncate">
+              <span className="text-xs text-muted-foreground hidden sm:block truncate">
                 {label}
               </span>
               {i < STEP_LABELS.length - 1 && (
-                <Separator className="flex-1 mx-1" />
+                <div className="flex-1 h-px bg-border mx-1 hidden sm:block" />
               )}
             </div>
           ))}
         </div>
 
-        {/* Step 1: Basic Info */}
-        {step === 0 && (
-          <div className="space-y-4">
-            <div>
-              <Label>اسم الكوبون</Label>
-              <Input
-                placeholder="مثال: خصم الصيف"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>كود الكوبون</Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="SUMMER2026"
-                  value={form.code}
-                  onChange={(e) =>
-                    setForm({ ...form, code: e.target.value.toUpperCase() })
-                  }
-                  className="font-mono"
-                  dir="ltr"
-                  disabled={!!editingCoupon}
-                />
-                {!editingCoupon && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleGenerateCode}
-                    disabled={isGenerating}
-                    title="توليد كود عشوائي"
-                  >
-                    <RefreshCw
-                      className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
-                    />
-                  </Button>
-                )}
-              </div>
-            </div>
-            <div>
-              <Label>النوع</Label>
-              <Select
-                value={form.type}
-                onValueChange={(v) =>
-                  setForm({ ...form, type: v as Coupon["type"] })
+        {/* ─── Step Content ─── */}
+        <Form {...form}>
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-2">
+            {step === 0 && renderStepBasicInfo()}
+            {step === 1 && renderStepDiscountSettings()}
+            {step === 2 && renderStepRestrictions()}
+            {step === 3 && renderStepReview()}
+
+            {/* ─── Navigation ─── */}
+            <div className="flex items-center justify-between pt-4 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  step > 0 ? setStep(step - 1) : onOpenChange(false)
                 }
-                disabled={!!editingCoupon}
+                disabled={isSaving}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TYPE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      <span className="flex items-center gap-2">
-                        <opt.icon className="w-4 h-4" />
-                        {opt.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>الوصف (اختياري)</Label>
-              <Textarea
-                placeholder="وصف مختصر للكوبون..."
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                rows={2}
-              />
-            </div>
-          </div>
-        )}
+                <ChevronRight className="h-4 w-4 ms-1" />
+                {step > 0 ? "السابق" : "إلغاء"}
+              </Button>
 
-        {/* Step 2: Discount Settings */}
-        {step === 1 && (
-          <div className="space-y-4">
-            {(form.type === "PERCENTAGE" || form.type === "PRODUCT_DISCOUNT") && (
-              <>
-                <div>
-                  <Label>نسبة الخصم (%)</Label>
-                  <div className="flex items-center gap-4 mt-2">
-                    <Slider
-                      value={[form.discountValue]}
-                      onValueChange={([v]) =>
-                        setForm({ ...form, discountValue: v })
-                      }
-                      min={1}
-                      max={100}
-                      step={1}
-                      className="flex-1"
-                    />
-                    <div className="flex items-center gap-1 min-w-[70px]">
-                      <Input
-                        type="number"
-                        min={1}
-                        max={100}
-                        value={form.discountValue}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            discountValue: Number(e.target.value),
-                          })
-                        }
-                        className="w-16 text-center"
-                        dir="ltr"
-                      />
-                      <span className="text-sm text-muted-foreground">%</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <Label>الحد الأقصى للخصم (ر.س) — اختياري</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="بدون حد"
-                    value={form.maxDiscountAmount ?? ""}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        maxDiscountAmount: e.target.value
-                          ? Number(e.target.value)
-                          : undefined,
-                      })
-                    }
-                    dir="ltr"
-                  />
-                </div>
-              </>
-            )}
-
-            {form.type === "FIXED_AMOUNT" && (
-              <div>
-                <Label>مبلغ الخصم (ر.س)</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="50"
-                  value={form.discountValue ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, discountValue: Number(e.target.value) })
-                  }
-                  dir="ltr"
-                />
-              </div>
-            )}
-
-            {form.type === "FREE_SHIPPING" && (
-              <Card className="p-6 text-center">
-                <Truck className="w-12 h-12 mx-auto text-primary mb-3" />
-                <p className="text-muted-foreground">
-                  سيتم إعفاء العميل من رسوم الشحن عند استخدام هذا الكوبون
-                </p>
-              </Card>
-            )}
-
-            {form.type === "FREE_PRODUCT" && (
-              <>
-                <div>
-                  <Label>معرّف المنتج المجاني</Label>
-                  <Input
-                    placeholder="أدخل معرّف المنتج"
-                    value={form.freeProductId}
-                    onChange={(e) =>
-                      setForm({ ...form, freeProductId: e.target.value })
-                    }
-                    dir="ltr"
-                  />
-                </div>
-                <div>
-                  <Label>الكمية المجانية</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={form.freeProductQty}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        freeProductQty: Number(e.target.value),
-                      })
-                    }
-                    dir="ltr"
-                  />
-                </div>
-              </>
-            )}
-
-            {form.type === "PRODUCT_DISCOUNT" && (
-              <div>
-                <Label>معرّفات المنتجات المؤهلة (مفصولة بفاصلة)</Label>
-                <Input
-                  placeholder="product-id-1, product-id-2"
-                  value={form.applicableProductIds.join(", ")}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      applicableProductIds: e.target.value
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  dir="ltr"
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Step 3: Restrictions */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div>
-              <Label>الحد الأدنى للطلب (ر.س) — اختياري</Label>
-              <Input
-                type="number"
-                min={0}
-                placeholder="بدون حد أدنى"
-                value={form.minOrderAmount ?? ""}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    minOrderAmount: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
-                  })
-                }
-                dir="ltr"
-              />
+              {step < 3 ? (
+                <Button type="button" onClick={handleNext}>
+                  التالي
+                  <ChevronLeft className="h-4 w-4 me-1" />
+                </Button>
+              ) : (
+                <Button type="button" onClick={() => handleSubmit()} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin me-2" />
+                      جاري الحفظ...
+                    </>
+                  ) : editingCoupon ? (
+                    "تحديث الكوبون"
+                  ) : (
+                    "إنشاء الكوبون"
+                  )}
+                </Button>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>عدد الاستخدامات الكلي</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="بلا حدود"
-                  value={form.maxUsageCount ?? ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      maxUsageCount: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    })
-                  }
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <Label>الحد لكل عميل</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={form.perCustomerLimit}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      perCustomerLimit: Number(e.target.value),
-                    })
-                  }
-                  dir="ltr"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>تاريخ البدء (اختياري)</Label>
-                <Input
-                  type="datetime-local"
-                  value={form.startsAt}
-                  onChange={(e) =>
-                    setForm({ ...form, startsAt: e.target.value })
-                  }
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <Label>تاريخ الانتهاء (اختياري)</Label>
-                <Input
-                  type="datetime-local"
-                  value={form.expiresAt}
-                  onChange={(e) =>
-                    setForm({ ...form, expiresAt: e.target.value })
-                  }
-                  dir="ltr"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Review */}
-        {step === 3 && (
-          <Card className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">الاسم</span>
-              <span className="font-medium">{form.name}</span>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">الكود</span>
-              <code className="bg-muted px-2 py-0.5 rounded text-sm font-mono">
-                {form.code}
-              </code>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">النوع</span>
-              <Badge variant="secondary">{getTypeLabel(form.type)}</Badge>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">الخصم</span>
-              <span className="font-bold text-primary">{formatDiscount()}</span>
-            </div>
-            {form.maxDiscountAmount && (
-              <>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">حد أقصى للخصم</span>
-                  <span>{form.maxDiscountAmount} ر.س</span>
-                </div>
-              </>
-            )}
-            {form.minOrderAmount && (
-              <>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">حد أدنى للطلب</span>
-                  <span>{form.minOrderAmount} ر.س</span>
-                </div>
-              </>
-            )}
-            <Separator />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">عدد الاستخدامات</span>
-              <span>{form.maxUsageCount ?? "بلا حدود"}</span>
-            </div>
-            {form.expiresAt && (
-              <>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">ينتهي في</span>
-                  <span dir="ltr">
-                    {new Date(form.expiresAt).toLocaleDateString("ar-SA")}
-                  </span>
-                </div>
-              </>
-            )}
-          </Card>
-        )}
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-4">
-          <Button
-            variant="outline"
-            onClick={() => (step > 0 ? setStep(step - 1) : onOpenChange(false))}
-            disabled={isCreating || isUpdating}
-          >
-            <ChevronRight className="w-4 h-4 ms-1" />
-            {step > 0 ? "السابق" : "إلغاء"}
-          </Button>
-          {step < 3 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={!canProceed()}>
-              التالي
-              <ChevronLeft className="w-4 h-4 me-1" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={isCreating || isUpdating}
-            >
-              {isCreating || isUpdating
-                ? "جاري الحفظ..."
-                : editingCoupon
-                  ? "تحديث الكوبون"
-                  : "إنشاء الكوبون"}
-            </Button>
-          )}
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
