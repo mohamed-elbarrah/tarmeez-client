@@ -24,6 +24,7 @@ export async function getStoreBySlug(slug: string) {
     customDomain: s.customDomain ?? null,
     domainStatus: s.domainStatus ?? null,
     themeId: s.themeId ?? null,
+    theme: s.theme ?? null,
     isOnboarded: s.isOnboarded ?? false,
     logo: s.logo ?? null,
     logoWidth: s.logoWidth ?? null,

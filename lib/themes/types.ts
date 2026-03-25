@@ -57,6 +57,8 @@ export interface StoreCategory {
   sortOrder: number
 }
 
+import type { ActiveTheme } from './engine/types'
+
 export interface StoreData {
   slug: string
   name: string
@@ -74,6 +76,8 @@ export interface StoreData {
   fontFamily?: string | null
   borderRadius?: string | null
   themeId?: string | null
+  /** Populated from the Theme relation — null when no theme is linked yet */
+  theme?: ActiveTheme | null
   products?: StoreProduct[]
   categories?: StoreCategory[]
   merchant?: StoreMerchant

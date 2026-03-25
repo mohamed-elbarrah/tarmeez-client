@@ -3,7 +3,7 @@ import Script from "next/script";
 import { getStoreBySlug } from "@/lib/api/stores";
 import Header from "@/lib/themes/store/default/components/Header";
 import Footer from "@/lib/themes/store/default/components/Footer";
-import { resolveTokens } from "@/lib/themes/store/default/config";
+import { ThemeEngine } from "@/lib/themes/engine";
 
 export async function generateMetadata({
   params,
@@ -34,17 +34,10 @@ export default async function StoreLayout({
     notFound();
   }
 
-  const theme = resolveTokens(store);
-
+  const engine = new ThemeEngine(store, store.theme ?? null);
+  const theme   = engine.getComputedConfig();
   const cssVars = {
-    "--p-color": theme.primary,
-    "--s-color": theme.secondary,
-    "--a-color": theme.accent,
-    "--b-color": theme.buttonColor,
-    "--t-color": theme.textColor,
-    "--h-color": theme.headingColor,
-    "--radius": theme.borderRadius,
-    fontFamily: theme.fontFamily,
+    ...engine.getStyleObject(),
     color: theme.textColor,
     backgroundColor: "#ffffff",
   } as React.CSSProperties;
