@@ -256,9 +256,9 @@ export default function VariantSelector({
                       variants,
                     );
                     const hex = isColor
-                      ? (val.colorCode && val.colorCode.trim() !== ""
-                          ? val.colorCode
-                          : resolveColor(val.value))
+                      ? val.colorCode && val.colorCode.trim() !== ""
+                        ? val.colorCode
+                        : resolveColor(val.value)
                       : null;
 
                     if (isColor) {
