@@ -1,19 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { authApi } from '@/lib/services/authApi'
-import { customerApi } from '@/lib/services/customerApi'
-import authReducer from './slices/authSlice'
-import { merchantApi } from '@/lib/services/merchantApi'
-import { superadminApi } from '@/lib/services/superadminApi'
-import { productsApi } from '@/lib/services/productsApi'
-import cartReducer from './slices/cartSlice'
-import { ordersApi } from '@/lib/services/ordersApi'
-import { reviewsApi } from '@/lib/services/reviewsApi'
-import { wishlistApi } from '@/lib/services/wishlistApi'
-import { categoriesApi } from '@/lib/services/categoriesApi'
-import { pagesApi } from '@/lib/services/pagesApi'
-import { analyticsApi } from '@/lib/services/analyticsApi'
-import { couponsApi } from '@/lib/services/couponsApi'
-import { analyticsListenerMiddleware } from './analytics-listener'
+import { configureStore } from "@reduxjs/toolkit";
+import { authApi } from "@/lib/services/authApi";
+import { customerApi } from "@/lib/services/customerApi";
+import authReducer from "./slices/authSlice";
+import { merchantApi } from "@/lib/services/merchantApi";
+import { superadminApi } from "@/lib/services/superadminApi";
+import { productsApi } from "@/lib/services/productsApi";
+import cartReducer from "./slices/cartSlice";
+import { ordersApi } from "@/lib/services/ordersApi";
+import { reviewsApi } from "@/lib/services/reviewsApi";
+import { wishlistApi } from "@/lib/services/wishlistApi";
+import { categoriesApi } from "@/lib/services/categoriesApi";
+import { pagesApi } from "@/lib/services/pagesApi";
+import { analyticsApi } from "@/lib/services/analyticsApi";
+import { couponsApi } from "@/lib/services/couponsApi";
+import { teamApi } from "@/lib/services/teamApi";
+import { analyticsListenerMiddleware } from "./analytics-listener";
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
     [pagesApi.reducerPath]: pagesApi.reducer,
     [analyticsApi.reducerPath]: analyticsApi.reducer,
     [couponsApi.reducerPath]: couponsApi.reducer,
+    [teamApi.reducerPath]: teamApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -48,8 +50,9 @@ export const store = configureStore({
         pagesApi.middleware,
         analyticsApi.middleware,
         couponsApi.middleware,
+        teamApi.middleware,
       ),
-})
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
