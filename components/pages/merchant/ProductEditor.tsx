@@ -36,6 +36,31 @@ export default function ProductEditor() {
   const params = useParams();
   const productId = params?.id as string;
 
+  /** Lightweight color resolver used to pre-fill the color picker when a merchant types a known color name */
+  const EDITOR_COLOR_MAP: Record<string, string> = {
+    أحمر: "#ef4444", red: "#ef4444", crimson: "#dc143c",
+    وردي: "#ec4899", pink: "#ec4899", rose: "#f43f5e",
+    برتقالي: "#f97316", orange: "#f97316",
+    أصفر: "#eab308", yellow: "#eab308",
+    أخضر: "#22c55e", green: "#22c55e", teal: "#14b8a6",
+    زيتوني: "#65a30d", olive: "#65a30d",
+    أزرق: "#3b82f6", blue: "#3b82f6",
+    سماوي: "#06b6d4", cyan: "#06b6d4",
+    كحلي: "#1e40af", navy: "#1e40af",
+    بنفسجي: "#a855f7", purple: "#a855f7",
+    أبيض: "#ffffff", white: "#ffffff",
+    أسود: "#000000", black: "#000000",
+    رمادي: "#6b7280", gray: "#6b7280", grey: "#6b7280",
+    فضي: "#9ca3af", silver: "#9ca3af",
+    بني: "#92400e", brown: "#92400e",
+    ذهبي: "#ca8a04", gold: "#ca8a04",
+    بيج: "#d4b08c", beige: "#d4b08c",
+  };
+  const resolveColorInEditor = (v: string): string | null => {
+    if (/^#[0-9a-fA-F]{3,8}$/.test(v)) return v;
+    return EDITOR_COLOR_MAP[v.toLowerCase().trim()] ?? null;
+  };
+
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const { data: existingProduct, isLoading: isProductLoading } =
@@ -90,7 +115,9 @@ export default function ProductEditor() {
         a.flatMap((d: any) => b.map((e: any) => [d, e].flat())),
       );
 
-    const optionValues = validOptions.map((opt) => opt.values);
+    const optionValues = validOptions.map((opt) =>
+      opt.values.map((v: any) => (typeof v === "string" ? v : v.value)),
+    );
     const combinations =
       optionValues.length === 1
         ? optionValues[0].map((v: any) => [v])
@@ -142,7 +169,10 @@ export default function ProductEditor() {
           existingProduct.options.map((opt: any) => ({
             name: opt.name,
             type: opt.type,
-            values: opt.values.map((v: any) => v.value),
+            values: opt.values.map((v: any) => ({
+              value: v.value,
+              colorCode: v.colorCode ?? "",
+            })),
           })),
         );
 
@@ -424,12 +454,46 @@ export default function ProductEditor() {
                       <div>
                         <Label>القيم</Label>
                         <div className="flex flex-wrap gap-2 p-2 min-h-[42px] border rounded-md bg-background focus-within:ring-2 ring-accent/30 transition-all">
-                          {opt.values.map((val: string, valIdx: number) => (
+                          {opt.values.map((val: any, valIdx: number) => (
                             <span
                               key={valIdx}
-                              className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 border border-accent/20 rounded text-sm"
+                              className="inline-flex items-center gap-1.5 px-2 py-1 bg-accent/10 border border-accent/20 rounded text-sm"
                             >
-                              {val}
+                              {/* Color swatch + native color picker for COLORS type */}
+                              {opt.type === "COLORS" && (
+                                <label
+                                  className="cursor-pointer shrink-0"
+                                  title="اضغط لاختيار اللون"
+                                >
+                                  <input
+                                    type="color"
+                                    className="sr-only"
+                                    value={
+                                      val.colorCode && val.colorCode !== ""
+                                        ? val.colorCode
+                                        : "#888888"
+                                    }
+                                    onChange={(e) => {
+                                      const newOpts = [...options];
+                                      newOpts[optIdx].values[valIdx] = {
+                                        ...newOpts[optIdx].values[valIdx],
+                                        colorCode: e.target.value,
+                                      };
+                                      setOptions(newOpts);
+                                    }}
+                                  />
+                                  <span
+                                    className="w-4 h-4 rounded-full border border-border shadow-sm block hover:scale-110 transition-transform"
+                                    style={{
+                                      backgroundColor:
+                                        val.colorCode && val.colorCode !== ""
+                                          ? val.colorCode
+                                          : "#888888",
+                                    }}
+                                  />
+                                </label>
+                              )}
+                              {typeof val === "string" ? val : val.value}
                               <X
                                 className="w-3 h-3 cursor-pointer hover:text-destructive"
                                 onClick={() => {
@@ -450,10 +514,25 @@ export default function ProductEditor() {
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
                                 e.preventDefault();
-                                const val = e.currentTarget.value.trim();
-                                if (val && !opt.values.includes(val)) {
+                                const raw = e.currentTarget.value.trim();
+                                const alreadyExists = opt.values.some(
+                                  (v: any) =>
+                                    (typeof v === "string" ? v : v.value) ===
+                                    raw,
+                                );
+                                if (raw && !alreadyExists) {
                                   const newOpts = [...options];
-                                  newOpts[optIdx].values = [...opt.values, val];
+                                  const autoColor = resolveColorInEditor(raw);
+                                  newOpts[optIdx].values = [
+                                    ...opt.values,
+                                    {
+                                      value: raw,
+                                      colorCode:
+                                        opt.type === "COLORS"
+                                          ? (autoColor ?? "#888888")
+                                          : "",
+                                    },
+                                  ];
                                   setOptions(newOpts);
                                   e.currentTarget.value = "";
                                 }

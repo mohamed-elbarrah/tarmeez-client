@@ -25,6 +25,8 @@ export interface ProductOffer {
 export interface ProductOptionValue {
   id: string;
   value: string;
+  /** Explicit hex color the merchant chose — takes priority over name-based resolution */
+  colorCode?: string;
   position: number;
 }
 

@@ -255,7 +255,11 @@ export default function VariantSelector({
                       selectedOptions,
                       variants,
                     );
-                    const hex = isColor ? resolveColor(val.value) : null;
+                    const hex = isColor
+                      ? (val.colorCode && val.colorCode.trim() !== ""
+                          ? val.colorCode
+                          : resolveColor(val.value))
+                      : null;
 
                     if (isColor) {
                       return (
@@ -308,7 +312,7 @@ export default function VariantSelector({
                             </span>
                           )}
                           {/* Out-of-stock diagonal slash */}
-                          {!inStock && available && (
+                          {/* {!inStock && available && (
                             <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                               <svg
                                 className="w-full h-full"
@@ -325,7 +329,7 @@ export default function VariantSelector({
                                 />
                               </svg>
                             </span>
-                          )}
+                          )} */}
                         </button>
                       );
                     }
