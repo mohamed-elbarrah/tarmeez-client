@@ -136,13 +136,14 @@ export default function ProductDetailPage({ storeData, product }: Props) {
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
-  // Resolved prices — prefer activeVariant overrides
+  // Resolved prices — prefer activeVariant overrides.
+  // When a variant is active, ONLY use that variant's own comparePrice.
+  // Never fall back to the base product's comparePrice for a variant — that
+  // would show a misleading "was X" badge against a completely different price.
   const displayPrice = activeVariant?.price ?? product.price;
-  const displayComparePrice =
-    activeVariant?.comparePrice ??
-    product.comparePrice ??
-    product.oldPrice ??
-    null;
+  const displayComparePrice = activeVariant
+    ? (activeVariant.comparePrice ?? null)
+    : (product.comparePrice ?? product.oldPrice ?? null);
 
   const isOutOfStock =
     hasVariants && activeVariant !== null
