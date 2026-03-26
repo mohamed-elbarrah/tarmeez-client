@@ -57,45 +57,125 @@ function isValueInStock(
 /** Comprehensive Arabic + English color name → hex map */
 const COLOR_MAP: Record<string, string> = {
   // reds
-  أحمر: "#ef4444", red: "#ef4444", crimson: "#dc143c", قرمزي: "#dc143c",
-  maroon: "#800000", كستنائي: "#800000", coral: "#ff6b6b", مرجاني: "#ff6b6b",
-  salmon: "#fa8072", سلموني: "#fa8072",
+  أحمر: "#ef4444",
+  red: "#ef4444",
+  crimson: "#dc143c",
+  قرمزي: "#dc143c",
+  maroon: "#800000",
+  كستنائي: "#800000",
+  coral: "#ff6b6b",
+  مرجاني: "#ff6b6b",
+  salmon: "#fa8072",
+  سلموني: "#fa8072",
   // pinks
-  وردي: "#ec4899", pink: "#ec4899", hotpink: "#ff69b4", زهري: "#ff69b4",
-  rose: "#f43f5e", ورد: "#f43f5e", magenta: "#d946ef", فوشيا: "#d946ef",
+  وردي: "#ec4899",
+  pink: "#ec4899",
+  hotpink: "#ff69b4",
+  زهري: "#ff69b4",
+  rose: "#f43f5e",
+  ورد: "#f43f5e",
+  magenta: "#d946ef",
+  فوشيا: "#d946ef",
   // oranges
-  برتقالي: "#f97316", orange: "#f97316", peach: "#ffb347", خوخي: "#ffb347",
+  برتقالي: "#f97316",
+  orange: "#f97316",
+  peach: "#ffb347",
+  خوخي: "#ffb347",
   // yellows
-  أصفر: "#eab308", yellow: "#eab308", amber: "#f59e0b", عنبري: "#f59e0b",
-  لايم: "#84cc16", lime: "#84cc16",
+  أصفر: "#eab308",
+  yellow: "#eab308",
+  amber: "#f59e0b",
+  عنبري: "#f59e0b",
+  لايم: "#84cc16",
+  lime: "#84cc16",
   // greens
-  أخضر: "#22c55e", green: "#22c55e", teal: "#14b8a6", زمردي: "#10b981",
-  emerald: "#10b981", خضراء: "#22c55e", زيتوني: "#65a30d", olive: "#65a30d",
-  mint: "#6ee7b7", نعناعي: "#6ee7b7", forest: "#166534", غابات: "#166534",
+  أخضر: "#22c55e",
+  green: "#22c55e",
+  teal: "#14b8a6",
+  زمردي: "#10b981",
+  emerald: "#10b981",
+  خضراء: "#22c55e",
+  زيتوني: "#65a30d",
+  olive: "#65a30d",
+  mint: "#6ee7b7",
+  نعناعي: "#6ee7b7",
+  forest: "#166534",
+  غابات: "#166534",
   // blues
-  أزرق: "#3b82f6", blue: "#3b82f6", سماوي: "#06b6d4", cyan: "#06b6d4",
-  كحلي: "#1e40af", navy: "#1e40af", sky: "#0ea5e9", سكاي: "#0ea5e9",
-  indigo: "#6366f1", نيلي: "#6366f1", cobalt: "#1e3a8a", كوبالت: "#1e3a8a",
-  turquoise: "#2dd4bf", فيروزي: "#2dd4bf", aqua: "#22d3ee", أكوا: "#22d3ee",
+  أزرق: "#3b82f6",
+  blue: "#3b82f6",
+  سماوي: "#06b6d4",
+  cyan: "#06b6d4",
+  كحلي: "#1e40af",
+  navy: "#1e40af",
+  sky: "#0ea5e9",
+  سكاي: "#0ea5e9",
+  indigo: "#6366f1",
+  نيلي: "#6366f1",
+  cobalt: "#1e3a8a",
+  كوبالت: "#1e3a8a",
+  turquoise: "#2dd4bf",
+  فيروزي: "#2dd4bf",
+  aqua: "#22d3ee",
+  أكوا: "#22d3ee",
   // purples & violets
-  بنفسجي: "#a855f7", purple: "#a855f7", violet: "#7c3aed", بنفسجي_غامق: "#5b21b6",
-  lavender: "#c4b5fd", خزامى: "#c4b5fd", lilac: "#d8b4fe", لايلك: "#d8b4fe",
-  plum: "#7e22ce", برقوقي: "#7e22ce",
+  بنفسجي: "#a855f7",
+  purple: "#a855f7",
+  violet: "#7c3aed",
+  بنفسجي_غامق: "#5b21b6",
+  lavender: "#c4b5fd",
+  خزامى: "#c4b5fd",
+  lilac: "#d8b4fe",
+  لايلك: "#d8b4fe",
+  plum: "#7e22ce",
+  برقوقي: "#7e22ce",
   // neutrals
-  أبيض: "#ffffff", white: "#ffffff", cream: "#fef9c3", كريمي: "#fefce8",
-  ivory: "#fffff0", عاجي: "#fffff0", offwhite: "#f8fafc", أوف_وايت: "#f8fafc",
-  أسود: "#000000", black: "#000000", charcoal: "#374151", فحمي: "#374151",
-  رمادي: "#6b7280", gray: "#6b7280", grey: "#6b7280", silver: "#9ca3af",
-  فضي: "#9ca3af", slate: "#64748b", ardoise: "#64748b",
-  darkgray: "#374151", lightgray: "#d1d5db", رمادي_فاتح: "#d1d5db",
+  أبيض: "#ffffff",
+  white: "#ffffff",
+  cream: "#fef9c3",
+  كريمي: "#fefce8",
+  ivory: "#fffff0",
+  عاجي: "#fffff0",
+  offwhite: "#f8fafc",
+  أوف_وايت: "#f8fafc",
+  أسود: "#000000",
+  black: "#000000",
+  charcoal: "#374151",
+  فحمي: "#374151",
+  رمادي: "#6b7280",
+  gray: "#6b7280",
+  grey: "#6b7280",
+  silver: "#9ca3af",
+  فضي: "#9ca3af",
+  slate: "#64748b",
+  ardoise: "#64748b",
+  darkgray: "#374151",
+  lightgray: "#d1d5db",
+  رمادي_فاتح: "#d1d5db",
   // browns & earth tones
-  بني: "#92400e", brown: "#92400e", chocolate: "#7c2d12", شوكولاتة: "#7c2d12",
-  caramel: "#d97706", كراميل: "#d97706", tan: "#d4a373", بيج: "#d4b08c",
-  beige: "#d4b08c", sand: "#fbbf24", رملي: "#fde68a", khaki: "#a3b18a",
-  كاكي: "#a3b18a", mocha: "#6f4e37", موكا: "#6f4e37",
+  بني: "#92400e",
+  brown: "#92400e",
+  chocolate: "#7c2d12",
+  شوكولاتة: "#7c2d12",
+  caramel: "#d97706",
+  كراميل: "#d97706",
+  tan: "#d4a373",
+  بيج: "#d4b08c",
+  beige: "#d4b08c",
+  sand: "#fbbf24",
+  رملي: "#fde68a",
+  khaki: "#a3b18a",
+  كاكي: "#a3b18a",
+  mocha: "#6f4e37",
+  موكا: "#6f4e37",
   // metallics
-  ذهبي: "#ca8a04", gold: "#ca8a04", brass: "#b5a016", نحاسي: "#b45309",
-  copper: "#b45309", bronze: "#a16207", برونزي: "#a16207",
+  ذهبي: "#ca8a04",
+  gold: "#ca8a04",
+  brass: "#b5a016",
+  نحاسي: "#b45309",
+  copper: "#b45309",
+  bronze: "#a16207",
+  برونزي: "#a16207",
 };
 
 /**
@@ -154,9 +234,7 @@ export default function VariantSelector({
               {/* Values — RADIO gets a column layout, all others wrap */}
               <div
                 className={`flex gap-2.5 ${
-                  option.type === "RADIO"
-                    ? "flex-col"
-                    : "flex-wrap"
+                  option.type === "RADIO" ? "flex-col" : "flex-wrap"
                 }`}
                 dir="rtl"
               >
@@ -213,16 +291,38 @@ export default function VariantSelector({
                               className="absolute inset-0 flex items-center justify-center rounded-full"
                               style={{ backgroundColor: "rgba(0,0,0,0.20)" }}
                             >
-                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                              >
+                                <path
+                                  d="M2.5 7L5.5 10L11.5 4"
+                                  stroke="white"
+                                  strokeWidth="2.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                             </span>
                           )}
                           {/* Out-of-stock diagonal slash */}
                           {!inStock && available && (
                             <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-                              <svg className="w-full h-full" viewBox="0 0 40 40" fill="none">
-                                <line x1="4" y1="36" x2="36" y2="4" stroke="rgba(239,68,68,0.75)" strokeWidth="2.5" />
+                              <svg
+                                className="w-full h-full"
+                                viewBox="0 0 40 40"
+                                fill="none"
+                              >
+                                <line
+                                  x1="4"
+                                  y1="36"
+                                  x2="36"
+                                  y2="4"
+                                  stroke="rgba(239,68,68,0.75)"
+                                  strokeWidth="2.5"
+                                />
                               </svg>
                             </span>
                           )}
@@ -242,9 +342,11 @@ export default function VariantSelector({
                             relative flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 text-sm font-bold
                             transition-all duration-200 text-right
                             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
-                            ${isSelected
-                              ? "border-(--p-color) bg-[color-mix(in_srgb,var(--p-color)_8%,transparent)]"
-                              : "border-slate-200 bg-white hover:border-slate-300"}
+                            ${
+                              isSelected
+                                ? "border-(--p-color) bg-[color-mix(in_srgb,var(--p-color)_8%,transparent)]"
+                                : "border-slate-200 bg-white hover:border-slate-300"
+                            }
                             ${!available ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
                           `}
                           aria-pressed={isSelected}
@@ -252,7 +354,9 @@ export default function VariantSelector({
                           {/* Radio circle */}
                           <span
                             className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors duration-200 ${
-                              isSelected ? "border-(--p-color)" : "border-slate-300"
+                              isSelected
+                                ? "border-(--p-color)"
+                                : "border-slate-300"
                             }`}
                           >
                             {isSelected && (
@@ -262,7 +366,11 @@ export default function VariantSelector({
                               />
                             )}
                           </span>
-                          <span className={isSelected ? "text-(--p-color)" : "text-slate-700"}>
+                          <span
+                            className={
+                              isSelected ? "text-(--p-color)" : "text-slate-700"
+                            }
+                          >
                             {val.value}
                           </span>
                           {!inStock && available && (
