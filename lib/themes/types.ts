@@ -22,6 +22,37 @@ export interface ProductOffer {
   sortOrder: number;
 }
 
+export interface ProductOptionValue {
+  id: string;
+  value: string;
+  position: number;
+}
+
+export interface ProductOption {
+  id: string;
+  name: string;
+  /** COLORS | BUTTONS | DROPDOWN | RADIO */
+  type: string;
+  position: number;
+  values: ProductOptionValue[];
+}
+
+export interface ProductVariantValue {
+  optionValueId: string;
+  optionValue: ProductOptionValue;
+}
+
+export interface ProductVariant {
+  id: string;
+  sku?: string;
+  price?: number;
+  comparePrice?: number;
+  quantity: number;
+  image?: string;
+  isActive: boolean;
+  optionValues: ProductVariantValue[];
+}
+
 export interface StoreProduct {
   id: number | string;
   name: string;
@@ -36,6 +67,8 @@ export interface StoreProduct {
   slug?: string;
   description?: string;
   offers?: ProductOffer[];
+  options?: ProductOption[];
+  variants?: ProductVariant[];
   averageRating?: number;
   reviewCount?: number;
   isWishlisted?: boolean;

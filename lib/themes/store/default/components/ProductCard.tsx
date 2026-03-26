@@ -14,10 +14,45 @@ interface Props {
 
 import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 
+const COLOR_MAP: Record<string, string> = {
+  أحمر: '#ef4444', red: '#ef4444',
+  أزرق: '#3b82f6', blue: '#3b82f6',
+  أخضر: '#22c55e', green: '#22c55e',
+  أصفر: '#eab308', yellow: '#eab308',
+  برتقالي: '#f97316', orange: '#f97316',
+  بنفسجي: '#a855f7', purple: '#a855f7',
+  وردي: '#ec4899', pink: '#ec4899',
+  أبيض: '#ffffff', white: '#ffffff',
+  أسود: '#000000', black: '#000000',
+  رمادي: '#6b7280', gray: '#6b7280', grey: '#6b7280',
+  بني: '#92400e', brown: '#92400e',
+  ذهبي: '#ca8a04', gold: '#ca8a04',
+  فضي: '#9ca3af', silver: '#9ca3af',
+  سماوي: '#06b6d4', cyan: '#06b6d4',
+  كحلي: '#1e40af', navy: '#1e40af',
+}
+
+function resolveColor(value: string): string | null {
+  if (/^#[0-9a-fA-F]{3,8}$/.test(value)) return value
+  return COLOR_MAP[value.toLowerCase().trim()] ?? null
+}
+
 export default function ProductCard({ product, theme, storeSlug }: Props) {
   const dispatch = useAppDispatch()
   const productUrl = `/store/${storeSlug}/product/${encodeURIComponent(product.slug || product.id)}`
   const displayImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : null)
+
+  // Color option swatches to show on card
+  const colorOption = product.options?.find(
+    o => o.type === 'COLORS' || o.name.toLowerCase().includes('color') || o.name.includes('لون')
+  )
+  const colorValues = colorOption?.values ?? []
+  const MAX_SWATCHES = 4
+  const visibleColors = colorValues.slice(0, MAX_SWATCHES)
+  const extraColors = colorValues.length - MAX_SWATCHES
+
+  // Count distinct option combinations (total variants)
+  const variantCount = product.variants?.length ?? 0
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -66,6 +101,43 @@ export default function ProductCard({ product, theme, storeSlug }: Props) {
           <Star size={10} fill="currentColor" />
           <span className="text-[10px] font-black text-gray-900">{product.rating}</span>
         </div>
+
+        {/* Variant indicators */}
+        {(visibleColors.length > 0 || variantCount > 1) && (
+          <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+            {visibleColors.length > 0 ? (
+              <>
+                {visibleColors.map(v => {
+                  const hex = resolveColor(v.value)
+                  return (
+                    <span
+                      key={v.id}
+                      title={v.value}
+                      className="w-4 h-4 rounded-full border border-slate-200 shadow-sm inline-block shrink-0"
+                      style={hex
+                        ? { backgroundColor: hex }
+                        : { background: 'linear-gradient(135deg,#f3f4f6,#d1d5db)' }
+                      }
+                    />
+                  )
+                })}
+                {extraColors > 0 && (
+                  <span className="text-[9px] font-black text-slate-400">+{extraColors}</span>
+                )}
+              </>
+            ) : variantCount > 1 ? (
+              <span
+                className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                style={{
+                  color: 'var(--p-color)',
+                  backgroundColor: 'color-mix(in srgb, var(--p-color) 10%, transparent)',
+                }}
+              >
+                {variantCount} خيارات متوفرة
+              </span>
+            ) : null}
+          </div>
+        )}
       </Link>
       <div className="flex items-center justify-between mt-auto">
         <div className="flex flex-col">

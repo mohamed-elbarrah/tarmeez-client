@@ -1,14 +1,15 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { Star, ShoppingCart, Heart, Tag, Zap, CheckCircle } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Star, ShoppingCart, Heart, Tag, Zap, CheckCircle, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { StoreProduct, StoreData } from '@/lib/themes/types'
+import { StoreProduct, StoreData, ProductVariant } from '@/lib/themes/types'
 import ProductCard from '@/lib/themes/store/default/components/ProductCard'
 import ProductImage from '@/lib/themes/store/default/components/ProductImage'
 import StarRating from '@/lib/themes/store/default/components/StarRating'
+import VariantSelector from '@/lib/themes/store/default/components/VariantSelector'
 import { useAppDispatch } from '@/lib/store/hooks'
 import { addItem } from '@/lib/store/slices/cartSlice'
 import { productViewed } from '@/lib/store/analytics-listener'
@@ -32,6 +33,41 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   const { data: customerProfile } = useGetCustomerMeQuery()
   const customer = customerProfile ?? null
 
+  // Variant selection
+  const hasVariants = !!(product.options?.length && product.variants?.length)
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    // Pre-select the first available value for each option
+    if (!product.options?.length) return {}
+    const initial: Record<string, string> = {}
+    for (const opt of product.options) {
+      if (opt.values.length > 0) {
+        initial[opt.name] = opt.values[0].value
+      }
+    }
+    return initial
+  })
+
+  /** The exact variant that matches ALL currently selected option values */
+  const activeVariant = useMemo<ProductVariant | null>(() => {
+    if (!hasVariants || !product.variants) return null
+    const selectionCount = Object.keys(selectedOptions).length
+    if (selectionCount === 0) return null
+    return (
+      product.variants.find(
+        v =>
+          v.isActive &&
+          v.optionValues.length === selectionCount &&
+          Object.values(selectedOptions).every(val =>
+            v.optionValues.some(ov => ov.optionValue.value === val)
+          )
+      ) ?? null
+    )
+  }, [selectedOptions, product.variants, hasVariants])
+
+  const handleOptionSelect = (optionName: string, value: string) => {
+    setSelectedOptions(prev => ({ ...prev, [optionName]: value }))
+  }
+
   // Offers
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null)
 
@@ -51,9 +87,18 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   const [reviewRating, setReviewRating] = useState(0)
   const [reviewComment, setReviewComment] = useState('')
 
-  // Image gallery
+  // Image gallery — if the active variant has its own image, show it first
   const productImages = product.images?.length ? product.images : product.image ? [product.image] : []
   const [selectedImage, setSelectedImage] = useState(0)
+
+  // Auto-switch gallery to variant image when selection changes
+  useEffect(() => {
+    if (activeVariant?.image) {
+      const idx = productImages.indexOf(activeVariant.image)
+      setSelectedImage(idx >= 0 ? idx : 0)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeVariant?.image])
 
   // Track product view on mount (ANALYTICS-RULE 4)
   useEffect(() => {
@@ -67,16 +112,43 @@ export default function ProductDetailPage({ storeData, product }: Props) {
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4)
 
+  // Resolved prices — prefer activeVariant overrides
+  const displayPrice = activeVariant?.price ?? product.price
+  const displayComparePrice =
+    activeVariant?.comparePrice ?? product.comparePrice ?? product.oldPrice ?? null
+
+  const isOutOfStock =
+    hasVariants && activeVariant !== null
+      ? activeVariant.quantity <= 0
+      : !hasVariants && product.quantity !== undefined
+        ? (product as any).quantity <= 0
+        : false
+
   const handleAddToCart = () => {
+    if (hasVariants && !activeVariant) {
+      toast.error('يرجى اختيار المواصفات أولاً')
+      return
+    }
+    if (isOutOfStock) {
+      toast.error('هذا المنتج غير متوفر في المخزن حالياً')
+      return
+    }
+    const selectedOptionsLabel = Object.entries(selectedOptions)
+      .map(([, v]) => v)
+      .join(' / ')
     dispatch(
       addItem({
         storeSlug,
         item: {
           id: product.id,
-          name: product.name,
-          price: product.price,
-          image: productImages[0] || '',
+          name: selectedOptionsLabel
+            ? `${product.name} — ${selectedOptionsLabel}`
+            : product.name,
+          price: displayPrice,
+          image: activeVariant?.image || productImages[0] || '',
           quantity: 1,
+          variantId: activeVariant?.id,
+          selectedOptions: Object.keys(selectedOptions).length ? selectedOptions : undefined,
         },
       })
     )
@@ -135,15 +207,13 @@ export default function ProductDetailPage({ storeData, product }: Props) {
   } as React.CSSProperties
 
   const savings =
-    product.comparePrice && product.comparePrice > product.price
-      ? product.comparePrice - product.price
-      : product.oldPrice && product.oldPrice > product.price
-        ? product.oldPrice - product.price
-        : 0
+    displayComparePrice && displayComparePrice > displayPrice
+      ? displayComparePrice - displayPrice
+      : 0
 
   const discountPercent =
     savings > 0
-      ? Math.round((savings / (product.comparePrice ?? product.oldPrice ?? product.price)) * 100)
+      ? Math.round((savings / displayComparePrice!) * 100)
       : 0
 
   return (
@@ -256,16 +326,16 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           )}
 
           {/* Price Section */}
-          <div className="p-6 mb-8 border border-slate-100 flex items-center justify-between"
+          <div className="p-6 mb-6 border border-slate-100 flex items-center justify-between"
                style={{ backgroundColor: 'bg-slate-50', borderRadius: 'var(--radius)' }}>
             <div className="space-y-1">
-              <span className="text-4xl font-black" style={{ color: 'var(--p-color)' }}>
-                {product.price.toLocaleString()} ر.س
+              <span className="text-4xl font-black transition-all duration-300" style={{ color: 'var(--p-color)' }}>
+                {displayPrice.toLocaleString()} ر.س
               </span>
               {savings > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-400 font-bold line-through">
-                    {(product.comparePrice ?? product.oldPrice ?? 0).toLocaleString()} ر.س
+                    {displayComparePrice!.toLocaleString()} ر.س
                   </span>
                   <span className="text-[10px] font-black text-red-500">
                     وفرت {savings.toLocaleString()} ر.س
@@ -279,6 +349,16 @@ export default function ProductDetailPage({ storeData, product }: Props) {
               </div>
             </div>
           </div>
+
+          {/* Variant Selector */}
+          {hasVariants && product.options && product.variants && (
+            <VariantSelector
+              options={product.options}
+              variants={product.variants}
+              selectedOptions={selectedOptions}
+              onSelect={handleOptionSelect}
+            />
+          )}
 
           {/* Offers Section */}
           {product.offers && product.offers.length > 0 && (
@@ -352,11 +432,21 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           <div className="flex gap-2">
             <button
               onClick={handleAddToCart}
-              className="flex-grow py-5 text-white font-black text-lg shadow-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 group"
-              style={{ backgroundColor: 'var(--p-color)', borderRadius: 'var(--radius)' }}
+              disabled={isOutOfStock || (hasVariants && Object.keys(selectedOptions).length < (product.options?.length ?? 0))}
+              className="grow py-5 text-white font-black text-lg shadow-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100"
+              style={{ backgroundColor: isOutOfStock ? '#94a3b8' : 'var(--p-color)', borderRadius: 'var(--radius)' }}
             >
-              <ShoppingCart size={22} className="group-hover:animate-bounce" />
-              إضافة للسلة
+              {isOutOfStock ? (
+                <>
+                  <AlertCircle size={22} />
+                  نفد المخزون
+                </>
+              ) : (
+                <>
+                  <ShoppingCart size={22} className="group-hover:animate-bounce" />
+                  إضافة للسلة
+                </>
+              )}
             </button>
           </div>
 
