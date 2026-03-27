@@ -1,85 +1,133 @@
-import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithReauth } from './baseQuery'
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "./baseQuery";
 import type {
   CurrentUser,
   PlatformLoginPayload,
   MerchantRegisterPayload,
   CustomerLoginPayload,
   CustomerRegisterPayload,
-} from '@/lib/types/auth'
-import { setUser, setInitialized, clearUser } from '@/lib/store/slices/authSlice'
+} from "@/lib/types/auth";
+import {
+  setUser,
+  setInitialized,
+  clearUser,
+} from "@/lib/store/slices/authSlice";
+
+interface CompleteRegistrationPayload {
+  token: string;
+  fullName: string;
+  password: string;
+}
+
+interface CompleteRegistrationResponse {
+  user: CurrentUser;
+  storeName: string;
+  storeSlug?: string;
+}
 
 export const authApi = createApi({
-  reducerPath: 'authApi',
+  reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,
   endpoints: (build) => ({
     platformLogin: build.mutation<{ user: CurrentUser }, PlatformLoginPayload>({
-      query: (body) => ({ url: '/auth/platform/login', method: 'POST', body }),
+      query: (body) => ({ url: "/auth/platform/login", method: "POST", body }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          const { data } = await queryFulfilled
+          const { data } = await queryFulfilled;
           if (data?.user) {
-            dispatch(setUser(data.user))
+            dispatch(setUser(data.user));
           }
         } catch (err) {
-          dispatch(clearUser())
+          dispatch(clearUser());
         }
       },
     }),
 
-    merchantRegister: build.mutation<{ message: string; user: CurrentUser }, MerchantRegisterPayload>({
-      query: (body) => ({ url: '/auth/platform/register', method: 'POST', body }),
+    merchantRegister: build.mutation<
+      { message: string; user: CurrentUser },
+      MerchantRegisterPayload
+    >({
+      query: (body) => ({
+        url: "/auth/platform/register",
+        method: "POST",
+        body,
+      }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          const { data } = await queryFulfilled
+          const { data } = await queryFulfilled;
           if (data?.user) {
-            dispatch(setUser(data.user))
+            dispatch(setUser(data.user));
           }
         } catch (err) {
-          dispatch(clearUser())
+          dispatch(clearUser());
         }
       },
     }),
 
     customerLogin: build.mutation<{ user: CurrentUser }, CustomerLoginPayload>({
-      query: (body) => ({ url: '/auth/customer/login', method: 'POST', body }),
+      query: (body) => ({ url: "/auth/customer/login", method: "POST", body }),
     }),
 
     customerRegister: build.mutation<any, CustomerRegisterPayload>({
-      query: (body) => ({ url: '/auth/customer/register', method: 'POST', body }),
+      query: (body) => ({
+        url: "/auth/customer/register",
+        method: "POST",
+        body,
+      }),
     }),
 
     getMe: build.query<CurrentUser | null, void>({
-      query: () => ({ url: '/auth/me', method: 'GET' }),
+      query: () => ({ url: "/auth/me", method: "GET" }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          const { data } = await queryFulfilled
-          dispatch(setUser(data ?? null))
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data ?? null));
         } catch (err) {
-          dispatch(setUser(null))
+          dispatch(setUser(null));
         } finally {
-          dispatch(setInitialized(true))
+          dispatch(setInitialized(true));
         }
       },
     }),
 
     logout: build.mutation<any, void>({
-      query: () => ({ url: '/auth/logout', method: 'POST' }),
+      query: () => ({ url: "/auth/logout", method: "POST" }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled
-          dispatch(clearUser())
+          await queryFulfilled;
+          dispatch(clearUser());
         } catch (err) {
-          dispatch(clearUser())
+          dispatch(clearUser());
         }
       },
     }),
 
     refreshTokens: build.mutation<any, void>({
-      query: () => ({ url: '/auth/refresh', method: 'POST' }),
+      query: () => ({ url: "/auth/refresh", method: "POST" }),
+    }),
+
+    completeInvitedRegistration: build.mutation<
+      CompleteRegistrationResponse,
+      CompleteRegistrationPayload
+    >({
+      query: (body) => ({
+        url: "/auth/complete-registration",
+        method: "POST",
+        body,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.user) {
+            dispatch(setUser(data.user));
+          }
+        } catch {
+          dispatch(clearUser());
+        }
+      },
     }),
   }),
-})
+});
 
 export const {
   usePlatformLoginMutation,
@@ -88,6 +136,7 @@ export const {
   useCustomerRegisterMutation,
   useGetMeQuery,
   useLogoutMutation,
-} = authApi
+  useCompleteInvitedRegistrationMutation,
+} = authApi;
 
-export default authApi
+export default authApi;

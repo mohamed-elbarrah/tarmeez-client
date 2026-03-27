@@ -30,6 +30,17 @@ export interface InviteMemberPayload {
   role: Exclude<StoreRole, "OWNER">;
 }
 
+export interface AcceptInvitationPayload {
+  token: string;
+}
+
+export interface AcceptInvitationResponse {
+  email: string;
+  role: StoreRole;
+  storeName: string;
+  userExists: boolean;
+}
+
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const teamApi = createApi({
@@ -71,6 +82,17 @@ export const teamApi = createApi({
       }),
       invalidatesTags: ["Invitations"],
     }),
+
+    acceptInvitation: builder.mutation<
+      AcceptInvitationResponse,
+      AcceptInvitationPayload
+    >({
+      query: (body) => ({
+        url: "/merchant/team/invitations/accept",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -80,4 +102,5 @@ export const {
   useInviteMemberMutation,
   useRemoveMemberMutation,
   useCancelInvitationMutation,
+  useAcceptInvitationMutation,
 } = teamApi;
