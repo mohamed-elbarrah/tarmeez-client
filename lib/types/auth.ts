@@ -35,6 +35,7 @@ export interface MerchantDashboardData {
   store: StoreBrandInfo
 }
 export type UserRole = 'SUPERADMIN' | 'MERCHANT' | 'CUSTOMER'
+export type StoreRole = 'OWNER' | 'ADMIN' | 'EDITOR' | 'MARKETER'
 
 export interface MerchantInfo {
   status: MerchantStatus
@@ -46,8 +47,10 @@ export interface CurrentUser {
   id: string
   email: string
   role: UserRole
+  currentRole?: StoreRole // Role in the active store
   merchant?: MerchantInfo | null
 }
+
 
 export interface PlatformLoginPayload {
   email: string

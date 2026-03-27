@@ -34,23 +34,28 @@ import {
 } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 
+import { useRole } from "@/hooks/useRole";
+import { Resource, Action } from "@/lib/types/rbac";
+import { toast } from "sonner";
+import { useEffect } from "react";
+
 const navigation = [
-  { name: "لوحة التحكم", href: "/merchant", icon: LayoutDashboard },
-  { name: "الطلبات", href: "/merchant/orders", icon: ShoppingCart },
-  { name: "المنتجات", href: "/merchant/products", icon: Package },
-  { name: "الفئات", href: "/merchant/categories", icon: FolderOpen },
-  { name: "العملاء", href: "/merchant/customers", icon: Users },
-  { name: "التحليلات", href: "/merchant/analytics", icon: BarChart3 },
-  { name: "التسويق", href: "/merchant/marketing", icon: Megaphone },
-  { name: "صفحاتي", href: "/merchant/pages", icon: Layout },
-  { name: "القوالب", href: "/merchant/themes", icon: Palette },
-  { name: "التطبيقات", href: "/merchant/apps", icon: Puzzle },
+  { name: "لوحة التحكم", href: "/merchant", icon: LayoutDashboard }, // Dashboard is generally open for all
+  { name: "الطلبات", href: "/merchant/orders", icon: ShoppingCart, resource: Resource.ORDERS },
+  { name: "المنتجات", href: "/merchant/products", icon: Package, resource: Resource.PRODUCTS },
+  { name: "الفئات", href: "/merchant/categories", icon: FolderOpen, resource: Resource.CATEGORIES },
+  { name: "العملاء", href: "/merchant/customers", icon: Users, resource: Resource.CUSTOMERS },
+  { name: "التحليلات", href: "/merchant/analytics", icon: BarChart3, resource: Resource.ANALYTICS },
+  { name: "التسويق", href: "/merchant/marketing", icon: Megaphone, resource: Resource.ANALYTICS },
+  { name: "صفحاتي", href: "/merchant/pages", icon: Layout, resource: Resource.PAGES },
+  { name: "القوالب", href: "/merchant/themes", icon: Palette, resource: Resource.SETTINGS },
+  { name: "التطبيقات", href: "/merchant/apps", icon: Puzzle, resource: Resource.SETTINGS },
 ];
 
 const bottomNavigation = [
-  { name: "الإعدادات", href: "/merchant/settings", icon: Settings },
-  { name: "الفريق", href: "/merchant/team", icon: UsersRound },
-  { name: "الفواتير", href: "/merchant/billing", icon: CreditCard },
+  { name: "الإعدادات", href: "/merchant/settings", icon: Settings, resource: Resource.SETTINGS },
+  { name: "الفريق", href: "/merchant/team", icon: UsersRound, resource: Resource.TEAM },
+  { name: "الفواتير", href: "/merchant/billing", icon: CreditCard, resource: Resource.SETTINGS },
   { name: "الدعم", href: "/merchant/support", icon: HelpCircle },
 ];
 
@@ -64,8 +69,21 @@ export default function MerchantLayout({
 }) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
+  const { canRead } = useRole();
   const { data: pages } = useGetPagesQuery();
   const { data: storeData } = useGetMyStoreQuery();
+
+  // ROUTE PROTECTION: Sync layout with RBAC
+  useEffect(() => {
+    const currentNavItem = [...navigation, ...bottomNavigation].find((item) =>
+      pathname.startsWith(item.href) && item.href !== "/merchant"
+    );
+
+    if (currentNavItem?.resource && !canRead(currentNavItem.resource)) {
+      toast.error("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة");
+      window.location.href = "/merchant"; // Simple redirect
+    }
+  }, [pathname, canRead]);
 
   const publishedCount =
     pages?.filter((p) => p.status === "PUBLISHED").length ?? 0;
@@ -73,6 +91,15 @@ export default function MerchantLayout({
   const storeName = storeData?.store?.name ?? "";
   const storeSlug = storeData?.store?.slug ?? "";
   const initials = merchantName ? merchantName.charAt(0) : "ت";
+
+  // Filter Nav Items
+  const filteredNav = navigation.filter(item => 
+    !item.resource || canRead(item.resource)
+  );
+
+  const filteredBottomNav = bottomNavigation.filter(item => 
+    !item.resource || canRead(item.resource)
+  );
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -110,7 +137,7 @@ export default function MerchantLayout({
 
           {/* Main Nav */}
           <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
-            {navigation.map((item) => {
+            {filteredNav.map((item) => {
               const isActive =
                 pathname === item.href ||
                 (item.href !== "/merchant" && pathname.startsWith(item.href));
@@ -132,7 +159,7 @@ export default function MerchantLayout({
 
           {/* Bottom Nav */}
           <div className="border-t border-sidebar-border py-3 px-2 space-y-1 shrink-0">
-            {bottomNavigation.map((item) => {
+            {filteredBottomNav.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <SidebarLink
@@ -229,6 +256,7 @@ export default function MerchantLayout({
     </TooltipProvider>
   );
 }
+
 
 /* ─── Sidebar Link Component ─── */
 function SidebarLink({

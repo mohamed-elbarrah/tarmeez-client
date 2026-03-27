@@ -1,0 +1,18 @@
+export enum Resource {
+  PRODUCTS = 'PRODUCTS',
+  CATEGORIES = 'CATEGORIES',
+  ORDERS = 'ORDERS',
+  SETTINGS = 'SETTINGS',
+  TEAM = 'TEAM',
+  PAGES = 'PAGES',
+  CUSTOMERS = 'CUSTOMERS',
+  ANALYTICS = 'ANALYTICS',
+}
+
+export enum Action {
+  CREATE = 'CREATE',
+  READ = 'READ',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  MANAGE = 'MANAGE',
+}

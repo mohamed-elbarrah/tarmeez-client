@@ -53,12 +53,18 @@ const typeMap: Record<string, { label: string; color: string }> = {
   POLICY: { label: "سياسة", color: "bg-muted text-muted-foreground" },
 };
 
+import { useRole } from "@/hooks/useRole";
+import { Resource, Action } from "@/lib/types/rbac";
+
 export default function PagesDashboard() {
+  const { canManage } = useRole();
   const { data: pages, isLoading } = useGetPagesQuery();
   const [deletePage, { isLoading: isDeleting }] = useDeletePageMutation();
   const [updateStatus] = useUpdatePageStatusMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const canManagePages = canManage(Resource.PAGES);
 
   const filteredPages =
     pages?.filter((p) =>
@@ -102,15 +108,18 @@ export default function PagesDashboard() {
             إدارة محتوى متجرك وصفحات الهبوط
           </p>
         </div>
-        <Button
-          onClick={() => setIsCreateModalOpen(true)}
-          size="sm"
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          إنشاء صفحة
-        </Button>
+        {canManagePages && (
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            size="sm"
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            إنشاء صفحة
+          </Button>
+        )}
       </div>
+
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -226,11 +235,14 @@ export default function PagesDashboard() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <Link href={`/merchant/pages/${page.id}/edit`}>
-                          <Button variant="ghost" size="sm" title="تعديل">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Link>
+                        {canManagePages && (
+                          <Link href={`/merchant/pages/${page.id}/edit`}>
+                            <Button variant="ghost" size="sm" title="تعديل">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        )}
+                        
                         <Link
                           href={`/store/${page.storeId}/p/${page.slug}`}
                           target="_blank"
@@ -240,55 +252,60 @@ export default function PagesDashboard() {
                           </Button>
                         </Link>
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          title={
-                            page.status === "ARCHIVED" ? "استعادة" : "أرشفة"
-                          }
-                          onClick={() =>
-                            handleStatusToggle(page.id, page.status)
-                          }
-                        >
-                          {page.status === "ARCHIVED" ? (
-                            <RefreshCcw className="w-4 h-4" />
-                          ) : (
-                            <Archive className="w-4 h-4" />
-                          )}
-                        </Button>
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
+                        {canManagePages && (
+                          <>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              title="حذف"
+                              title={
+                                page.status === "ARCHIVED" ? "استعادة" : "أرشفة"
+                              }
+                              onClick={() =>
+                                handleStatusToggle(page.id, page.status)
+                              }
                             >
-                              <Trash2 className="w-4 h-4" />
+                              {page.status === "ARCHIVED" ? (
+                                <RefreshCcw className="w-4 h-4" />
+                              ) : (
+                                <Archive className="w-4 h-4" />
+                              )}
                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent dir="rtl">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>حذف الصفحة؟</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                سيتم حذف الصفحة وإزالتها من المتجر نهائياً. لا
-                                يمكن التراجع عن هذا الإجراء.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(page.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                {isDeleting ? "جاري الحذف..." : "تأكيد الحذف"}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  title="حذف"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent dir="rtl">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>حذف الصفحة؟</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    سيتم حذف الصفحة وإزالتها من المتجر نهائياً. لا
+                                    يمكن التراجع عن هذا الإجراء.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(page.id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    {isDeleting ? "جاري الحذف..." : "تأكيد الحذف"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        )}
                       </div>
                     </td>
+
                   </tr>
                 ))
               )}

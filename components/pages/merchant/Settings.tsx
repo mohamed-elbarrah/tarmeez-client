@@ -1,15 +1,24 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRole } from "@/hooks/useRole";
+import { Resource, Action } from "@/lib/types/rbac";
+import { Lock } from "lucide-react";
 
 export default function Settings() {
+  const { canManage } = useRole();
+  const canManageSettings = canManage(Resource.SETTINGS);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">الإعدادات</h1>
-        <p className="text-muted-foreground">إدارة إعدادات متجرك</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">الإعدادات</h1>
+          <p className="text-muted-foreground">إدارة إعدادات متجرك</p>
+        </div>
+        {!canManageSettings && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground border border-border">
+            <Lock className="w-3.5 h-3.5" />
+            وضع العرض فقط
+          </div>
+        )}
       </div>
 
       <Tabs defaultValue="general" dir="rtl">
@@ -27,19 +36,19 @@ export default function Settings() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="store-name">اسم المتجر</Label>
-                <Input id="store-name" defaultValue="متجري" />
+                <Input id="store-name" defaultValue="متجري" disabled={!canManageSettings} />
               </div>
               <div>
                 <Label htmlFor="store-email">البريد الإلكتروني</Label>
-                <Input id="store-email" type="email" defaultValue="store@example.com" />
+                <Input id="store-email" type="email" defaultValue="store@example.com" disabled={!canManageSettings} />
               </div>
               <div>
                 <Label htmlFor="store-phone">رقم الهاتف</Label>
-                <Input id="store-phone" defaultValue="+966 50 123 4567" />
+                <Input id="store-phone" defaultValue="+966 50 123 4567" disabled={!canManageSettings} />
               </div>
               <div>
                 <Label htmlFor="store-address">العنوان</Label>
-                <Input id="store-address" defaultValue="الرياض، المملكة العربية السعودية" />
+                <Input id="store-address" defaultValue="الرياض، المملكة العربية السعودية" disabled={!canManageSettings} />
               </div>
             </div>
           </Card>
@@ -56,7 +65,7 @@ export default function Settings() {
                 </div>
                 <span className="px-3 py-1 bg-accent/10 rounded-full text-xs">نشط</span>
               </div>
-              <Button variant="outline" className="w-full">إضافة نطاق مخصص</Button>
+              {canManageSettings && <Button variant="outline" className="w-full">إضافة نطاق مخصص</Button>}
             </div>
           </Card>
         </TabsContent>
@@ -68,8 +77,8 @@ export default function Settings() {
               {["مدى", "فيزا / ماستركارد", "Apple Pay", "الدفع عند الاستلام"].map((method, i) => (
                 <div key={i} className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                   <span className="font-medium">{method}</span>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked={i < 2} />
+                  <label className={`relative inline-flex items-center ${canManageSettings ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                    <input type="checkbox" className="sr-only peer" defaultChecked={i < 2} disabled={!canManageSettings} />
                     <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-background after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                   </label>
                 </div>
@@ -90,14 +99,14 @@ export default function Settings() {
                 <div key={i} className="p-4 bg-secondary rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">{zone.zone}</span>
-                    <Button variant="ghost" size="sm">تعديل</Button>
+                    {canManageSettings && <Button variant="ghost" size="sm">تعديل</Button>}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {zone.rate} • {zone.time}
                   </div>
                 </div>
               ))}
-              <Button variant="outline" className="w-full">إضافة منطقة</Button>
+              {canManageSettings && <Button variant="outline" className="w-full">إضافة منطقة</Button>}
             </div>
           </Card>
         </TabsContent>
@@ -108,25 +117,28 @@ export default function Settings() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="tax-rate">نسبة الضريبة (%)</Label>
-                <Input id="tax-rate" type="number" defaultValue="15" />
+                <Input id="tax-rate" type="number" defaultValue="15" disabled={!canManageSettings} />
               </div>
               <div>
                 <Label htmlFor="tax-number">الرقم الضريبي</Label>
-                <Input id="tax-number" placeholder="123456789" />
+                <Input id="tax-number" placeholder="123456789" disabled={!canManageSettings} />
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="include-tax" defaultChecked />
-                <Label htmlFor="include-tax" className="cursor-pointer">تضمين الضريبة في الأسعار</Label>
+                <input type="checkbox" id="include-tax" defaultChecked disabled={!canManageSettings} />
+                <Label htmlFor="include-tax" className={canManageSettings ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}>تضمين الضريبة في الأسعار</Label>
               </div>
             </div>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="outline">إلغاء</Button>
-        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">حفظ التغييرات</Button>
-      </div>
+      {canManageSettings && (
+        <div className="flex justify-end gap-2">
+          <Button variant="outline">إلغاء</Button>
+          <Button className="bg-accent text-accent-foreground hover:bg-accent/90">حفظ التغييرات</Button>
+        </div>
+      )}
     </div>
   );
 }
+
