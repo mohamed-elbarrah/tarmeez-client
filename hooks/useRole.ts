@@ -11,6 +11,8 @@ export function useRole() {
   const isMarketer = currentRole === 'MARKETER';
   const isEditor = currentRole === 'EDITOR';
 
+  console.log('[useRole] Resolved Role:', currentRole, 'isAdmin:', isAdmin);
+
   const can = (action: Action, resource: Resource): boolean => {
     if (isAdmin) return true;
 

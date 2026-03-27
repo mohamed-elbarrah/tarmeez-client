@@ -20,7 +20,31 @@ export interface StoreBrandInfo extends StoreInfo {
   accentColor?: string | null
   fontFamily?: string | null
   borderRadius?: string | null
+  
+  // New Settings Fields
+  supportEmail?: string | null
+  supportWhatsapp?: string | null
+  socialLinks?: { platform: string, url: string, icon?: string }[] | null
+  systemCurrency?: string
+  currencyIcon?: string | null
+  taxNumber?: string | null
+  taxPercentage?: number
+  isTaxEnabled?: boolean
 }
+
+export interface StoreSettings {
+  logo?: string | null
+  favicon?: string | null
+  supportEmail?: string | null
+  supportWhatsapp?: string | null
+  socialLinks?: { platform: string, url: string, icon?: string }[] | null
+  systemCurrency: string
+  currencyIcon?: string | null
+  taxNumber?: string | null
+  taxPercentage: number
+  isTaxEnabled: boolean
+}
+
 
 export interface MerchantProfile {
   id: string

@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
-import type { MerchantDashboardData } from "@/lib/types/auth";
+import type { MerchantDashboardData, StoreSettings } from "@/lib/types/auth";
+
 
 export const merchantApi = createApi({
   reducerPath: "merchantApi",
@@ -81,8 +82,32 @@ export const merchantApi = createApi({
     getAvailableThemes: build.query<any[], void>({
       query: () => "/themes",
     }),
+    /** GET /merchant/settings — fetch store settings */
+    getSettings: build.query<StoreSettings, void>({
+      query: () => ({ url: "/merchant/settings", method: "GET" }),
+      providesTags: ["Merchant"],
+    }),
+    /** PATCH /merchant/settings — update store settings */
+    updateSettings: build.mutation<StoreSettings, Partial<StoreSettings>>({
+      query: (body) => ({
+        url: "/merchant/settings",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Merchant"],
+    }),
+    /** POST /merchant/store/upload-image — uploads a file to the store assets */
+    uploadStoreImage: build.mutation<{ url: string }, FormData>({
+      query: (body) => ({
+        url: "/merchant/store/upload-image",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
+
+
 
 export const {
   useGetMyStoreQuery,
@@ -92,7 +117,11 @@ export const {
   useGetOrderByCodeQuery,
   useUpdateOrderStatusMutation,
   useSwitchThemeMutation,
-  useGetAvailableThemesQuery,
-} = merchantApi;
+    useGetAvailableThemesQuery,
+    useGetSettingsQuery,
+    useUpdateSettingsMutation,
+    useUploadStoreImageMutation,
+  } = merchantApi;
+
 
 export default merchantApi;

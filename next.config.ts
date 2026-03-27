@@ -1,37 +1,47 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-
-  output: 'standalone',
+  output: "standalone",
 
   /* config options here */
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'ik.imagekit.io',
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/uploads/**",
       },
       {
-        protocol: 'https',
-        hostname: 'cdn-icons-png.flaticon.com' ,
+        protocol: "https",
+        hostname: "ik.imagekit.io",
       },
       {
-        protocol: 'https',
-        hostname: 'm.media-amazon.com' ,
+        protocol: "https",
+        hostname: "cdn-icons-png.flaticon.com",
       },
       {
-protocol: 'https',
-hostname: 'dcsa.com.au'
+        protocol: "https",
+        hostname: "m.media-amazon.com",
       },
       {
-        protocol: 'https',
-        hostname: 'placehold.co'
+        protocol: "https",
+        hostname: "dcsa.com.au",
       },
       {
-        protocol: 'http',
-        hostname: 'localhost:8000'
-      }
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/**",
+      },
     ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "inline",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 
