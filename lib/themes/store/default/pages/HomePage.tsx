@@ -6,11 +6,13 @@ import CategoriesSlider from "@/lib/themes/store/default/components/CategoriesSl
 import PromoGrid from "@/lib/themes/store/default/components/PromoGrid";
 import ProductsSection from "@/lib/themes/store/default/components/ProductsSection";
 
-interface Props {
+export interface HomePageProps {
   theme: ThemeTokens;
   products: StoreProduct[];
   storeSlug: string;
   categories?: StoreCategory[];
+  /** Accepted but unused in the default theme — charity theme has its own HomePage */
+  activityType?: "RETAIL" | "CHARITY";
 }
 
 export default function HomePage({
@@ -18,7 +20,7 @@ export default function HomePage({
   products,
   storeSlug,
   categories,
-}: Props) {
+}: HomePageProps) {
   const featuredProduct = products?.[0] ?? null;
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-16">

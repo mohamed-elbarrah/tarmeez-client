@@ -18,17 +18,18 @@ export default function ConnectedCharityProductCard({
   storeSlug,
 }: ConnectedCharityProductCardProps) {
   const dispatch = useAppDispatch();
-  
+
   const contextManager = useMemo(
     () => new ActivityContextManager("CHARITY"),
-    []
+    [],
   );
-  
+
   const displayImage =
     product.image ||
     (product.images && product.images.length > 0 ? product.images[0] : null);
 
-  const handlePrimaryAction = ({ amount }: { amount?: number }) => {
+  const handlePrimaryAction = (payload?: { amount?: number }) => {
+    const amount = payload?.amount;
     // If it's a charity donation, the price is the amount donated
     const finalPrice = amount !== undefined ? amount : product.price;
 
@@ -60,14 +61,12 @@ export default function ConnectedCharityProductCard({
       primaryActionText={contextManager.getPrimaryActionLabel()}
       primaryActionIcon={primaryActionIcon}
       productUrl={contextManager.formatProductUrl(storeSlug, product)}
-      
       progressBarPercent={contextManager.getProgressBarPercent(product)}
       progressMessage={contextManager.getProgressMessage(product)}
       goalDisplay={contextManager.getGoalDisplay(product)}
       collectedDisplay={contextManager.getCollectedDisplay(product)}
       donationPresets={contextManager.getDonationPresets(product)}
       allowCustomAmount={contextManager.getAllowCustomAmount(product)}
-
       onPrimaryAction={handlePrimaryAction}
     />
   );

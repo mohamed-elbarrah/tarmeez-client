@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ThemeTokens, StoreProduct, StoreCategory } from "@/lib/themes/types";
 import FiltersSection from "@/lib/themes/store/default/components/FiltersSection";
 
-interface Props {
+export interface ProductsPageProps {
   theme: ThemeTokens;
   products: StoreProduct[];
   storeSlug: string;
@@ -12,6 +12,8 @@ interface Props {
   initialSearch?: string;
   initialCategory?: string;
   themeSlug?: string;
+  /** Accepted but unused in the default theme */
+  activityType?: "RETAIL" | "CHARITY";
 }
 
 export default function ProductsPage({
@@ -22,7 +24,7 @@ export default function ProductsPage({
   initialSearch = "",
   initialCategory = "الكل",
   themeSlug,
-}: Props) {
+}: ProductsPageProps) {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [priceRange, setPriceRange] = useState(10000);
