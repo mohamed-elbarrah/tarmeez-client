@@ -44,6 +44,8 @@ export async function getStoreBySlug(slug: string) {
     fontFamily: s.fontFamily ?? null,
     borderRadius: s.borderRadius ?? null,
     merchant: s.merchant ?? null,
+    systemCurrency: s.systemCurrency ?? "SAR",
+    currencyIcon: s.currencyIcon ?? null,
     products: s.products ?? [],
     categories: s.categories ?? [],
   };

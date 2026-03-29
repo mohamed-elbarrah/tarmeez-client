@@ -195,13 +195,13 @@ export default function CharityProductDetailPage({
     >
       {/* Main Product Card */}
       <div
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 bg-white p-6 md:p-10 border border-slate-100 shadow-sm"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 bg-white p-6 md:p-10 border border-slate-300 shadow-sm"
         style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
       >
         {/* Image Gallery */}
         <div className="space-y-4">
           <div
-            className="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center relative overflow-hidden group"
+            className="aspect-square bg-slate-50 border border-slate-300 flex items-center justify-center relative overflow-hidden group"
             style={{ borderRadius: "var(--radius)" }}
           >
             {productImages[selectedImage] ? (
@@ -238,7 +238,7 @@ export default function CharityProductDetailPage({
                   className={`aspect-square border-2 rounded-xl cursor-pointer transition-all overflow-hidden relative ${
                     selectedImage === i
                       ? "border-(--p-color) bg-blue-50"
-                      : "border-slate-100 bg-slate-50 hover:border-slate-300"
+                      : "border-slate-300 bg-slate-50 hover:border-slate-300"
                   }`}
                 >
                   <ProductImage
@@ -294,7 +294,7 @@ export default function CharityProductDetailPage({
           </h1>
 
           {product.description && (
-            <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6 border-r-4 border-slate-100 pr-4">
+            <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6 border-r-4 border-slate-300 pr-4">
               {product.description}
             </p>
           )}
@@ -447,7 +447,7 @@ export default function CharityProductDetailPage({
 
         {/* Average Rating Summary */}
         {reviewsData && reviewsData.totalReviews > 0 && (
-          <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-8">
+          <div className="bg-white p-6 rounded-2xl border border-slate-300 flex items-center gap-8">
             <div className="text-center">
               <div
                 className="text-5xl font-black"
@@ -496,7 +496,7 @@ export default function CharityProductDetailPage({
         {showReviewForm && customer && (
           <form
             onSubmit={handleSubmitReview}
-            className="bg-white p-6 rounded-2xl border border-slate-100 space-y-4"
+            className="bg-white p-6 rounded-2xl border border-slate-300 space-y-4"
           >
             <div>
               <label className="text-sm font-bold block mb-2">تقييمك</label>
@@ -548,7 +548,7 @@ export default function CharityProductDetailPage({
         {reviewsData?.reviews?.map((review: any) => (
           <div
             key={review.id}
-            className="bg-white p-6 rounded-2xl border border-slate-100"
+            className="bg-white p-6 rounded-2xl border border-slate-300"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
@@ -605,7 +605,9 @@ export default function CharityProductDetailPage({
           <h2 className="text-2xl font-black">مشاريع خيرة مشابهة</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {storeData.products
-              .filter((p) => p.id !== product.id && p.category === product.category)
+              .filter(
+                (p) => p.id !== product.id && p.category === product.category,
+              )
               .slice(0, 4)
               .map((p) => (
                 <ProductCardComponent

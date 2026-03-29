@@ -125,6 +125,10 @@ export interface StoreData {
   activityType?: "RETAIL" | "CHARITY";
   /** Populated from the Theme relation — null when no theme is linked yet */
   theme?: ActiveTheme | null;
+  /** ISO currency code from merchant dashboard, e.g. "SAR" | "USD" */
+  systemCurrency?: string | null;
+  /** Optional currency icon image URL from merchant dashboard */
+  currencyIcon?: string | null;
   products?: StoreProduct[];
   categories?: StoreCategory[];
   merchant?: StoreMerchant;
@@ -142,11 +146,17 @@ export interface ThemeProps {
 export interface WidgetProductCardProps {
   id: string | number;
   title: string;
+  description?: string;
   imageUrl: string | null;
+  /** Legacy combined string – prefer priceAmount + currency */
   displayPrice?: string;
+  /** Numeric/formatted amount only, e.g. "199" */
+  priceAmount?: string;
+  /** Currency symbol/code, e.g. "ر.س" */
+  currency?: string;
   discountBadge?: string;
 
-  primaryActionText: string;
+  primaryActionText?: string;
   /** Icon name (e.g., 'plus', 'heart') or pre-rendered node (for flexibility) */
   primaryActionIcon?: React.ReactNode;
 
