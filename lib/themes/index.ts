@@ -1,5 +1,5 @@
 import DefaultTheme from "./store/default";
-import ModernTheme from "./store/modern";
+import CharityTheme from "./store/charity";
 import { StoreData } from "./types";
 
 export { ThemeEngine } from "./engine";
@@ -10,7 +10,7 @@ export const STORE_THEMES: Record<
   React.ComponentType<{ storeData: StoreData }>
 > = {
   default: DefaultTheme,
-  modern: ModernTheme,
+  charity: CharityTheme,
 };
 
 export function getTheme(themeKey: string | null | undefined) {

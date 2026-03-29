@@ -1,7 +1,7 @@
 import type { ThemeTokens } from "../../types";
 
-/** Fallback tokens for the Modern theme */
-export const modernDefaultTokens: ThemeTokens = {
+/** Fallback tokens for the Charity theme */
+export const charityDefaultTokens: ThemeTokens = {
   primary: "#10b981",
   secondary: "#064e3b",
   accent: "#f59e0b",
@@ -16,12 +16,12 @@ export const modernDefaultTokens: ThemeTokens = {
 };
 
 /**
- * resolveTokens is intentionally not used at runtime for the modern theme —
+ * resolveTokens is intentionally not used at runtime for the charity theme —
  * ThemeEngine handles the three-layer merge. This function is kept for
- * isolated unit-testing of the modern defaults.
+ * isolated unit-testing of the charity defaults.
  */
 export function resolveTokens(
   overrides: Partial<ThemeTokens> = {},
 ): ThemeTokens {
-  return { ...modernDefaultTokens, ...overrides };
+  return { ...charityDefaultTokens, ...overrides };
 }

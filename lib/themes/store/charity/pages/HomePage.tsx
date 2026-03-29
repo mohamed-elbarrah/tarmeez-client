@@ -9,20 +9,21 @@ import ModernHeroBanner from "../components/ModernHeroBanner";
 // Reuse stateless presentational components from the default theme
 import CategoriesSlider from "@/lib/themes/store/default/components/CategoriesSlider";
 import ProductsSection from "@/lib/themes/store/default/components/ProductsSection";
-import PromoGrid from "@/lib/themes/store/default/components/PromoGrid";
 
 interface Props {
   theme: ThemeTokens;
   products: StoreProduct[];
   storeSlug: string;
   categories?: StoreCategory[];
+  themeSlug?: string;
 }
 
-export default function ModernHomePage({
+export default function CharityHomePage({
   theme,
   products,
   storeSlug,
   categories,
+  themeSlug,
 }: Props) {
   const featuredProduct = products?.[0] ?? null;
   return (
@@ -39,11 +40,11 @@ export default function ModernHomePage({
         storeSlug={storeSlug}
         categories={categories}
       />
-      <PromoGrid theme={theme} products={products} storeSlug={storeSlug} />
       <ProductsSection
         theme={theme}
         products={products}
         storeSlug={storeSlug}
+        themeSlug={themeSlug}
       />
     </main>
   );

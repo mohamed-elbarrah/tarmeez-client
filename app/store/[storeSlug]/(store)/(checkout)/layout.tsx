@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getStoreBySlug } from "@/lib/api/stores";
-import { resolveTokens } from "@/lib/themes/store/default/config";
+import { ThemeEngine } from "@/lib/themes/engine";
 import { ShieldCheck } from "lucide-react";
 
 export default async function CheckoutLayout({
@@ -17,17 +17,11 @@ export default async function CheckoutLayout({
     notFound();
   }
 
-  const theme = resolveTokens(store);
+  const engine = new ThemeEngine(store, store.theme ?? null);
+  const theme = engine.getComputedConfig();
 
   const cssVars = {
-    "--p-color": theme.primary,
-    "--s-color": theme.secondary,
-    "--a-color": theme.accent,
-    "--b-color": theme.buttonColor,
-    "--t-color": theme.textColor,
-    "--h-color": theme.headingColor,
-    "--radius": theme.borderRadius,
-    fontFamily: theme.fontFamily,
+    ...engine.getStyleObject(),
     color: theme.textColor,
     backgroundColor: "#ffffff",
   } as React.CSSProperties;

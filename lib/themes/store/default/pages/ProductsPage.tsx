@@ -1,29 +1,31 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { ThemeTokens, StoreProduct, StoreCategory } from '@/lib/themes/types'
-import FiltersSection from '@/lib/themes/store/default/components/FiltersSection'
+import React, { useState } from "react";
+import { ThemeTokens, StoreProduct, StoreCategory } from "@/lib/themes/types";
+import FiltersSection from "@/lib/themes/store/default/components/FiltersSection";
 
 interface Props {
-  theme: ThemeTokens
-  products: StoreProduct[]
-  storeSlug: string
-  categories: StoreCategory[]
-  initialSearch?: string
-  initialCategory?: string
+  theme: ThemeTokens;
+  products: StoreProduct[];
+  storeSlug: string;
+  categories: StoreCategory[];
+  initialSearch?: string;
+  initialCategory?: string;
+  themeSlug?: string;
 }
 
-export default function ProductsPage({ 
-  theme, 
-  products, 
-  storeSlug, 
+export default function ProductsPage({
+  theme,
+  products,
+  storeSlug,
   categories,
-  initialSearch = '', 
-  initialCategory = 'الكل' 
+  initialSearch = "",
+  initialCategory = "الكل",
+  themeSlug,
 }: Props) {
-  const [searchQuery, setSearchQuery] = useState(initialSearch)
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
-  const [priceRange, setPriceRange] = useState(10000)
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [priceRange, setPriceRange] = useState(10000);
 
   return (
     <FiltersSection
@@ -37,7 +39,12 @@ export default function ProductsPage({
       onSearchChange={(q) => setSearchQuery(q)}
       onCategoryChange={(c) => setSelectedCategory(c)}
       onPriceChange={(p) => setPriceRange(p)}
-      onReset={() => { setSelectedCategory('الكل'); setPriceRange(10000); setSearchQuery('') }}
+      onReset={() => {
+        setSelectedCategory("الكل");
+        setPriceRange(10000);
+        setSearchQuery("");
+      }}
+      themeSlug={themeSlug}
     />
-  )
+  );
 }

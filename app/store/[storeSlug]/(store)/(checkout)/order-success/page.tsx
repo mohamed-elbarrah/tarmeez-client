@@ -1,17 +1,17 @@
-import { getStoreBySlug } from '@/lib/api/stores'
-import { notFound } from 'next/navigation'
-import OrderSuccessPage from '@/lib/themes/store/default/pages/OrderSuccessPage'
-import { resolveTokens } from '@/lib/themes/store/default/config'
+import { getStoreBySlug } from "@/lib/api/stores";
+import { notFound } from "next/navigation";
+import { getThemeOrderSuccessPage } from "@/lib/themes/page-registry";
+import { resolveThemeSlug } from "@/lib/helpers/activity";
 
 export default async function Page({
-  params
+  params,
 }: {
-  params: Promise<{ storeSlug: string }>
+  params: Promise<{ storeSlug: string }>;
 }) {
-  const { storeSlug } = await params
-  const store = await getStoreBySlug(storeSlug)
-  if (!store) notFound()
-  // No token resolve needed? OrderSuccess might just use colors.
-  // Actually we need to pass tokens for background etc if needed.
-  return <OrderSuccessPage storeSlug={storeSlug} />
+  const { storeSlug } = await params;
+  const store = await getStoreBySlug(storeSlug);
+  if (!store) notFound();
+  const themeSlug = resolveThemeSlug(store);
+  const OrderSuccessPage = getThemeOrderSuccessPage(themeSlug);
+  return <OrderSuccessPage storeSlug={storeSlug} />;
 }

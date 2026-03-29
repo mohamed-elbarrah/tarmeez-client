@@ -3,24 +3,24 @@
 import React, { useState } from "react";
 import { ThemeEngine } from "@/lib/themes/engine";
 import type { ThemeProps, StoreProduct } from "../../types";
-// Shared layout components from default theme
-import Header from "@/lib/themes/store/default/components/Header";
-import Footer from "@/lib/themes/store/default/components/Footer";
-// Modern-specific pages
-import ModernHomePage from "./pages/HomePage";
+// Shared layout components from storefront core
+import { Header, Footer } from "@/components/storefront/core";
+// Charity-specific pages
+import CharityHomePage from "./pages/HomePage";
+import CharityProductDetailPage from "./pages/ProductDetailPage";
 // Default pages reused as-is (they're theme-token-driven, not hardcoded)
 import ProductsPage from "@/lib/themes/store/default/pages/ProductsPage";
-import ProductDetailPage from "@/lib/themes/store/default/pages/ProductDetailPage";
 import CartPage from "@/lib/themes/store/default/pages/CartPage";
 import AccountPage from "@/lib/themes/store/default/pages/AccountPage";
 import CheckoutPage from "@/lib/themes/store/default/pages/CheckoutPage";
 import OrderSuccessPage from "@/lib/themes/store/default/pages/OrderSuccessPage";
 import OrderTrackingPage from "@/lib/themes/store/default/pages/OrderTrackingPage";
 
-export default function ModernTheme({ storeData, initialView }: ThemeProps) {
+export default function CharityTheme({ storeData, initialView }: ThemeProps) {
   // Use ThemeEngine so store-level overrides still win over theme defaults
   const engine = new ThemeEngine(storeData, storeData.theme ?? null);
   const theme = engine.getComputedConfig();
+  const themeSlug = engine.getThemeSlug();
 
   const [view, setView] = useState(initialView ?? "home");
   const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(
@@ -62,11 +62,12 @@ export default function ModernTheme({ storeData, initialView }: ThemeProps) {
       />
 
       {view === "home" && (
-        <ModernHomePage
+        <CharityHomePage
           theme={theme}
           products={allProducts}
           storeSlug={storeData.slug}
           categories={storeData.categories}
+          themeSlug={themeSlug}
         />
       )}
 
@@ -78,11 +79,16 @@ export default function ModernTheme({ storeData, initialView }: ThemeProps) {
           categories={storeData.categories || []}
           initialSearch=""
           initialCategory={selectedCategory}
+          themeSlug={themeSlug}
         />
       )}
 
       {view === "product" && selectedProduct && (
-        <ProductDetailPage storeData={storeData} product={selectedProduct} />
+        <CharityProductDetailPage
+          storeData={storeData}
+          product={selectedProduct}
+          themeSlug={themeSlug}
+        />
       )}
 
       {view === "cart" && <CartPage theme={theme} storeSlug={storeData.slug} />}

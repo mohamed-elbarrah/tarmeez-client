@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { getStoreBySlug } from "@/lib/api/stores";
 import PageRenderer from "@/lib/page-builder/renderer/PageRenderer";
 import { resolvePageProducts } from "@/lib/page-builder/renderer/resolveProducts";
-import Header from "@/lib/themes/store/default/components/Header";
-import Footer from "@/lib/themes/store/default/components/Footer";
-import { resolveTokens } from "@/lib/themes/store/default/config";
+import Header from "@/components/storefront/core/Header";
+import Footer from "@/components/storefront/core/Footer";
+import { computeTheme } from "@/lib/themes/page-registry";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 
@@ -89,7 +89,7 @@ export default async function PublicPage({
   );
 
   // 4. Branding & Styles
-  const theme = resolveTokens(store);
+  const theme = computeTheme(store);
   const cssVars = {
     "--p-color": theme.primary,
     "--s-color": theme.secondary,

@@ -740,6 +740,7 @@ interface ThemeRecord {
   id: string;
   slug: string;
   name: string;
+  description: string | null;
   previewImage: string | null;
 }
 
@@ -807,7 +808,7 @@ const ThemeCard = ({
         </div>
 
         <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <h3 className="font-bold text-sm">{theme.name}</h3>
             {isActive && (
               <Badge
@@ -818,6 +819,12 @@ const ThemeCard = ({
               </Badge>
             )}
           </div>
+          {theme.description && (
+            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+              {theme.description}
+            </p>
+          )}
+          {!theme.description && <div className="mb-3" />}
 
           <div className="flex gap-2">
             {/* Preview — only shown when a previewImage exists */}

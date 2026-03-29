@@ -20,6 +20,7 @@ import {
   useDeleteOfferMutation,
 } from "@/lib/services/productsApi";
 import { useGetCategoriesQuery } from "@/lib/services/categoriesApi";
+import { useGetMyStoreQuery } from "@/lib/services/merchantApi";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -87,6 +88,9 @@ export default function ProductEditor() {
   const { data: existingProduct, isLoading: isProductLoading } =
     useGetProductByIdQuery(productId, { skip: !productId });
   const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: storeInfo } = useGetMyStoreQuery();
+
+  const isCharityTheme = storeInfo?.store?.activityType === "CHARITY";
 
   const isLoading = isCreating || isUpdating;
 
@@ -109,6 +113,31 @@ export default function ProductEditor() {
   });
 
   const [images, setImages] = useState<string[]>([]);
+
+  // Donation state (only shown when store activityType is CHARITY)
+  const [donationEnabled, setDonationEnabled] = useState(false);
+  const [donationForm, setDonationForm] = useState({
+    targetAmount: 0,
+    currentAmount: 0,
+    allowCustomAmount: true,
+  });
+  const [donationPresets, setDonationPresets] = useState<
+    { label: string; amount: number }[]
+  >([
+    { label: "سهم الخير", amount: 50 },
+    { label: "سهم البركة", amount: 100 },
+    { label: "سهم الإحسان", amount: 200 },
+    { label: "سهم العطاء", amount: 500 },
+  ]);
+  const [progressMessages, setProgressMessages] = useState<
+    { percent: string; message: string }[]
+  >([
+    { percent: "0", message: "كن أول مبادر" },
+    { percent: "25", message: "بداية رائعة!" },
+    { percent: "50", message: "نصف الطريق" },
+    { percent: "75", message: "اقتربنا من الهدف" },
+    { percent: "100", message: "تم تحقيق الهدف! شكراً لكم" },
+  ]);
 
   // Variants State
   const [hasVariants, setHasVariants] = useState(false);
@@ -184,6 +213,37 @@ export default function ProductEditor() {
       });
       setImages(existingProduct.images);
 
+      // Pre-fill donation metadata if present
+      if (existingProduct.donationMetadata) {
+        const dm = existingProduct.donationMetadata as any;
+        setDonationEnabled(dm.isDonation ?? false);
+        setDonationForm({
+          targetAmount: dm.targetAmount ?? 0,
+          currentAmount: dm.currentAmount ?? 0,
+          allowCustomAmount: dm.allowCustomAmount ?? true,
+        });
+        if (
+          Array.isArray(dm.donationOptions) &&
+          dm.donationOptions.length > 0
+        ) {
+          const labels = dm.donationLabels ?? {};
+          setDonationPresets(
+            dm.donationOptions.map((amt: number, i: number) => ({
+              label: labels[String(i)] ?? "",
+              amount: amt,
+            })),
+          );
+        }
+        if (dm.progressMessages && typeof dm.progressMessages === "object") {
+          setProgressMessages(
+            Object.entries(dm.progressMessages).map(([k, v]) => ({
+              percent: k,
+              message: v as string,
+            })),
+          );
+        }
+      }
+
       if (existingProduct.options && existingProduct.options.length > 0) {
         setHasVariants(true);
         setOptions(
@@ -235,11 +295,45 @@ export default function ProductEditor() {
           .filter(Boolean),
       };
 
-      if (hasVariants) {
+      if (!isCharityTheme && hasVariants) {
         payload.options = options.filter(
           (opt) => opt.name && opt.values.length > 0,
         );
         payload.variants = variants;
+      }
+
+      // Charity defaults: no shipping, unlimited stock
+      if (isCharityTheme) {
+        payload.isPhysical = false;
+        payload.weight = 0;
+        payload.trackStock = false;
+        payload.quantity = 99999;
+      }
+
+      if (isCharityTheme && donationEnabled) {
+        const messagesObj: Record<string, string> = {};
+        for (const pm of progressMessages) {
+          if (pm.percent && pm.message) {
+            messagesObj[pm.percent] = pm.message;
+          }
+        }
+        const labelsObj: Record<string, string> = {};
+        donationPresets.forEach((p, i) => {
+          if (p.label) labelsObj[String(i)] = p.label;
+        });
+        payload.donationMetadata = {
+          isDonation: true,
+          targetAmount: Number(donationForm.targetAmount),
+          currentAmount: Number(donationForm.currentAmount),
+          donationOptions: donationPresets
+            .map((p) => Number(p.amount))
+            .filter((n) => !isNaN(n) && n > 0),
+          donationLabels: labelsObj,
+          allowCustomAmount: donationForm.allowCustomAmount,
+          progressMessages: messagesObj,
+        };
+      } else if (isCharityTheme && !donationEnabled) {
+        payload.donationMetadata = null;
       }
 
       if (productId) {
@@ -396,262 +490,266 @@ export default function ProductEditor() {
             </div>
           </Card>
 
-          {/* Variants Card */}
-          <Card className="overflow-hidden">
-            <div
-              className="p-6 flex items-center justify-between border-b cursor-pointer hover:bg-muted/30 transition-colors"
-              onClick={() => setIsVariantsOpen(!isVariantsOpen)}
-            >
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="variants-toggle"
-                  checked={hasVariants}
-                  onCheckedChange={setHasVariants}
-                  onClick={(e) => e.stopPropagation()}
-                />
-                <h3 className="text-lg font-bold">المتغيرات</h3>
+          {/* Variants Card — hidden in Charity mode */}
+          {!isCharityTheme && (
+            <Card className="overflow-hidden">
+              <div
+                className="p-6 flex items-center justify-between border-b cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => setIsVariantsOpen(!isVariantsOpen)}
+              >
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="variants-toggle"
+                    checked={hasVariants}
+                    onCheckedChange={setHasVariants}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <h3 className="text-lg font-bold">المتغيرات</h3>
+                </div>
+                <Button variant="ghost" size="icon">
+                  {isVariantsOpen ? (
+                    <ChevronUp className="w-5 h-5" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5" />
+                  )}
+                </Button>
               </div>
-              <Button variant="ghost" size="icon">
-                {isVariantsOpen ? (
-                  <ChevronUp className="w-5 h-5" />
-                ) : (
-                  <ChevronDown className="w-5 h-5" />
-                )}
-              </Button>
-            </div>
 
-            {hasVariants && isVariantsOpen && (
-              <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                {/* Options List */}
-                <div className="space-y-6">
-                  {options.map((opt, optIdx) => (
-                    <div
-                      key={optIdx}
-                      className="p-4 bg-muted/30 rounded-lg border border-dashed relative group"
-                    >
-                      <button
-                        onClick={() =>
-                          setOptions(options.filter((_, i) => i !== optIdx))
-                        }
-                        className="absolute -top-2 -left-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+              {hasVariants && isVariantsOpen && (
+                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {/* Options List */}
+                  <div className="space-y-6">
+                    {options.map((opt, optIdx) => (
+                      <div
+                        key={optIdx}
+                        className="p-4 bg-muted/30 rounded-lg border border-dashed relative group"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <button
+                          onClick={() =>
+                            setOptions(options.filter((_, i) => i !== optIdx))
+                          }
+                          className="absolute -top-2 -left-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
 
-                      <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div>
-                          <Label>اسم الخيار</Label>
-                          <Input
-                            placeholder="مثال: الحجم، اللون..."
-                            value={opt.name}
-                            onChange={(e) => {
-                              const newOpts = [...options];
-                              newOpts[optIdx].name = e.target.value;
-                              setOptions(newOpts);
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <Label>النوع</Label>
-                          <select
-                            className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm"
-                            value={opt.type}
-                            onChange={(e) => {
-                              const newOpts = [...options];
-                              newOpts[optIdx].type = e.target.value;
-                              setOptions(newOpts);
-                            }}
-                          >
-                            <option value="DROPDOWN">قائمة منسدلة</option>
-                            <option value="BUTTONS">أزرار نصية</option>
-                            <option value="COLORS">
-                              أزرار قائمة على اللون
-                            </option>
-                            <option value="RADIO">أزرار الراديو</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>القيم</Label>
-                        <div className="flex flex-wrap gap-2 p-2 min-h-[42px] border rounded-md bg-background focus-within:ring-2 ring-accent/30 transition-all">
-                          {opt.values.map((val: any, valIdx: number) => (
-                            <span
-                              key={valIdx}
-                              className="inline-flex items-center gap-1.5 px-2 py-1 bg-accent/10 border border-accent/20 rounded text-sm"
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                          <div>
+                            <Label>اسم الخيار</Label>
+                            <Input
+                              placeholder="مثال: الحجم، اللون..."
+                              value={opt.name}
+                              onChange={(e) => {
+                                const newOpts = [...options];
+                                newOpts[optIdx].name = e.target.value;
+                                setOptions(newOpts);
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label>النوع</Label>
+                            <select
+                              className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm"
+                              value={opt.type}
+                              onChange={(e) => {
+                                const newOpts = [...options];
+                                newOpts[optIdx].type = e.target.value;
+                                setOptions(newOpts);
+                              }}
                             >
-                              {/* Color swatch + native color picker for COLORS type */}
-                              {opt.type === "COLORS" && (
-                                <label
-                                  className="cursor-pointer shrink-0"
-                                  title="اضغط لاختيار اللون"
-                                >
-                                  <input
-                                    type="color"
-                                    className="sr-only"
-                                    value={
-                                      val.colorCode && val.colorCode !== ""
-                                        ? val.colorCode
-                                        : "#888888"
-                                    }
-                                    onChange={(e) => {
-                                      const newOpts = [...options];
-                                      newOpts[optIdx].values[valIdx] = {
-                                        ...newOpts[optIdx].values[valIdx],
-                                        colorCode: e.target.value,
-                                      };
-                                      setOptions(newOpts);
-                                    }}
-                                  />
-                                  <span
-                                    className="w-4 h-4 rounded-full border border-border shadow-sm block hover:scale-110 transition-transform"
-                                    style={{
-                                      backgroundColor:
+                              <option value="DROPDOWN">قائمة منسدلة</option>
+                              <option value="BUTTONS">أزرار نصية</option>
+                              <option value="COLORS">
+                                أزرار قائمة على اللون
+                              </option>
+                              <option value="RADIO">أزرار الراديو</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label>القيم</Label>
+                          <div className="flex flex-wrap gap-2 p-2 min-h-[42px] border rounded-md bg-background focus-within:ring-2 ring-accent/30 transition-all">
+                            {opt.values.map((val: any, valIdx: number) => (
+                              <span
+                                key={valIdx}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 bg-accent/10 border border-accent/20 rounded text-sm"
+                              >
+                                {/* Color swatch + native color picker for COLORS type */}
+                                {opt.type === "COLORS" && (
+                                  <label
+                                    className="cursor-pointer shrink-0"
+                                    title="اضغط لاختيار اللون"
+                                  >
+                                    <input
+                                      type="color"
+                                      className="sr-only"
+                                      value={
                                         val.colorCode && val.colorCode !== ""
                                           ? val.colorCode
-                                          : "#888888",
-                                    }}
-                                  />
-                                </label>
-                              )}
-                              {typeof val === "string" ? val : val.value}
-                              <X
-                                className="w-3 h-3 cursor-pointer hover:text-destructive"
-                                onClick={() => {
-                                  const newOpts = [...options];
-                                  newOpts[optIdx].values = newOpts[
-                                    optIdx
-                                  ].values.filter(
-                                    (_: any, i: number) => i !== valIdx,
+                                          : "#888888"
+                                      }
+                                      onChange={(e) => {
+                                        const newOpts = [...options];
+                                        newOpts[optIdx].values[valIdx] = {
+                                          ...newOpts[optIdx].values[valIdx],
+                                          colorCode: e.target.value,
+                                        };
+                                        setOptions(newOpts);
+                                      }}
+                                    />
+                                    <span
+                                      className="w-4 h-4 rounded-full border border-border shadow-sm block hover:scale-110 transition-transform"
+                                      style={{
+                                        backgroundColor:
+                                          val.colorCode && val.colorCode !== ""
+                                            ? val.colorCode
+                                            : "#888888",
+                                      }}
+                                    />
+                                  </label>
+                                )}
+                                {typeof val === "string" ? val : val.value}
+                                <X
+                                  className="w-3 h-3 cursor-pointer hover:text-destructive"
+                                  onClick={() => {
+                                    const newOpts = [...options];
+                                    newOpts[optIdx].values = newOpts[
+                                      optIdx
+                                    ].values.filter(
+                                      (_: any, i: number) => i !== valIdx,
+                                    );
+                                    setOptions(newOpts);
+                                  }}
+                                />
+                              </span>
+                            ))}
+                            <input
+                              className="flex-1 bg-transparent border-none outline-none text-sm min-w-[120px]"
+                              placeholder="اكتب القيمة ثم اضغط Enter..."
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  const raw = e.currentTarget.value.trim();
+                                  const alreadyExists = opt.values.some(
+                                    (v: any) =>
+                                      (typeof v === "string" ? v : v.value) ===
+                                      raw,
                                   );
-                                  setOptions(newOpts);
-                                }}
-                              />
-                            </span>
-                          ))}
-                          <input
-                            className="flex-1 bg-transparent border-none outline-none text-sm min-w-[120px]"
-                            placeholder="اكتب القيمة ثم اضغط Enter..."
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                const raw = e.currentTarget.value.trim();
-                                const alreadyExists = opt.values.some(
-                                  (v: any) =>
-                                    (typeof v === "string" ? v : v.value) ===
-                                    raw,
-                                );
-                                if (raw && !alreadyExists) {
-                                  const newOpts = [...options];
-                                  const autoColor = resolveColorInEditor(raw);
-                                  newOpts[optIdx].values = [
-                                    ...opt.values,
-                                    {
-                                      value: raw,
-                                      colorCode:
-                                        opt.type === "COLORS"
-                                          ? (autoColor ?? "#888888")
-                                          : "",
-                                    },
-                                  ];
-                                  setOptions(newOpts);
-                                  e.currentTarget.value = "";
+                                  if (raw && !alreadyExists) {
+                                    const newOpts = [...options];
+                                    const autoColor = resolveColorInEditor(raw);
+                                    newOpts[optIdx].values = [
+                                      ...opt.values,
+                                      {
+                                        value: raw,
+                                        colorCode:
+                                          opt.type === "COLORS"
+                                            ? (autoColor ?? "#888888")
+                                            : "",
+                                      },
+                                    ];
+                                    setOptions(newOpts);
+                                    e.currentTarget.value = "";
+                                  }
                                 }
-                              }
-                            }}
-                          />
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
 
-                  <Button
-                    variant="outline"
-                    className="w-full border-dashed"
-                    onClick={() =>
-                      setOptions([
-                        ...options,
-                        { name: "", type: "DROPDOWN", values: [] },
-                      ])
-                    }
-                    disabled={options.length >= 3}
-                  >
-                    <Plus className="w-4 h-4 ml-2" />
-                    أضف خيارًا آخر
-                  </Button>
-                </div>
-
-                {/* Variants List */}
-                {variants.length > 0 && (
-                  <div className="pt-6 border-t">
-                    <h4 className="font-bold mb-4">
-                      قائمة المتغيرات ({variants.length})
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="text-right text-sm text-muted-foreground border-b">
-                            <th className="pb-2 font-medium">المتغير</th>
-                            <th className="pb-2 font-medium w-32">السعر</th>
-                            <th className="pb-2 font-medium w-24">الكمية</th>
-                            <th className="pb-2 font-medium w-40">SKU</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {variants.map((variant, idx) => (
-                            <tr key={idx} className="group">
-                              <td className="py-3 pr-2">
-                                <span className="font-medium">
-                                  {variant.optionValues.join(" / ")}
-                                </span>
-                              </td>
-                              <td className="py-3 px-2">
-                                <Input
-                                  type="number"
-                                  className="h-8"
-                                  value={variant.price}
-                                  onChange={(e) => {
-                                    const newVars = [...variants];
-                                    newVars[idx].price = Number(e.target.value);
-                                    setVariants(newVars);
-                                  }}
-                                />
-                              </td>
-                              <td className="py-3 px-2">
-                                <Input
-                                  type="number"
-                                  className="h-8"
-                                  value={variant.quantity}
-                                  onChange={(e) => {
-                                    const newVars = [...variants];
-                                    newVars[idx].quantity = Number(
-                                      e.target.value,
-                                    );
-                                    setVariants(newVars);
-                                  }}
-                                />
-                              </td>
-                              <td className="py-3 pl-2">
-                                <Input
-                                  className="h-8"
-                                  value={variant.sku}
-                                  onChange={(e) => {
-                                    const newVars = [...variants];
-                                    newVars[idx].sku = e.target.value;
-                                    setVariants(newVars);
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full border-dashed"
+                      onClick={() =>
+                        setOptions([
+                          ...options,
+                          { name: "", type: "DROPDOWN", values: [] },
+                        ])
+                      }
+                      disabled={options.length >= 3}
+                    >
+                      <Plus className="w-4 h-4 ml-2" />
+                      أضف خيارًا آخر
+                    </Button>
                   </div>
-                )}
-              </div>
-            )}
-          </Card>
+
+                  {/* Variants List */}
+                  {variants.length > 0 && (
+                    <div className="pt-6 border-t">
+                      <h4 className="font-bold mb-4">
+                        قائمة المتغيرات ({variants.length})
+                      </h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="text-right text-sm text-muted-foreground border-b">
+                              <th className="pb-2 font-medium">المتغير</th>
+                              <th className="pb-2 font-medium w-32">السعر</th>
+                              <th className="pb-2 font-medium w-24">الكمية</th>
+                              <th className="pb-2 font-medium w-40">SKU</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {variants.map((variant, idx) => (
+                              <tr key={idx} className="group">
+                                <td className="py-3 pr-2">
+                                  <span className="font-medium">
+                                    {variant.optionValues.join(" / ")}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2">
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    value={variant.price}
+                                    onChange={(e) => {
+                                      const newVars = [...variants];
+                                      newVars[idx].price = Number(
+                                        e.target.value,
+                                      );
+                                      setVariants(newVars);
+                                    }}
+                                  />
+                                </td>
+                                <td className="py-3 px-2">
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    value={variant.quantity}
+                                    onChange={(e) => {
+                                      const newVars = [...variants];
+                                      newVars[idx].quantity = Number(
+                                        e.target.value,
+                                      );
+                                      setVariants(newVars);
+                                    }}
+                                  />
+                                </td>
+                                <td className="py-3 pl-2">
+                                  <Input
+                                    className="h-8"
+                                    value={variant.sku}
+                                    onChange={(e) => {
+                                      const newVars = [...variants];
+                                      newVars[idx].sku = e.target.value;
+                                      setVariants(newVars);
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+          )}
 
           {/* SEO */}
           <Card className="p-6">
@@ -683,18 +781,24 @@ export default function ProductEditor() {
             </div>
           </Card>
 
-          {/* Offers Section */}
-          {productId && <OffersSection productId={productId} />}
+          {/* Offers Section — hidden in Charity mode */}
+          {productId && !isCharityTheme && (
+            <OffersSection productId={productId} />
+          )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Pricing */}
           <Card className="p-6">
-            <h3 className="text-lg font-bold mb-4">السعر</h3>
+            <h3 className="text-lg font-bold mb-4">
+              {isCharityTheme ? "مبلغ التبرع" : "السعر"}
+            </h3>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="price">السعر</Label>
+                <Label htmlFor="price">
+                  {isCharityTheme ? "مبلغ التبرع الافتراضي" : "السعر"}
+                </Label>
                 <Input
                   id="price"
                   type="number"
@@ -705,119 +809,130 @@ export default function ProductEditor() {
                   }
                 />
               </div>
-              <div>
-                <Label htmlFor="compare-price">السعر قبل الخصم</Label>
-                <Input
-                  id="compare-price"
-                  type="number"
-                  placeholder="0.00"
-                  value={form.comparePrice}
-                  onChange={(e) =>
-                    setForm({ ...form, comparePrice: Number(e.target.value) })
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="cost">التكلفة</Label>
-                <Input
-                  id="cost"
-                  type="number"
-                  placeholder="0.00"
-                  value={form.cost}
-                  onChange={(e) =>
-                    setForm({ ...form, cost: Number(e.target.value) })
-                  }
-                />
-              </div>
+              {!isCharityTheme && (
+                <>
+                  <div>
+                    <Label htmlFor="compare-price">السعر قبل الخصم</Label>
+                    <Input
+                      id="compare-price"
+                      type="number"
+                      placeholder="0.00"
+                      value={form.comparePrice}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          comparePrice: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="cost">التكلفة</Label>
+                    <Input
+                      id="cost"
+                      type="number"
+                      placeholder="0.00"
+                      value={form.cost}
+                      onChange={(e) =>
+                        setForm({ ...form, cost: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </Card>
 
-          {/* Inventory */}
-          <Card className="p-6">
-            <h3 className="text-lg font-bold mb-4">المخزون</h3>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="sku">رمز المنتج (SKU)</Label>
-                <Input
-                  id="sku"
-                  placeholder="ABC-123"
-                  value={form.sku}
-                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                />
+          {/* Inventory — hidden in Charity mode */}
+          {!isCharityTheme && (
+            <Card className="p-6">
+              <h3 className="text-lg font-bold mb-4">المخزون</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="sku">رمز المنتج (SKU)</Label>
+                  <Input
+                    id="sku"
+                    placeholder="ABC-123"
+                    value={form.sku}
+                    onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="barcode">الباركود</Label>
+                  <Input
+                    id="barcode"
+                    placeholder="1234567890"
+                    value={form.barcode}
+                    onChange={(e) =>
+                      setForm({ ...form, barcode: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="quantity">الكمية</Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    placeholder="0"
+                    value={form.quantity}
+                    onChange={(e) =>
+                      setForm({ ...form, quantity: Number(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="track"
+                    className="rounded"
+                    checked={form.trackStock}
+                    onChange={(e) =>
+                      setForm({ ...form, trackStock: e.target.checked })
+                    }
+                  />
+                  <Label htmlFor="track" className="cursor-pointer">
+                    تتبع المخزون
+                  </Label>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="barcode">الباركود</Label>
-                <Input
-                  id="barcode"
-                  placeholder="1234567890"
-                  value={form.barcode}
-                  onChange={(e) =>
-                    setForm({ ...form, barcode: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="quantity">الكمية</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  placeholder="0"
-                  value={form.quantity}
-                  onChange={(e) =>
-                    setForm({ ...form, quantity: Number(e.target.value) })
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="track"
-                  className="rounded"
-                  checked={form.trackStock}
-                  onChange={(e) =>
-                    setForm({ ...form, trackStock: e.target.checked })
-                  }
-                />
-                <Label htmlFor="track" className="cursor-pointer">
-                  تتبع المخزون
-                </Label>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
-          {/* Shipping */}
-          <Card className="p-6">
-            <h3 className="text-lg font-bold mb-4">الشحن</h3>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="weight">الوزن (كجم)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  placeholder="0.0"
-                  step="0.1"
-                  value={form.weight}
-                  onChange={(e) =>
-                    setForm({ ...form, weight: Number(e.target.value) })
-                  }
-                />
+          {/* Shipping — hidden in Charity mode */}
+          {!isCharityTheme && (
+            <Card className="p-6">
+              <h3 className="text-lg font-bold mb-4">الشحن</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="weight">الوزن (كجم)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    placeholder="0.0"
+                    step="0.1"
+                    value={form.weight}
+                    onChange={(e) =>
+                      setForm({ ...form, weight: Number(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="physical"
+                    className="rounded"
+                    checked={form.isPhysical}
+                    onChange={(e) =>
+                      setForm({ ...form, isPhysical: e.target.checked })
+                    }
+                  />
+                  <Label htmlFor="physical" className="cursor-pointer">
+                    منتج مادي
+                  </Label>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="physical"
-                  className="rounded"
-                  checked={form.isPhysical}
-                  onChange={(e) =>
-                    setForm({ ...form, isPhysical: e.target.checked })
-                  }
-                />
-                <Label htmlFor="physical" className="cursor-pointer">
-                  منتج مادي
-                </Label>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           {/* Organization */}
           <Card className="p-6">
@@ -852,6 +967,161 @@ export default function ProductEditor() {
               </div>
             </div>
           </Card>
+
+          {/* Donation Settings — only for charity stores */}
+          {isCharityTheme && (
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">إعدادات التبرع</h3>
+                <Switch
+                  checked={donationEnabled}
+                  onCheckedChange={setDonationEnabled}
+                />
+              </div>
+              {donationEnabled && (
+                <div className="space-y-5">
+                  {/* Target & current amounts */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>المبلغ المستهدف (ر.س)</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="10000"
+                        value={donationForm.targetAmount || ""}
+                        onChange={(e) =>
+                          setDonationForm({
+                            ...donationForm,
+                            targetAmount: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>المبلغ الحالي (ر.س)</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="0"
+                        value={donationForm.currentAmount || ""}
+                        onChange={(e) =>
+                          setDonationForm({
+                            ...donationForm,
+                            currentAmount: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Allow custom amount */}
+                  <div className="flex items-center justify-between">
+                    <Label>السماح بمبلغ مخصص</Label>
+                    <Switch
+                      checked={donationForm.allowCustomAmount}
+                      onCheckedChange={(checked) =>
+                        setDonationForm({
+                          ...donationForm,
+                          allowCustomAmount: checked,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* Dynamic preset amounts */}
+                  <div>
+                    <Label className="mb-2 block">مبالغ التبرع المحددة</Label>
+                    <div className="space-y-2">
+                      {donationPresets.map((preset, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <Input
+                            placeholder="التسمية (مثال: سهم الخير)"
+                            value={preset.label}
+                            onChange={(e) => {
+                              const next = [...donationPresets];
+                              next[idx] = {
+                                ...next[idx],
+                                label: e.target.value,
+                              };
+                              setDonationPresets(next);
+                            }}
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder="المبلغ"
+                            value={preset.amount || ""}
+                            onChange={(e) => {
+                              const next = [...donationPresets];
+                              next[idx] = {
+                                ...next[idx],
+                                amount: Number(e.target.value),
+                              };
+                              setDonationPresets(next);
+                            }}
+                            className="w-28"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDonationPresets(
+                                donationPresets.filter((_, i) => i !== idx),
+                              )
+                            }
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setDonationPresets([
+                            ...donationPresets,
+                            { label: "", amount: 0 },
+                          ])
+                        }
+                        className="w-full"
+                      >
+                        <Plus className="w-4 h-4 ml-1" />
+                        إضافة مبلغ
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Progress messages */}
+                  <div>
+                    <Label className="mb-2 block">رسائل التقدم</Label>
+                    <div className="space-y-2">
+                      {progressMessages.map((pm, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground w-10 shrink-0 text-center">
+                            %{pm.percent}
+                          </span>
+                          <Input
+                            placeholder="الرسالة"
+                            value={pm.message}
+                            onChange={(e) => {
+                              const next = [...progressMessages];
+                              next[idx] = {
+                                ...next[idx],
+                                message: e.target.value,
+                              };
+                              setProgressMessages(next);
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
         </div>
       </div>
     </div>

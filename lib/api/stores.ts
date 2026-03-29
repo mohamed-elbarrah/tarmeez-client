@@ -29,6 +29,7 @@ export async function getStoreBySlug(slug: string) {
     themeId: s.themeId ?? null,
     theme: s.theme ?? null,
     isOnboarded: s.isOnboarded ?? false,
+    activityType: s.activityType ?? "RETAIL",
     logo: s.logo ?? null,
     logoWidth: s.logoWidth ?? null,
     logoHeight: s.logoHeight ?? null,

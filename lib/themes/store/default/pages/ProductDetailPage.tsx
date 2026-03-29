@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { StoreProduct, StoreData, ProductVariant } from "@/lib/themes/types";
-import ProductCard from "@/lib/themes/store/default/components/ProductCard";
+import ConnectedProductCard from "@/lib/themes/store/default/components/ConnectedProductCard";
 import ProductImage from "@/lib/themes/store/default/components/ProductImage";
 import StarRating from "@/lib/themes/store/default/components/StarRating";
 import VariantSelector from "@/lib/themes/store/default/components/VariantSelector";
@@ -684,10 +684,9 @@ export default function ProductDetailPage({ storeData, product }: Props) {
           <h2 className="text-2xl font-black">منتجات مشابهة</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {relatedProducts.map((p) => (
-              <ProductCard
+              <ConnectedProductCard
                 key={p.id}
                 product={p}
-                theme={theme}
                 storeSlug={storeSlug}
               />
             ))}

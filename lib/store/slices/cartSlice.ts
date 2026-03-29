@@ -11,6 +11,8 @@ export interface CartItem {
   variantId?: string;
   /** Human-readable map of selections e.g. { "اللون": "أحمر", "المقاس": "L" } */
   selectedOptions?: Record<string, string>;
+  /** True when this item is a donation (charity mode) */
+  isDonation?: boolean;
 }
 
 interface CartStore {

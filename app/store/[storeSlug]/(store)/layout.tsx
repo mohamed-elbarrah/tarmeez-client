@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getStoreBySlug } from "@/lib/api/stores";
-import Header from "@/lib/themes/store/default/components/Header";
-import Footer from "@/lib/themes/store/default/components/Footer";
+import Header from "@/components/storefront/core/Header";
+import Footer from "@/components/storefront/core/Footer";
 import { ThemeEngine } from "@/lib/themes/engine";
 
 export async function generateMetadata({
@@ -46,6 +46,7 @@ export default async function StoreLayout({
     <div
       style={cssVars}
       dir="rtl"
+      data-activity-type={store.activityType ?? "RETAIL"}
       className="store-root light min-h-screen flex flex-col"
     >
       <Script

@@ -74,6 +74,16 @@ export interface StoreProduct {
   averageRating?: number;
   reviewCount?: number;
   isWishlisted?: boolean;
+  quantity?: number;
+  donationMetadata?: {
+    isDonation?: boolean;
+    targetAmount?: number;
+    currentAmount?: number;
+    donationOptions?: number[];
+    donationLabels?: Record<string, string>;
+    allowCustomAmount?: boolean;
+    progressMessages?: Record<string, string>;
+  } | null;
 }
 
 export interface StoreMerchant {
@@ -111,6 +121,8 @@ export interface StoreData {
   fontFamily?: string | null;
   borderRadius?: string | null;
   themeId?: string | null;
+  /** Store activity type — determines which theme branch to use */
+  activityType?: "RETAIL" | "CHARITY";
   /** Populated from the Theme relation — null when no theme is linked yet */
   theme?: ActiveTheme | null;
   products?: StoreProduct[];
@@ -121,4 +133,32 @@ export interface StoreData {
 export interface ThemeProps {
   storeData: StoreData;
   initialView?: string;
+}
+
+/**
+ * Global Widget Contract: ProductCard
+ * Strictly serializable (primitives/flat objects) for Visual Page Builder compatibility.
+ */
+export interface WidgetProductCardProps {
+  id: string | number;
+  title: string;
+  imageUrl: string | null;
+  displayPrice?: string;
+  discountBadge?: string;
+
+  primaryActionText: string;
+  /** Icon name (e.g., 'plus', 'heart') or pre-rendered node (for flexibility) */
+  primaryActionIcon?: React.ReactNode;
+
+  productUrl: string;
+
+  // Charity/Specialized Fields (Optional)
+  progressBarPercent?: number;
+  progressMessage?: string;
+  goalDisplay?: string;
+  collectedDisplay?: string;
+  donationPresets?: number[];
+  allowCustomAmount?: boolean;
+
+  onPrimaryAction: (payload?: { amount?: number }) => void;
 }

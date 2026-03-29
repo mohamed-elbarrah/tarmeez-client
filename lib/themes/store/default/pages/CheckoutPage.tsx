@@ -26,6 +26,20 @@ const checkoutSchema = z.object({
   notes: z.string().optional(),
 });
 
+const donationCheckoutSchema = z.object({
+  customerName: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
+  customerPhone: z.string().min(10, "رقم الجوال غير صحيح"),
+  customerEmail: z
+    .string()
+    .email("بريد إلكتروني غير صحيح")
+    .optional()
+    .or(z.literal("")),
+  city: z.string().optional(),
+  region: z.string().optional(),
+  street: z.string().optional(),
+  notes: z.string().optional(),
+});
+
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 interface Props {
@@ -34,17 +48,22 @@ interface Props {
 }
 
 export default function CheckoutPage({ theme, storeSlug }: Props) {
+  const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || []);
+  const isDonationOnly =
+    cart.length > 0 && cart.every((i: any) => i.isDonation);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CheckoutFormData>({
-    resolver: zodResolver(checkoutSchema),
+    resolver: zodResolver(
+      isDonationOnly ? donationCheckoutSchema : checkoutSchema,
+    ),
   });
   const [createOrder, { isLoading }] = useCreateOrderMutation();
   const [validateCoupon, { isLoading: isValidating }] =
     useValidateCouponMutation();
-  const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items || []);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -94,7 +113,10 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
     try {
       const res: any = await createOrder(payload).unwrap();
       dispatch(clearCart(storeSlug));
-      router.push(`/store/${storeSlug}/order-success?code=${res.orderCode}`);
+      const successUrl = isDonationOnly
+        ? `/store/${storeSlug}/order-success?code=${res.orderCode}&type=donation`
+        : `/store/${storeSlug}/order-success?code=${res.orderCode}`;
+      router.push(successUrl);
     } catch (err: any) {
       console.error("Order creation error:", err);
       const errorMessage = Array.isArray(err?.data?.message)
@@ -114,19 +136,23 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-black mb-8">إتمام عملية الشراء</h1>
+      <h1 className="text-2xl font-black mb-8">
+        {isDonationOnly ? "تأكيد التبرع" : "إتمام عملية الشراء"}
+      </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-8 border rounded-lg">
-            <h2 className="text-lg font-black mb-4">عنوان الشحن</h2>
+            <h2 className="text-lg font-black mb-4">
+              {isDonationOnly ? "بيانات المتبرع" : "عنوان الشحن"}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="space-y-1">
                 <input
                   {...register("customerName")}
-                  placeholder="الاسم الكامل"
+                  placeholder={isDonationOnly ? "اسم المتبرع" : "الاسم الكامل"}
                   className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.customerName ? "border-red-500" : ""}`}
                 />
                 {errors.customerName && (
@@ -159,42 +185,46 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
                   </p>
                 )}
               </div>
-              <div className="space-y-1">
-                <input
-                  {...register("city")}
-                  placeholder="المدينة"
-                  className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.city ? "border-red-500" : ""}`}
-                />
-                {errors.city && (
-                  <p className="text-red-500 text-[10px] pr-2">
-                    {errors.city.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <input
-                  {...register("region")}
-                  placeholder="المنطقة"
-                  className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.region ? "border-red-500" : ""}`}
-                />
-                {errors.region && (
-                  <p className="text-red-500 text-[10px] pr-2">
-                    {errors.region.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <input
-                  {...register("street")}
-                  placeholder="الشارع"
-                  className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.street ? "border-red-500" : ""}`}
-                />
-                {errors.street && (
-                  <p className="text-red-500 text-[10px] pr-2">
-                    {errors.street.message}
-                  </p>
-                )}
-              </div>
+              {!isDonationOnly && (
+                <>
+                  <div className="space-y-1">
+                    <input
+                      {...register("city")}
+                      placeholder="المدينة"
+                      className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.city ? "border-red-500" : ""}`}
+                    />
+                    {errors.city && (
+                      <p className="text-red-500 text-[10px] pr-2">
+                        {errors.city.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <input
+                      {...register("region")}
+                      placeholder="المنطقة"
+                      className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.region ? "border-red-500" : ""}`}
+                    />
+                    {errors.region && (
+                      <p className="text-red-500 text-[10px] pr-2">
+                        {errors.region.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <input
+                      {...register("street")}
+                      placeholder="الشارع"
+                      className={`w-full p-3 bg-slate-50 border rounded-lg ${errors.street ? "border-red-500" : ""}`}
+                    />
+                    {errors.street && (
+                      <p className="text-red-500 text-[10px] pr-2">
+                        {errors.street.message}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
               <div className="md:col-span-2 space-y-1">
                 <textarea
                   {...register("notes")}
@@ -223,7 +253,9 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
 
         <div className="w-full lg:w-96">
           <div className="bg-white p-8 border rounded-lg sticky top-6">
-            <h3 className="text-lg font-black mb-6 text-center">ملخص الطلب</h3>
+            <h3 className="text-lg font-black mb-6 text-center">
+              {isDonationOnly ? "ملخص التبرع" : "ملخص الطلب"}
+            </h3>
             <div className="space-y-4 mb-6">
               {cart.map((item: any) => (
                 <div key={item.id} className="flex gap-2 items-center">
@@ -339,10 +371,12 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
                   <span>- {appliedCoupon.discount.toLocaleString()} ر.س</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm font-bold text-green-500">
-                <span>رسوم الشحن</span>
-                <span>مجاني</span>
-              </div>
+              {!isDonationOnly && (
+                <div className="flex justify-between text-sm font-bold text-green-500">
+                  <span>رسوم الشحن</span>
+                  <span>مجاني</span>
+                </div>
+              )}
               <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t border-dashed">
                 <span>الإجمالي</span>
                 <span className="text-[var(--p-color)]">
@@ -357,7 +391,11 @@ export default function CheckoutPage({ theme, storeSlug }: Props) {
               type="submit"
               className="w-full py-4 text-white font-black rounded-xl bg-[var(--p-color)] hover:shadow-lg transition-all"
             >
-              {isLoading ? "جاري المعالجة..." : "إتمام الطلب"}
+              {isLoading
+                ? "جاري المعالجة..."
+                : isDonationOnly
+                  ? "تأكيد التبرع 💚"
+                  : "إتمام الطلب"}
             </button>
           </div>
         </div>

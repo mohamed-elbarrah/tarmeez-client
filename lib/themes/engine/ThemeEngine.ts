@@ -100,10 +100,20 @@ export class ThemeEngine {
   }
 
   /**
-   * Convenience: returns the active theme slug, falling back to 'default'.
-   * Use this to select the correct theme component from the registry.
+   * Convenience: returns the active theme slug.
+   * Logic:
+   * 1. If a theme is explicitly set in the DB, use its slug.
+   * 2. If no theme is set OR theme is 'default', but activityType is 'CHARITY', route to 'charity'.
+   * 3. Fall back to 'default'.
    */
   getThemeSlug(): string {
-    return this.activeTheme?.slug ?? "default";
+    const slug = this.activeTheme?.slug ?? "default";
+    
+    // Automatic Migration Logic (Constraint 3)
+    if (slug === "default" && this.storeData.activityType === "CHARITY") {
+      return "charity";
+    }
+
+    return slug;
   }
 }
