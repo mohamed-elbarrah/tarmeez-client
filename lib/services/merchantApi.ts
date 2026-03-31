@@ -2,7 +2,6 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 import type { MerchantDashboardData, StoreSettings } from "@/lib/types/auth";
 
-
 export const merchantApi = createApi({
   reducerPath: "merchantApi",
   baseQuery: baseQueryWithReauth,
@@ -97,9 +96,13 @@ export const merchantApi = createApi({
       async onQueryStarted(patch, { dispatch, queryFulfilled }) {
         // Optimistically apply the patch so the UI reflects changes immediately
         const patchResult = dispatch(
-          merchantApi.util.updateQueryData("getSettings", undefined, (draft) => {
-            Object.assign(draft, patch);
-          }),
+          merchantApi.util.updateQueryData(
+            "getSettings",
+            undefined,
+            (draft) => {
+              Object.assign(draft, patch);
+            },
+          ),
         );
         try {
           await queryFulfilled;
@@ -121,8 +124,6 @@ export const merchantApi = createApi({
   }),
 });
 
-
-
 export const {
   useGetMyStoreQuery,
   useGetCustomersQuery,
@@ -131,11 +132,10 @@ export const {
   useGetOrderByCodeQuery,
   useUpdateOrderStatusMutation,
   useSwitchThemeMutation,
-    useGetAvailableThemesQuery,
-    useGetSettingsQuery,
-    useUpdateSettingsMutation,
-    useUploadStoreImageMutation,
-  } = merchantApi;
-
+  useGetAvailableThemesQuery,
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+  useUploadStoreImageMutation,
+} = merchantApi;
 
 export default merchantApi;

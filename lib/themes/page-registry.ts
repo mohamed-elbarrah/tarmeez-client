@@ -63,7 +63,9 @@ type SimpleThemeProps = {
   theme: ThemeTokens;
   storeSlug: string;
   activityType?: "RETAIL" | "CHARITY";
-  checkoutFieldsConfig?: import("@/lib/types/auth").CheckoutFieldConfig[] | null;
+  checkoutFieldsConfig?:
+    | import("@/lib/types/auth").CheckoutFieldConfig[]
+    | null;
 };
 
 type AuthPageProps = {

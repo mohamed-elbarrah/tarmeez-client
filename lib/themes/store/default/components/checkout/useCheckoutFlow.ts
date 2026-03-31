@@ -19,14 +19,53 @@ export type { CheckoutFieldConfig };
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
 export const DEFAULT_CHECKOUT_FIELDS: CheckoutFieldConfig[] = [
-  { id: "name",    type: "text",    label: "الاسم الكامل",       placeholder: "أدخل اسمك الكامل", enabled: true, required: true,  isCustom: false, sortOrder: 0 },
-  { id: "phone",   type: "phone",   label: "رقم الجوال",         placeholder: "9665xxxxxxxx",     enabled: true, required: true,  isCustom: false, sortOrder: 1 },
-  { id: "email",   type: "email",   label: "البريد الإلكتروني",  placeholder: "example@mail.com", enabled: true, required: false, isCustom: false, sortOrder: 2 },
-  { id: "address", type: "address", label: "العنوان",             placeholder: "",                 enabled: true, required: true,  isCustom: false, sortOrder: 3 },
+  {
+    id: "name",
+    type: "text",
+    label: "الاسم الكامل",
+    placeholder: "أدخل اسمك الكامل",
+    enabled: true,
+    required: true,
+    isCustom: false,
+    sortOrder: 0,
+  },
+  {
+    id: "phone",
+    type: "phone",
+    label: "رقم الجوال",
+    placeholder: "9665xxxxxxxx",
+    enabled: true,
+    required: true,
+    isCustom: false,
+    sortOrder: 1,
+  },
+  {
+    id: "email",
+    type: "email",
+    label: "البريد الإلكتروني",
+    placeholder: "example@mail.com",
+    enabled: true,
+    required: false,
+    isCustom: false,
+    sortOrder: 2,
+  },
+  {
+    id: "address",
+    type: "address",
+    label: "العنوان",
+    placeholder: "",
+    enabled: true,
+    required: true,
+    isCustom: false,
+    sortOrder: 3,
+  },
 ];
 
-function normalizeConfig(raw?: CheckoutFieldConfig[] | null): CheckoutFieldConfig[] {
-  if (!raw || !Array.isArray(raw) || raw.length === 0) return DEFAULT_CHECKOUT_FIELDS;
+function normalizeConfig(
+  raw?: CheckoutFieldConfig[] | null,
+): CheckoutFieldConfig[] {
+  if (!raw || !Array.isArray(raw) || raw.length === 0)
+    return DEFAULT_CHECKOUT_FIELDS;
   return [...raw].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
@@ -46,7 +85,7 @@ export interface CheckoutFormValues {
 // ─── Map field.id → core form key ─────────────────────────────────────────────
 
 const FIELD_TO_FORM_KEY: Record<string, keyof CheckoutFormValues> = {
-  name:  "customerName",
+  name: "customerName",
   phone: "customerPhone",
   email: "customerEmail",
 };
@@ -59,13 +98,13 @@ export function fieldToFormKey(fieldId: string): string {
 
 function buildCheckoutSchema(fields: CheckoutFieldConfig[]) {
   const shape: Record<string, z.ZodTypeAny> = {
-    customerName:  z.string(),
+    customerName: z.string(),
     customerPhone: z.string(),
     customerEmail: z.string().optional().or(z.literal("")),
-    city:    z.string().optional(),
-    region:  z.string().optional(),
-    street:  z.string().optional(),
-    notes:   z.string().optional(),
+    city: z.string().optional(),
+    region: z.string().optional(),
+    street: z.string().optional(),
+    notes: z.string().optional(),
   };
 
   for (const field of fields) {
@@ -84,7 +123,11 @@ function buildCheckoutSchema(fields: CheckoutFieldConfig[]) {
       case "email":
         shape.customerEmail = field.required
           ? z.string().email(`${field.label} غير صحيح`)
-          : z.string().email(`${field.label} غير صحيح`).optional().or(z.literal(""));
+          : z
+              .string()
+              .email(`${field.label} غير صحيح`)
+              .optional()
+              .or(z.literal(""));
         break;
       case "address":
         // sub-fields enforced via setError in onFormSubmit
@@ -112,7 +155,10 @@ export function useCheckoutFlow(
 
   const checkoutFields = normalizeConfig(rawConfig);
   const addrField = checkoutFields.find((f) => f.id === "address");
-  const addrRequired = !isDonationOnly && (addrField?.enabled ?? true) && (addrField?.required ?? true);
+  const addrRequired =
+    !isDonationOnly &&
+    (addrField?.enabled ?? true) &&
+    (addrField?.required ?? true);
 
   const {
     register,
@@ -124,19 +170,25 @@ export function useCheckoutFlow(
   });
 
   const [createOrder, { isLoading }] = useCreateOrderMutation();
-  const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation();
+  const [validateCoupon, { isLoading: isValidating }] =
+    useValidateCouponMutation();
 
   // ── Analytics ────────────────────────────────────────────────────────────
   const cartRef = useRef(cart);
   useEffect(() => {
-    const subtotal = cartRef.current.reduce((s, i) => s + i.price * i.quantity, 0);
+    const subtotal = cartRef.current.reduce(
+      (s, i) => s + i.price * i.quantity,
+      0,
+    );
     dispatch(checkoutStarted({ storeRef: storeSlug, cartTotal: subtotal }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Coupon ────────────────────────────────────────────────────────────────
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
   const [couponError, setCouponError] = useState<string | null>(null);
 
   const handleApplyCoupon = async () => {
@@ -179,12 +231,17 @@ export function useCheckoutFlow(
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const onFormSubmit = async (data: CheckoutFormValues) => {
-    if (cart.length === 0) { alert("سلة الشراء فارغة"); return; }
+    if (cart.length === 0) {
+      alert("سلة الشراء فارغة");
+      return;
+    }
 
     if (addrRequired) {
       let valid = true;
       if (!data.city || data.city.length < 2) {
-        setError("city", { message: `${addrField?.label ?? "العنوان"} — المدينة مطلوبة` });
+        setError("city", {
+          message: `${addrField?.label ?? "العنوان"} — المدينة مطلوبة`,
+        });
         valid = false;
       }
       if (!data.region || data.region.length < 2) {
@@ -218,7 +275,10 @@ export function useCheckoutFlow(
       customerEmail: data.customerEmail || undefined,
       shippingAddress,
       paymentMethod: "cash_on_delivery",
-      items: cart.map((i) => ({ productId: String(i.id), quantity: i.quantity })),
+      items: cart.map((i) => ({
+        productId: String(i.id),
+        quantity: i.quantity,
+      })),
       notes: data.notes || undefined,
       storeSlug: String(storeSlug),
       ...(Object.keys(customFields).length > 0 ? { customFields } : {}),
@@ -233,10 +293,15 @@ export function useCheckoutFlow(
         : `/store/${storeSlug}/order-success?code=${res.orderCode}`;
       router.push(successUrl);
     } catch (err: unknown) {
-      const apiErr = err as { data?: { message?: string | string[] }; message?: string };
+      const apiErr = err as {
+        data?: { message?: string | string[] };
+        message?: string;
+      };
       const raw = apiErr?.data?.message;
       const errorMessage = Array.isArray(raw)
-        ? raw.map((m) => (typeof m === "object" ? JSON.stringify(m) : m)).join("\n")
+        ? raw
+            .map((m) => (typeof m === "object" ? JSON.stringify(m) : m))
+            .join("\n")
         : (raw ?? apiErr?.message ?? "خطأ أثناء إنشاء الطلب");
       alert(errorMessage);
     }

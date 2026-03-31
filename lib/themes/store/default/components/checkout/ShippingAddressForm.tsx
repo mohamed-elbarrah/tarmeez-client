@@ -16,7 +16,14 @@ interface FieldInputProps {
   colSpan?: "full" | "half";
 }
 
-function FieldInput({ formKey, placeholder, type = "text", register, error, colSpan = "half" }: FieldInputProps) {
+function FieldInput({
+  formKey,
+  placeholder,
+  type = "text",
+  register,
+  error,
+  colSpan = "half",
+}: FieldInputProps) {
   return (
     <div className={`space-y-1${colSpan === "full" ? " md:col-span-2" : ""}`}>
       <input
@@ -32,7 +39,11 @@ function FieldInput({ formKey, placeholder, type = "text", register, error, colS
 
 // ─── Address compound field ──────────────────────────────────────────────────
 
-function AddressFields({ field, register, errors }: {
+function AddressFields({
+  field,
+  register,
+  errors,
+}: {
   field: CheckoutFieldConfig;
   register: ReturnType<typeof useCheckoutContext>["register"];
   errors: ReturnType<typeof useCheckoutContext>["errors"];
@@ -70,7 +81,8 @@ function AddressFields({ field, register, errors }: {
  * correct <input type> and handling the special `address` compound field.
  */
 export default function ShippingAddressForm() {
-  const { register, errors, isDonationOnly, checkoutFields } = useCheckoutContext();
+  const { register, errors, isDonationOnly, checkoutFields } =
+    useCheckoutContext();
 
   const visibleFields = checkoutFields
     .filter((f) => f.enabled)
@@ -95,7 +107,11 @@ export default function ShippingAddressForm() {
           if (field.id === "address") {
             return (
               <React.Fragment key="address">
-                <AddressFields field={field} register={register} errors={errors} />
+                <AddressFields
+                  field={field}
+                  register={register}
+                  errors={errors}
+                />
               </React.Fragment>
             );
           }
@@ -103,7 +119,9 @@ export default function ShippingAddressForm() {
           // Textarea type
           if (field.type === "textarea") {
             const formKey = fieldToFormKey(field.id);
-            const errMsg = (errors as any)[formKey]?.message as string | undefined;
+            const errMsg = (errors as any)[formKey]?.message as
+              | string
+              | undefined;
             return (
               <div key={field.id} className="md:col-span-2 space-y-1">
                 <textarea
@@ -111,14 +129,18 @@ export default function ShippingAddressForm() {
                   placeholder={field.placeholder || field.label}
                   className={`w-full p-3 bg-slate-50 border rounded-lg h-24 ${errMsg ? "border-red-500" : "border-slate-200"}`}
                 />
-                {errMsg && <p className="text-red-500 text-[10px] pr-2">{errMsg}</p>}
+                {errMsg && (
+                  <p className="text-red-500 text-[10px] pr-2">{errMsg}</p>
+                )}
               </div>
             );
           }
 
           // All other field types → single input
           const formKey = fieldToFormKey(field.id);
-          const errMsg = (errors as any)[formKey]?.message as string | undefined;
+          const errMsg = (errors as any)[formKey]?.message as
+            | string
+            | undefined;
           const inputType = inputTypeMap[field.type] ?? "text";
 
           return (

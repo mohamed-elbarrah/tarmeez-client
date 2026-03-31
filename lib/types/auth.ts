@@ -33,7 +33,12 @@ export interface StoreBrandInfo extends StoreInfo {
   isTaxEnabled?: boolean;
 }
 
-export type CheckoutFieldType = 'text' | 'phone' | 'email' | 'textarea' | 'address';
+export type CheckoutFieldType =
+  | "text"
+  | "phone"
+  | "email"
+  | "textarea"
+  | "address";
 
 export interface CheckoutFieldConfig {
   /** Stable field id — 'name' | 'phone' | 'email' | 'address' for core fields; UUID for custom */

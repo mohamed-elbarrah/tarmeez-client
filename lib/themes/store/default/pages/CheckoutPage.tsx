@@ -19,7 +19,10 @@ interface Props {
  * Orchestrator — bootstraps CheckoutContext and delegates layout to organisms.
  * Zero business logic: form flow, coupon, and order creation live in useCheckoutFlow.
  */
-export default function CheckoutPage({ storeSlug, checkoutFieldsConfig }: Props) {
+export default function CheckoutPage({
+  storeSlug,
+  checkoutFieldsConfig,
+}: Props) {
   const checkoutValue = useCheckoutFlow(storeSlug, checkoutFieldsConfig);
 
   return (

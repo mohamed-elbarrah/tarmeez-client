@@ -52,28 +52,36 @@ import { SocialLinksRepeater } from "@/components/merchant/SocialLinksRepeater";
 import { cn } from "@/lib/utils";
 
 const checkoutFieldSchema = z.object({
-  id:          z.string(),
-  type:        z.enum(['text', 'phone', 'email', 'textarea', 'address']),
-  label:       z.string(),
+  id: z.string(),
+  type: z.enum(["text", "phone", "email", "textarea", "address"]),
+  label: z.string(),
   placeholder: z.string().optional(),
-  enabled:     z.boolean(),
-  required:    z.boolean(),
-  isCustom:    z.boolean(),
-  sortOrder:   z.number(),
+  enabled: z.boolean(),
+  required: z.boolean(),
+  isCustom: z.boolean(),
+  sortOrder: z.number(),
 });
 
 const settingsSchema = z.object({
   logo: z.string().nullable().optional(),
   favicon: z.string().nullable().optional(),
-  supportEmail: z.string().email("البريد الإلكتروني غير صحيح").nullable().optional().or(z.literal("")),
+  supportEmail: z
+    .string()
+    .email("البريد الإلكتروني غير صحيح")
+    .nullable()
+    .optional()
+    .or(z.literal("")),
   supportWhatsapp: z.string().nullable().optional(),
-  socialLinks: z.array(
-    z.object({
-      platform: z.string(),
-      url: z.string().url("يجب أن يكون الرابط صحيحاً"),
-      icon: z.string().optional(),
-    })
-  ).nullable().optional(),
+  socialLinks: z
+    .array(
+      z.object({
+        platform: z.string(),
+        url: z.string().url("يجب أن يكون الرابط صحيحاً"),
+        icon: z.string().optional(),
+      }),
+    )
+    .nullable()
+    .optional(),
   systemCurrency: z.string().min(1, "العملة مطلوبة"),
   currencyIcon: z.string().nullable().optional(),
   taxNumber: z.string().nullable().optional(),
@@ -88,10 +96,16 @@ export default function SettingsPage() {
   const { role, isEditor, canUpdate } = useRole();
   const canModify = !isEditor && canUpdate(Resource.SETTINGS);
 
-  console.log('[SettingsPage] Current User Role:', role, 'canModify:', canModify);
+  console.log(
+    "[SettingsPage] Current User Role:",
+    role,
+    "canModify:",
+    canModify,
+  );
 
   const { data: settings, isLoading, isError } = useGetSettingsQuery();
-  const [updateSettings, { isLoading: isUpdating }] = useUpdateSettingsMutation();
+  const [updateSettings, { isLoading: isUpdating }] =
+    useUpdateSettingsMutation();
 
   const {
     register,
@@ -117,9 +131,11 @@ export default function SettingsPage() {
         ...settings,
         supportEmail: settings.supportEmail || "",
         socialLinks: settings.socialLinks || [],
-      checkoutFieldsConfig: (Array.isArray(settings.checkoutFieldsConfig) && settings.checkoutFieldsConfig.length > 0)
-          ? (settings.checkoutFieldsConfig as CheckoutFieldConfig[])
-          : DEFAULT_CHECKOUT_FIELDS,
+        checkoutFieldsConfig:
+          Array.isArray(settings.checkoutFieldsConfig) &&
+          settings.checkoutFieldsConfig.length > 0
+            ? (settings.checkoutFieldsConfig as CheckoutFieldConfig[])
+            : DEFAULT_CHECKOUT_FIELDS,
       });
     }
   }, [settings, reset]);
@@ -147,7 +163,10 @@ export default function SettingsPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-4" dir="rtl">
+      <div
+        className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-4"
+        dir="rtl"
+      >
         <AlertCircle className="w-12 h-12 text-destructive opacity-50" />
         <h2 className="text-xl font-bold">عذراً، حدث خطأ ما</h2>
         <p className="text-muted-foreground">فشل تحميل الإعدادات من الخادم</p>
@@ -179,11 +198,15 @@ export default function SettingsPage() {
               </Tooltip>
             )}
             <div>
-              <h1 className="text-2xl font-bold font-heading">إعدادات المتجر</h1>
-              <p className="text-sm text-muted-foreground mt-1">تخصيص هوية المتجر، العملات، الضرائب، وروابط التواصل.</p>
+              <h1 className="text-2xl font-bold font-heading">
+                إعدادات المتجر
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                تخصيص هوية المتجر، العملات، الضرائب، وروابط التواصل.
+              </p>
             </div>
           </div>
-          
+
           {!isDirty && settings && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
               <Check className="w-3.5 h-3.5" />
@@ -218,11 +241,16 @@ export default function SettingsPage() {
             </TabsList>
 
             {/* Tab 1: Basic Info */}
-            <TabsContent value="basic" className="space-y-6 animate-in fade-in-50 duration-500">
+            <TabsContent
+              value="basic"
+              className="space-y-6 animate-in fade-in-50 duration-500"
+            >
               <Card className="border-border/50 shadow-sm overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                   <CardTitle className="text-lg">المعلومات الأساسية</CardTitle>
-                  <CardDescription>إدارة هوية العلامة التجارية وبيانات التواصل.</CardDescription>
+                  <CardDescription>
+                    إدارة هوية العلامة التجارية وبيانات التواصل.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -230,21 +258,28 @@ export default function SettingsPage() {
                       label="شعار المتجر (Logo)"
                       description="يُنصح بـ 500x500 بكسل، خلفية شفافة."
                       value={watch("logo")}
-                      onChange={(url) => setValue("logo", url, { shouldDirty: true })}
+                      onChange={(url) =>
+                        setValue("logo", url, { shouldDirty: true })
+                      }
                       disabled={!canModify}
                     />
                     <AssetUploader
                       label="أيقونة المتجر (Favicon)"
                       description="يُنصح بـ 32x32 بكسل (ICO/PNG)."
                       value={watch("favicon")}
-                      onChange={(url) => setValue("favicon", url, { shouldDirty: true })}
+                      onChange={(url) =>
+                        setValue("favicon", url, { shouldDirty: true })
+                      }
                       disabled={!canModify}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="supportEmail" className="gap-2 flex items-center">
+                      <Label
+                        htmlFor="supportEmail"
+                        className="gap-2 flex items-center"
+                      >
                         <Mail className="w-3.5 h-3.5 text-muted-foreground" />
                         البريد الإلكتروني للدعم
                       </Label>
@@ -254,13 +289,24 @@ export default function SettingsPage() {
                         placeholder="support@yourstore.com"
                         dir="ltr"
                         disabled={!canModify}
-                        className={errors.supportEmail ? "border-destructive focus:ring-destructive" : "focus:ring-primary"}
+                        className={
+                          errors.supportEmail
+                            ? "border-destructive focus:ring-destructive"
+                            : "focus:ring-primary"
+                        }
                       />
-                      {errors.supportEmail && <p className="text-[10px] text-destructive">{errors.supportEmail.message}</p>}
+                      {errors.supportEmail && (
+                        <p className="text-[10px] text-destructive">
+                          {errors.supportEmail.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="supportWhatsapp" className="gap-2 flex items-center">
+                      <Label
+                        htmlFor="supportWhatsapp"
+                        className="gap-2 flex items-center"
+                      >
                         <Phone className="w-3.5 h-3.5 text-muted-foreground" />
                         رقم واتساب للدعم
                       </Label>
@@ -283,7 +329,9 @@ export default function SettingsPage() {
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="bg-muted/30 border-b">
                   <CardTitle className="text-lg">العملة والإقليمية</CardTitle>
-                  <CardDescription>تحديد العملة وشكل عرض الأسعار في المتجر.</CardDescription>
+                  <CardDescription>
+                    تحديد العملة وشكل عرض الأسعار في المتجر.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -298,50 +346,66 @@ export default function SettingsPage() {
                           className="focus:ring-primary"
                         />
                       </div>
-                      
+
                       <AssetUploader
                         label="أيقونة العملة (Currency Icon)"
                         description="أيقونة صغيرة تظهر بجانب السعر (SVG يُفضل)."
                         value={currencyIcon}
-                        onChange={(url) => setValue("currencyIcon", url, { shouldDirty: true })}
+                        onChange={(url) =>
+                          setValue("currencyIcon", url, { shouldDirty: true })
+                        }
                         disabled={!canModify}
                       />
                     </div>
 
                     <div className="space-y-4">
-                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">معاينة عرض السعر في المتجر</Label>
+                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        معاينة عرض السعر في المتجر
+                      </Label>
                       <div className="group relative">
                         {/* Premium Card Preview */}
                         <div className="p-8 rounded-3xl bg-neutral-50 dark:bg-neutral-900 border border-border/50 flex flex-col items-center justify-center gap-6 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/20">
                           {/* Decorative elements */}
                           <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-50" />
                           <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-50" />
-                          
+
                           <div className="bg-background rounded-2xl p-6 shadow-2xl border border-border/40 flex items-center gap-4 min-w-[240px] transform transition-transform group-hover:scale-105 duration-500 relative z-10">
                             <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center overflow-hidden border border-primary/10">
                               {currencyIcon ? (
-                                <img src={currencyIcon} alt="Icon" className="w-8 h-8 object-contain" />
+                                <img
+                                  src={currencyIcon}
+                                  alt="Icon"
+                                  className="w-8 h-8 object-contain"
+                                />
                               ) : (
-                                <span className="text-xl font-bold text-primary">{currentCurrency}</span>
+                                <span className="text-xl font-bold text-primary">
+                                  {currentCurrency}
+                                </span>
                               )}
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-xs text-muted-foreground font-medium">سعر المنتج المختصر</span>
+                              <span className="text-xs text-muted-foreground font-medium">
+                                سعر المنتج المختصر
+                              </span>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-bold text-primary mr-1">{currentCurrency}</span>
-                                <span className="text-3xl font-black tracking-tight font-mono text-foreground font-sans">100.00</span>
+                                <span className="text-sm font-bold text-primary mr-1">
+                                  {currentCurrency}
+                                </span>
+                                <span className="text-3xl font-black tracking-tight font-mono text-foreground font-sans">
+                                  100.00
+                                </span>
                               </div>
                             </div>
                           </div>
 
                           <div className="flex gap-2 relative z-10">
-                             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:-0.3s]" />
-                             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:-0.15s]" />
-                             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" />
+                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:-0.3s]" />
+                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:-0.15s]" />
+                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" />
                           </div>
 
                           <p className="text-[10px] font-medium text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-full border border-border/50 relative z-10">
-                             عرض تجريبي للشكل النهائي في المتجر
+                            عرض تجريبي للشكل النهائي في المتجر
                           </p>
                         </div>
                       </div>
@@ -355,13 +419,19 @@ export default function SettingsPage() {
             <TabsContent value="social" className="space-y-6">
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="bg-muted/30 border-b">
-                  <CardTitle className="text-lg">روابط التواصل الاجتماعي</CardTitle>
-                  <CardDescription>ستظهر هذه الروابط في تذييل المتجر (Footer).</CardDescription>
+                  <CardTitle className="text-lg">
+                    روابط التواصل الاجتماعي
+                  </CardTitle>
+                  <CardDescription>
+                    ستظهر هذه الروابط في تذييل المتجر (Footer).
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   <SocialLinksRepeater
                     value={watch("socialLinks") || []}
-                    onChange={(val) => setValue("socialLinks", val, { shouldDirty: true })}
+                    onChange={(val) =>
+                      setValue("socialLinks", val, { shouldDirty: true })
+                    }
                     disabled={!canModify}
                   />
                 </CardContent>
@@ -372,27 +442,43 @@ export default function SettingsPage() {
             <TabsContent value="tax" className="space-y-6">
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="bg-muted/30 border-b">
-                  <CardTitle className="text-lg">إعدادات الضرائب (VAT)</CardTitle>
-                  <CardDescription>تفعيل تطبيق الضريبة على الطلبات وإضافة الرقم الضريبي.</CardDescription>
+                  <CardTitle className="text-lg">
+                    إعدادات الضرائب (VAT)
+                  </CardTitle>
+                  <CardDescription>
+                    تفعيل تطبيق الضريبة على الطلبات وإضافة الرقم الضريبي.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-8">
                   <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border transition-colors hover:bg-muted/30">
                     <div className="space-y-0.5">
-                      <Label className="text-base cursor-pointer" htmlFor="tax-toggle">تفعيل الضريبة</Label>
-                      <p className="text-xs text-muted-foreground">سيتم احتساب الضريبة تلقائياً في الفاتورة.</p>
+                      <Label
+                        className="text-base cursor-pointer"
+                        htmlFor="tax-toggle"
+                      >
+                        تفعيل الضريبة
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        سيتم احتساب الضريبة تلقائياً في الفاتورة.
+                      </p>
                     </div>
                     <Switch
                       id="tax-toggle"
                       checked={isTaxEnabled}
-                      onCheckedChange={(val) => setValue("isTaxEnabled", val, { shouldDirty: true })}
+                      onCheckedChange={(val) =>
+                        setValue("isTaxEnabled", val, { shouldDirty: true })
+                      }
                       disabled={!canModify}
                     />
                   </div>
 
-                  <div className={cn(
-                    "grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300",
-                    !isTaxEnabled && "opacity-40 grayscale pointer-events-none"
-                  )}>
+                  <div
+                    className={cn(
+                      "grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300",
+                      !isTaxEnabled &&
+                        "opacity-40 grayscale pointer-events-none",
+                    )}
+                  >
                     <div className="space-y-2">
                       <Label htmlFor="taxNumber">الرقم الضريبي للمتجر</Label>
                       <Input
@@ -411,7 +497,9 @@ export default function SettingsPage() {
                         <Input
                           id="taxPercentage"
                           type="number"
-                          {...register("taxPercentage", { valueAsNumber: true })}
+                          {...register("taxPercentage", {
+                            valueAsNumber: true,
+                          })}
                           placeholder="15"
                           dir="ltr"
                           disabled={!canModify}
@@ -426,25 +514,33 @@ export default function SettingsPage() {
             </TabsContent>
 
             {/* Tab 5: Checkout Settings */}
-            <TabsContent value="checkout" className="space-y-6 animate-in fade-in-50 duration-500">
+            <TabsContent
+              value="checkout"
+              className="space-y-6 animate-in fade-in-50 duration-500"
+            >
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="bg-muted/30 border-b">
                   <CardTitle className="text-lg">إعدادات صفحة الدفع</CardTitle>
                   <CardDescription>
-                    تحكم في حقول الطلب — اضبط التسمية، النص التوضيحي، والإلزامية لكل حقل.
-                    اسحب وأفلت لترتيب الحقول.
+                    تحكم في حقول الطلب — اضبط التسمية، النص التوضيحي، والإلزامية
+                    لكل حقل. اسحب وأفلت لترتيب الحقول.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
                   <CheckoutFieldsEditor
-                    value={(checkoutFieldsConfig as CheckoutFieldConfig[]) ?? []}
+                    value={
+                      (checkoutFieldsConfig as CheckoutFieldConfig[]) ?? []
+                    }
                     onChange={(fields) =>
-                      setValue("checkoutFieldsConfig", fields, { shouldDirty: true })
+                      setValue("checkoutFieldsConfig", fields, {
+                        shouldDirty: true,
+                      })
                     }
                     disabled={!canModify}
                   />
                   <p className="text-[11px] text-muted-foreground pt-1">
-                    تنبيه: لا يمكن حذف الحقول الأساسية (اسم، جوال) لكن يمكن إخفاؤها أو تعديل تسميتها.
+                    تنبيه: لا يمكن حذف الحقول الأساسية (اسم، جوال) لكن يمكن
+                    إخفاؤها أو تعديل تسميتها.
                   </p>
                 </CardContent>
               </Card>
@@ -460,9 +556,11 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex-1 hidden md:block">
                   <p className="text-sm font-bold">لديك تغييرات غير محفوظة</p>
-                  <p className="text-[10px] text-muted-foreground">تأكد من الحفظ قبل مغادرة الصفحة</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    تأكد من الحفظ قبل مغادرة الصفحة
+                  </p>
                 </div>
-                
+
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Button
                     variant="outline"
