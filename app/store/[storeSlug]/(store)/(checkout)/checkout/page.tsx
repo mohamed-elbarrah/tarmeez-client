@@ -14,5 +14,5 @@ export default async function Page({
   const themeSlug = resolveThemeSlug(store);
   const theme = computeTheme(store);
   const CheckoutPage = getThemeCheckoutPage(themeSlug);
-  return <CheckoutPage theme={theme} storeSlug={storeSlug} />;
+  return <CheckoutPage theme={theme} storeSlug={storeSlug} checkoutFieldsConfig={store.checkoutFieldsConfig} />;
 }

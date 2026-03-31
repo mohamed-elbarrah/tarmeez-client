@@ -41,6 +41,7 @@ type HomePageProps = {
   products: StoreProduct[];
   storeSlug: string;
   categories?: StoreCategory[];
+  activityType?: "RETAIL" | "CHARITY";
 };
 
 type ProductDetailProps = {
@@ -55,12 +56,14 @@ type ProductsPageProps = {
   storeSlug: string;
   initialSearch?: string;
   initialCategory?: string;
+  activityType?: "RETAIL" | "CHARITY";
 };
 
 type SimpleThemeProps = {
   theme: ThemeTokens;
   storeSlug: string;
   activityType?: "RETAIL" | "CHARITY";
+  checkoutFieldsConfig?: import("@/lib/types/auth").CheckoutFieldConfig[] | null;
 };
 
 type AuthPageProps = {

@@ -10,42 +10,109 @@ import { useValidateCouponMutation } from "@/lib/services/couponsApi";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { clearCart } from "@/lib/store/slices/cartSlice";
 import { checkoutStarted } from "@/lib/store/analytics-listener";
+import type { CheckoutFieldConfig } from "@/lib/types/auth";
 import type { CheckoutContextValue, AppliedCoupon } from "./CheckoutContext";
 
-// ─── Schema ────────────────────────────────────────────────────────────────────
-// A single permissive schema — address fields are always optional at the schema
-// level. Required-field enforcement for non-donation orders happens in onSubmit
-// via setError, keeping useForm typed with one concrete value type throughout.
+// ─── Re-export for consumers ───────────────────────────────────────────────────
+export type { CheckoutFieldConfig };
 
-const checkoutFormSchema = z.object({
-  customerName: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
-  customerPhone: z.string().min(10, "رقم الجوال غير صحيح"),
-  customerEmail: z
-    .string()
-    .email("بريد إلكتروني غير صحيح")
-    .optional()
-    .or(z.literal("")),
-  city: z.string().optional(),
-  region: z.string().optional(),
-  street: z.string().optional(),
-  notes: z.string().optional(),
-});
+// ─── Defaults ─────────────────────────────────────────────────────────────────
 
-export type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
+export const DEFAULT_CHECKOUT_FIELDS: CheckoutFieldConfig[] = [
+  { id: "name",    type: "text",    label: "الاسم الكامل",       placeholder: "أدخل اسمك الكامل", enabled: true, required: true,  isCustom: false, sortOrder: 0 },
+  { id: "phone",   type: "phone",   label: "رقم الجوال",         placeholder: "9665xxxxxxxx",     enabled: true, required: true,  isCustom: false, sortOrder: 1 },
+  { id: "email",   type: "email",   label: "البريد الإلكتروني",  placeholder: "example@mail.com", enabled: true, required: false, isCustom: false, sortOrder: 2 },
+  { id: "address", type: "address", label: "العنوان",             placeholder: "",                 enabled: true, required: true,  isCustom: false, sortOrder: 3 },
+];
+
+function normalizeConfig(raw?: CheckoutFieldConfig[] | null): CheckoutFieldConfig[] {
+  if (!raw || !Array.isArray(raw) || raw.length === 0) return DEFAULT_CHECKOUT_FIELDS;
+  return [...raw].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+// ─── Form values ───────────────────────────────────────────────────────────────
+
+export interface CheckoutFormValues {
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  city?: string;
+  region?: string;
+  street?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
+// ─── Map field.id → core form key ─────────────────────────────────────────────
+
+const FIELD_TO_FORM_KEY: Record<string, keyof CheckoutFormValues> = {
+  name:  "customerName",
+  phone: "customerPhone",
+  email: "customerEmail",
+};
+
+export function fieldToFormKey(fieldId: string): string {
+  return (FIELD_TO_FORM_KEY[fieldId] as string) ?? fieldId;
+}
+
+// ─── Dynamic Zod schema builder ───────────────────────────────────────────────
+
+function buildCheckoutSchema(fields: CheckoutFieldConfig[]) {
+  const shape: Record<string, z.ZodTypeAny> = {
+    customerName:  z.string(),
+    customerPhone: z.string(),
+    customerEmail: z.string().optional().or(z.literal("")),
+    city:    z.string().optional(),
+    region:  z.string().optional(),
+    street:  z.string().optional(),
+    notes:   z.string().optional(),
+  };
+
+  for (const field of fields) {
+    if (!field.enabled) continue;
+    switch (field.id) {
+      case "name":
+        shape.customerName = field.required
+          ? z.string().min(3, `${field.label} يجب أن يكون 3 أحرف على الأقل`)
+          : z.string();
+        break;
+      case "phone":
+        shape.customerPhone = field.required
+          ? z.string().min(10, `${field.label} غير صحيح`)
+          : z.string();
+        break;
+      case "email":
+        shape.customerEmail = field.required
+          ? z.string().email(`${field.label} غير صحيح`)
+          : z.string().email(`${field.label} غير صحيح`).optional().or(z.literal(""));
+        break;
+      case "address":
+        // sub-fields enforced via setError in onFormSubmit
+        break;
+      default:
+        shape[field.id] = field.required
+          ? z.string().min(1, `${field.label} مطلوب`)
+          : z.string().optional().or(z.literal(""));
+    }
+  }
+
+  return z.object(shape);
+}
 
 // ─── Hook ──────────────────────────────────────────────────────────────────────
 
-/**
- * Owns ALL checkout logic: form validation, coupon application, order creation.
- * Returns a CheckoutContextValue ready to be passed into CheckoutContextProvider.
- *
- * Zero JSX — pure logic / RTK bridge.
- */
-export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
+export function useCheckoutFlow(
+  storeSlug: string,
+  rawConfig?: CheckoutFieldConfig[] | null,
+): CheckoutContextValue {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const cart = useAppSelector((s) => s.cart.carts[storeSlug]?.items ?? []);
   const isDonationOnly = cart.length > 0 && cart.every((i) => i.isDonation);
+
+  const checkoutFields = normalizeConfig(rawConfig);
+  const addrField = checkoutFields.find((f) => f.id === "address");
+  const addrRequired = !isDonationOnly && (addrField?.enabled ?? true) && (addrField?.required ?? true);
 
   const {
     register,
@@ -53,29 +120,23 @@ export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
     setError,
     formState: { errors },
   } = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutFormSchema),
+    resolver: zodResolver(buildCheckoutSchema(checkoutFields)) as any,
   });
 
   const [createOrder, { isLoading }] = useCreateOrderMutation();
-  const [validateCoupon, { isLoading: isValidating }] =
-    useValidateCouponMutation();
+  const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation();
 
-  // ── Analytics: fire checkout_start once ──────────────────────────────────
+  // ── Analytics ────────────────────────────────────────────────────────────
   const cartRef = useRef(cart);
   useEffect(() => {
-    const subtotal = cartRef.current.reduce(
-      (s, i) => s + i.price * i.quantity,
-      0,
-    );
+    const subtotal = cartRef.current.reduce((s, i) => s + i.price * i.quantity, 0);
     dispatch(checkoutStarted({ storeRef: storeSlug, cartTotal: subtotal }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Coupon ────────────────────────────────────────────────────────────────
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
-    null,
-  );
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
 
   const handleApplyCoupon = async () => {
@@ -118,16 +179,12 @@ export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const onFormSubmit = async (data: CheckoutFormValues) => {
-    if (cart.length === 0) {
-      alert("سلة الشراء فارغة");
-      return;
-    }
+    if (cart.length === 0) { alert("سلة الشراء فارغة"); return; }
 
-    // Required-field enforcement for non-donation orders
-    if (!isDonationOnly) {
+    if (addrRequired) {
       let valid = true;
       if (!data.city || data.city.length < 2) {
-        setError("city", { message: "المدينة مطلوبة" });
+        setError("city", { message: `${addrField?.label ?? "العنوان"} — المدينة مطلوبة` });
         valid = false;
       }
       if (!data.region || data.region.length < 2) {
@@ -141,22 +198,30 @@ export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
       if (!valid) return;
     }
 
+    // Build customFields map for merchant-defined custom fields
+    const customFields: Record<string, string> = {};
+    for (const f of checkoutFields) {
+      if (!f.isCustom || !f.enabled) continue;
+      const val = (data as Record<string, string | undefined>)[f.id];
+      if (val?.trim()) customFields[f.id] = val.trim();
+    }
+
+    // Address field — only include when enabled
+    const addrEnabled = addrField?.enabled ?? true;
+    const shippingAddress = addrEnabled
+      ? { city: data.city, region: data.region, street: data.street }
+      : undefined;
+
     const payload = {
       customerName: data.customerName,
       customerPhone: data.customerPhone,
       customerEmail: data.customerEmail || undefined,
-      shippingAddress: {
-        city: data.city,
-        region: data.region,
-        street: data.street,
-      },
+      shippingAddress,
       paymentMethod: "cash_on_delivery",
-      items: cart.map((i) => ({
-        productId: String(i.id),
-        quantity: i.quantity,
-      })),
-      notes: data.notes,
+      items: cart.map((i) => ({ productId: String(i.id), quantity: i.quantity })),
+      notes: data.notes || undefined,
       storeSlug: String(storeSlug),
+      ...(Object.keys(customFields).length > 0 ? { customFields } : {}),
       ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
     };
 
@@ -168,15 +233,10 @@ export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
         : `/store/${storeSlug}/order-success?code=${res.orderCode}`;
       router.push(successUrl);
     } catch (err: unknown) {
-      const apiErr = err as {
-        data?: { message?: string | string[] };
-        message?: string;
-      };
+      const apiErr = err as { data?: { message?: string | string[] }; message?: string };
       const raw = apiErr?.data?.message;
       const errorMessage = Array.isArray(raw)
-        ? raw
-            .map((m) => (typeof m === "object" ? JSON.stringify(m) : m))
-            .join("\n")
+        ? raw.map((m) => (typeof m === "object" ? JSON.stringify(m) : m)).join("\n")
         : (raw ?? apiErr?.message ?? "خطأ أثناء إنشاء الطلب");
       alert(errorMessage);
     }
@@ -185,6 +245,7 @@ export function useCheckoutFlow(storeSlug: string): CheckoutContextValue {
   return {
     storeSlug,
     isDonationOnly,
+    checkoutFields,
     subtotal,
     total,
     isLoading,

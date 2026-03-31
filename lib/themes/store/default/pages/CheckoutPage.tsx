@@ -7,18 +7,20 @@ import { CheckoutContextProvider } from "../components/checkout/CheckoutContext"
 import ShippingAddressForm from "../components/checkout/ShippingAddressForm";
 import PaymentMethodSelector from "../components/checkout/PaymentMethodSelector";
 import OrderReview from "../components/checkout/OrderReview";
+import type { CheckoutFieldConfig } from "@/lib/types/auth";
 
 interface Props {
   theme: ThemeTokens;
   storeSlug: string;
+  checkoutFieldsConfig?: CheckoutFieldConfig[] | null;
 }
 
 /**
  * Orchestrator — bootstraps CheckoutContext and delegates layout to organisms.
  * Zero business logic: form flow, coupon, and order creation live in useCheckoutFlow.
  */
-export default function CheckoutPage({ storeSlug }: Props) {
-  const checkoutValue = useCheckoutFlow(storeSlug);
+export default function CheckoutPage({ storeSlug, checkoutFieldsConfig }: Props) {
+  const checkoutValue = useCheckoutFlow(storeSlug, checkoutFieldsConfig);
 
   return (
     <CheckoutContextProvider value={checkoutValue}>

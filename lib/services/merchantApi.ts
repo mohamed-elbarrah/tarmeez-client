@@ -87,13 +87,27 @@ export const merchantApi = createApi({
       query: () => ({ url: "/merchant/settings", method: "GET" }),
       providesTags: ["Merchant"],
     }),
-    /** PATCH /merchant/settings — update store settings */
+    /** PATCH /merchant/settings — update store settings with optimistic update */
     updateSettings: build.mutation<StoreSettings, Partial<StoreSettings>>({
       query: (body) => ({
         url: "/merchant/settings",
         method: "PATCH",
         body,
       }),
+      async onQueryStarted(patch, { dispatch, queryFulfilled }) {
+        // Optimistically apply the patch so the UI reflects changes immediately
+        const patchResult = dispatch(
+          merchantApi.util.updateQueryData("getSettings", undefined, (draft) => {
+            Object.assign(draft, patch);
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          // Roll back on error
+          patchResult.undo();
+        }
+      },
       invalidatesTags: ["Merchant"],
     }),
     /** POST /merchant/store/upload-image — uploads a file to the store assets */

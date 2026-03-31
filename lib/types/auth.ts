@@ -33,6 +33,21 @@ export interface StoreBrandInfo extends StoreInfo {
   isTaxEnabled?: boolean;
 }
 
+export type CheckoutFieldType = 'text' | 'phone' | 'email' | 'textarea' | 'address';
+
+export interface CheckoutFieldConfig {
+  /** Stable field id — 'name' | 'phone' | 'email' | 'address' for core fields; UUID for custom */
+  id: string;
+  type: CheckoutFieldType;
+  label: string;
+  placeholder?: string;
+  enabled: boolean;
+  required: boolean;
+  /** true only for merchant-created custom fields */
+  isCustom: boolean;
+  sortOrder: number;
+}
+
 export interface StoreSettings {
   logo?: string | null;
   favicon?: string | null;
@@ -44,6 +59,7 @@ export interface StoreSettings {
   taxNumber?: string | null;
   taxPercentage: number;
   isTaxEnabled: boolean;
+  checkoutFieldsConfig?: CheckoutFieldConfig[] | null;
 }
 
 export interface MerchantProfile {

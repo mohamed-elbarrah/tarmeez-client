@@ -43,9 +43,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ShoppingCart } from "lucide-react";
 import { AssetUploader } from "@/components/merchant/AssetUploader";
+import { CheckoutFieldsEditor } from "@/components/merchant/CheckoutFieldsEditor";
+import { DEFAULT_CHECKOUT_FIELDS } from "@/lib/themes/store/default/components/checkout/useCheckoutFlow";
+import type { CheckoutFieldConfig } from "@/lib/types/auth";
 import { SocialLinksRepeater } from "@/components/merchant/SocialLinksRepeater";
 import { cn } from "@/lib/utils";
+
+const checkoutFieldSchema = z.object({
+  id:          z.string(),
+  type:        z.enum(['text', 'phone', 'email', 'textarea', 'address']),
+  label:       z.string(),
+  placeholder: z.string().optional(),
+  enabled:     z.boolean(),
+  required:    z.boolean(),
+  isCustom:    z.boolean(),
+  sortOrder:   z.number(),
+});
 
 const settingsSchema = z.object({
   logo: z.string().nullable().optional(),
@@ -64,6 +79,7 @@ const settingsSchema = z.object({
   taxNumber: z.string().nullable().optional(),
   taxPercentage: z.number().min(0).max(100),
   isTaxEnabled: z.boolean(),
+  checkoutFieldsConfig: z.array(checkoutFieldSchema).optional(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -91,6 +107,7 @@ export default function SettingsPage() {
       taxPercentage: 15,
       isTaxEnabled: false,
       socialLinks: [],
+      checkoutFieldsConfig: DEFAULT_CHECKOUT_FIELDS,
     },
   });
 
@@ -100,6 +117,9 @@ export default function SettingsPage() {
         ...settings,
         supportEmail: settings.supportEmail || "",
         socialLinks: settings.socialLinks || [],
+      checkoutFieldsConfig: (Array.isArray(settings.checkoutFieldsConfig) && settings.checkoutFieldsConfig.length > 0)
+          ? (settings.checkoutFieldsConfig as CheckoutFieldConfig[])
+          : DEFAULT_CHECKOUT_FIELDS,
       });
     }
   }, [settings, reset]);
@@ -138,6 +158,7 @@ export default function SettingsPage() {
   const isTaxEnabled = watch("isTaxEnabled");
   const currentCurrency = watch("systemCurrency");
   const currencyIcon = watch("currencyIcon");
+  const checkoutFieldsConfig = watch("checkoutFieldsConfig");
 
   return (
     <div className="relative pb-24" dir="rtl">
@@ -173,7 +194,7 @@ export default function SettingsPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6">
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="bg-muted/50 p-1 rounded-lg w-full md:w-auto h-auto grid grid-cols-2 md:grid-cols-4 gap-1">
+            <TabsList className="bg-muted/50 p-1 rounded-lg w-full md:w-auto h-auto grid grid-cols-2 md:grid-cols-5 gap-1">
               <TabsTrigger value="basic" className="gap-2 py-2">
                 <Settings className="w-4 h-4" />
                 <span>بيانات المتجر</span>
@@ -189,6 +210,10 @@ export default function SettingsPage() {
               <TabsTrigger value="tax" className="gap-2 py-2">
                 <Percent className="w-4 h-4" />
                 <span>الضرائب</span>
+              </TabsTrigger>
+              <TabsTrigger value="checkout" className="gap-2 py-2">
+                <ShoppingCart className="w-4 h-4" />
+                <span>إعدادات الدفع</span>
               </TabsTrigger>
             </TabsList>
 
@@ -396,6 +421,31 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab 5: Checkout Settings */}
+            <TabsContent value="checkout" className="space-y-6 animate-in fade-in-50 duration-500">
+              <Card className="border-border/50 shadow-sm">
+                <CardHeader className="bg-muted/30 border-b">
+                  <CardTitle className="text-lg">إعدادات صفحة الدفع</CardTitle>
+                  <CardDescription>
+                    تحكم في حقول الطلب — اضبط التسمية، النص التوضيحي، والإلزامية لكل حقل.
+                    اسحب وأفلت لترتيب الحقول.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <CheckoutFieldsEditor
+                    value={(checkoutFieldsConfig as CheckoutFieldConfig[]) ?? []}
+                    onChange={(fields) =>
+                      setValue("checkoutFieldsConfig", fields, { shouldDirty: true })
+                    }
+                    disabled={!canModify}
+                  />
+                  <p className="text-[11px] text-muted-foreground pt-1">
+                    تنبيه: لا يمكن حذف الحقول الأساسية (اسم، جوال) لكن يمكن إخفاؤها أو تعديل تسميتها.
+                  </p>
                 </CardContent>
               </Card>
             </TabsContent>

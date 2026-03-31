@@ -129,6 +129,8 @@ export interface StoreData {
   systemCurrency?: string | null;
   /** Optional currency icon image URL from merchant dashboard */
   currencyIcon?: string | null;
+  /** Checkout form field configuration — array of ordered field descriptors */
+  checkoutFieldsConfig?: import("@/lib/types/auth").CheckoutFieldConfig[] | null;
   products?: StoreProduct[];
   categories?: StoreCategory[];
   merchant?: StoreMerchant;

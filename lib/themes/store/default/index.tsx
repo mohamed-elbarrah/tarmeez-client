@@ -103,7 +103,7 @@ export default function DefaultTheme({ storeData, initialView }: ThemeProps) {
         )}
 
         {view === "checkout" && (
-          <CheckoutPage theme={theme} storeSlug={storeData.slug} />
+          <CheckoutPage theme={theme} storeSlug={storeData.slug} checkoutFieldsConfig={storeData.checkoutFieldsConfig} />
         )}
 
         {view === "order-success" && (

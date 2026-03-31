@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext } from "react";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { CheckoutFieldConfig } from "@/lib/types/auth";
 import type { CheckoutFormValues } from "./useCheckoutFlow";
 
 // ─── Applied coupon shape ─────────────────────────────────────────────────────
@@ -18,9 +19,9 @@ export interface AppliedCoupon {
 export interface CheckoutContextValue {
   storeSlug: string;
   isDonationOnly: boolean;
-  /** Formatted subtotal (already computed, ready to display) */
+  /** Ordered, fully-resolved field descriptors for building the form UI */
+  checkoutFields: CheckoutFieldConfig[];
   subtotal: number;
-  /** Final total after discount */
   total: number;
   isLoading: boolean;
   isValidating: boolean;
