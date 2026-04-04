@@ -28,9 +28,7 @@ export default function CheckoutPage({
   return (
     <CheckoutContextProvider value={checkoutValue}>
       <div className="max-w-6xl mx-auto py-10 px-4">
-        <h1 className="text-2xl font-black mb-8">
-          {checkoutValue.isDonationOnly ? "تأكيد التبرع" : "إتمام عملية الشراء"}
-        </h1>
+        <h1 className="text-2xl font-black mb-8">إتمام عملية الشراء</h1>
         <form
           onSubmit={checkoutValue.onSubmit}
           className="grid grid-cols-1 lg:grid-cols-3 gap-8"

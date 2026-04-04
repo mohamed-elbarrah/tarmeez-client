@@ -65,7 +65,7 @@ class CharityStrategy implements IActivityStrategy {
   }
 
   getPricingDisplay(product: StoreProduct): string {
-    return `${product.price.toLocaleString()} ر.س`;
+    return `${product.price.toLocaleString("en-US")} ر.س`;
   }
 
   resolveActivityIcon(): string {
@@ -108,14 +108,14 @@ class CharityStrategy implements IActivityStrategy {
   getGoalDisplay(product: StoreProduct): string | undefined {
     const dm = product.donationMetadata;
     return dm?.targetAmount
-      ? `${dm.targetAmount.toLocaleString()} ر.س`
+      ? `${dm.targetAmount.toLocaleString("en-US")} ر.س`
       : undefined;
   }
 
   getCollectedDisplay(product: StoreProduct): string | undefined {
     const dm = product.donationMetadata;
     return dm?.currentAmount !== undefined
-      ? `${dm.currentAmount.toLocaleString()} ر.س`
+      ? `${dm.currentAmount.toLocaleString("en-US")} ر.س`
       : undefined;
   }
 

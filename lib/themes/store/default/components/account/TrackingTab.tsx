@@ -9,19 +9,15 @@ import { ORDER_STATUS_MAP, TRACKING_STEPS } from "./orderStatusMap";
  * Dumb organism — reads from AccountContext, renders per-order tracking bars.
  */
 export default function TrackingTab() {
-  const { orders, isCharity } = useAccountContext();
+  const { orders } = useAccountContext();
 
   return (
     <div>
-      <h2 className="text-3xl font-black mb-6">
-        {isCharity ? "تتبع حالة تبرعي" : "تتبع حالة طلبي"}
-      </h2>
+      <h2 className="text-3xl font-black mb-6">تتبع حالة طلبي</h2>
       {!orders || orders.length === 0 ? (
         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm py-16 text-center text-gray-400">
           <Truck className="mx-auto mb-4" size={48} />
-          <p className="font-bold text-lg">
-            {isCharity ? "لا توجد تبرعات للتتبع" : "لا توجد طلبات للتتبع"}
-          </p>
+          <p className="font-bold text-lg">لا توجد طلبات للتتبع</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -40,7 +36,7 @@ export default function TrackingTab() {
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <div className="font-black text-lg">
-                      {isCharity ? "تبرع" : "طلب"} رقم #{order.orderCode}
+                      طلب رقم #{order.orderCode}
                     </div>
                     <div className="text-xs text-gray-400">
                       {new Date(order.createdAt).toLocaleDateString("ar-SA", {

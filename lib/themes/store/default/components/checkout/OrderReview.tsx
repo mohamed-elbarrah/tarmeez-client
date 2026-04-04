@@ -11,7 +11,6 @@ import { useCheckoutContext } from "./CheckoutContext";
 export default function OrderReview() {
   const {
     storeSlug,
-    isDonationOnly,
     subtotal,
     total,
     isLoading,
@@ -30,9 +29,7 @@ export default function OrderReview() {
 
   return (
     <div className="bg-white p-8 border rounded-lg sticky top-6">
-      <h3 className="text-lg font-black mb-6 text-center">
-        {isDonationOnly ? "ملخص التبرع" : "ملخص الطلب"}
-      </h3>
+      <h3 className="text-lg font-black mb-6 text-center">ملخص الطلب</h3>
 
       {/* Items */}
       <div className="space-y-4 mb-6">
@@ -55,7 +52,7 @@ export default function OrderReview() {
               </div>
             </div>
             <div className="text-xs font-black whitespace-nowrap">
-              {item.price.toLocaleString()} ر.س
+              {item.price.toLocaleString("en-US")} ر.س
             </div>
           </div>
         ))}
@@ -111,24 +108,22 @@ export default function OrderReview() {
         {/* Price rows */}
         <div className="flex justify-between text-sm font-bold text-slate-400">
           <span>المجموع الفرعي</span>
-          <span>{subtotal.toLocaleString()} ر.س</span>
+          <span>{subtotal.toLocaleString("en-US")} ر.س</span>
         </div>
         {discount > 0 && (
           <div className="flex justify-between text-sm font-bold text-green-500">
             <span>الخصم</span>
-            <span>- {discount.toLocaleString()} ر.س</span>
+            <span>- {discount.toLocaleString("en-US")} ر.س</span>
           </div>
         )}
-        {!isDonationOnly && (
-          <div className="flex justify-between text-sm font-bold text-green-500">
-            <span>رسوم الشحن</span>
-            <span>مجاني</span>
-          </div>
-        )}
+        <div className="flex justify-between text-sm font-bold text-green-500">
+          <span>رسوم الشحن</span>
+          <span>مجاني</span>
+        </div>
         <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t border-dashed">
           <span>الإجمالي</span>
           <span className="text-[var(--p-color)]">
-            {total.toLocaleString()} ر.س
+            {total.toLocaleString("en-US")} ر.س
           </span>
         </div>
       </div>
@@ -139,11 +134,7 @@ export default function OrderReview() {
         type="submit"
         className="w-full py-4 text-white font-black rounded-xl bg-[var(--p-color)] hover:shadow-lg transition-all disabled:opacity-50"
       >
-        {isLoading
-          ? "جاري المعالجة..."
-          : isDonationOnly
-            ? "تأكيد التبرع 💚"
-            : "إتمام الطلب"}
+        {isLoading ? "جاري المعالجة..." : "إتمام الطلب"}
       </button>
     </div>
   );

@@ -198,7 +198,7 @@ export default function CharityProductDetailPage({
     >
       {/* Main Product Card */}
       <div
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 bg-white p-6 md:p-10 border border-slate-300 shadow-sm"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-8 bg-white p-6 md:p-6 border border-slate-300 shadow-sm"
         style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
       >
         {/* Image Gallery */}
@@ -221,16 +221,6 @@ export default function CharityProductDetailPage({
                 صورة المشروع
               </div>
             )}
-            {/* Project status badge on image */}
-            <span
-              className="absolute top-4 right-4 text-white text-xs font-black px-4 py-2 z-10 shadow-lg"
-              style={{
-                backgroundColor: projectStatusColor,
-                borderRadius: "calc(var(--radius) * 0.5)",
-              }}
-            >
-              {projectStatus}
-            </span>
           </div>
           {productImages.length > 1 && (
             <div className="grid grid-cols-4 gap-3">
@@ -302,74 +292,79 @@ export default function CharityProductDetailPage({
             </p>
           )}
 
-          {/* ═══ HERO: Donation Progress ═══ */}
-          {targetAmount > 0 && (
-            <SharedDonationProgressBar
-              progressBarPercent={donationPercent}
-              progressMessage={progressMessage}
-              goalDisplay={`${targetAmount} ر.س`}
-              collectedDisplay={`${currentAmount} ر.س`}
-            />
-          )}
-
-          {/* ═══ Donation Amount Selector ═══ */}
-          <div className="mb-3">
-            <SharedDonationAmountSelector
-              donationPresets={donationOptions}
-              allowCustomAmount={allowCustomAmount}
-              selectedAmount={selectedAmount}
-              onAmountChange={(amount) => {
-                setSelectedAmount(amount);
-                if (amount !== 0) setCustomValue("");
-              }}
-            />
-          </div>
-
-          {/* ═══ CTA row — button + price pill (mirrors CharityProductCard) ═══ */}
-          <div className="flex items-center gap-2 mt-auto pt-2">
-            <button
-              onClick={handleDonate}
-              disabled={
-                isCustom ? !(parseFloat(customValue) > 0) : selectedAmount <= 0
-              }
-              className="donation-card__cta bg-(--p-color) text-white text-xs font-bold cursor-pointer px-4 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
-            >
-              تبرع الآن
-            </button>
-
-            {/* Price pill — input when custom, display when preset */}
-            {isCustom ? (
-              <div
-                className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 overflow-hidden"
-                style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
-              >
-                <input
-                  type="number"
-                  value={customValue}
-                  onChange={(e) => setCustomValue(e.target.value)}
-                  placeholder="المبلغ..."
-                  className="flex-1 min-w-0 bg-transparent outline-none text-base font-black text-(--p-color)"
-                  min={1}
-                />
-                <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
-                  ر.س
-                </span>
-              </div>
-            ) : (
-              <div
-                className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 cursor-pointer overflow-hidden"
-                style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
-                aria-label={`المبلغ: ${selectedAmount} ر.س`}
-              >
-                <span className="font-black text-base text-(--p-color) text-start flex-1">
-                  {selectedAmount}
-                </span>
-                <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
-                  ر.س
-                </span>
-              </div>
+          {/* progress & options & CTA */}
+          <div className="mt-auto">
+            {/* ═══ HERO: Donation Progress ═══ */}
+            {targetAmount > 0 && (
+              <SharedDonationProgressBar
+                progressBarPercent={donationPercent}
+                progressMessage={progressMessage}
+                goalDisplay={`${targetAmount} ر.س`}
+                collectedDisplay={`${currentAmount} ر.س`}
+              />
             )}
+
+            {/* ═══ Donation Amount Selector ═══ */}
+            <div className="mb-3">
+              <SharedDonationAmountSelector
+                donationPresets={donationOptions}
+                allowCustomAmount={allowCustomAmount}
+                selectedAmount={selectedAmount}
+                onAmountChange={(amount) => {
+                  setSelectedAmount(amount);
+                  if (amount !== 0) setCustomValue("");
+                }}
+              />
+            </div>
+
+            {/* ═══ CTA row — button + price pill (mirrors CharityProductCard) ═══ */}
+            <div className="flex items-center gap-2 mt-auto pt-2">
+              <button
+                onClick={handleDonate}
+                disabled={
+                  isCustom
+                    ? !(parseFloat(customValue) > 0)
+                    : selectedAmount <= 0
+                }
+                className="donation-card__cta bg-(--p-color) text-white text-xs font-bold cursor-pointer px-4 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+              >
+                تبرع الآن
+              </button>
+
+              {/* Price pill — input when custom, display when preset */}
+              {isCustom ? (
+                <div
+                  className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 overflow-hidden"
+                  style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+                >
+                  <input
+                    type="number"
+                    value={customValue}
+                    onChange={(e) => setCustomValue(e.target.value)}
+                    placeholder="المبلغ..."
+                    className="flex-1 min-w-0 bg-transparent outline-none text-base font-black text-(--p-color)"
+                    min={1}
+                  />
+                  <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+                    ر.س
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 cursor-pointer overflow-hidden"
+                  style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+                  aria-label={`المبلغ: ${selectedAmount} ر.س`}
+                >
+                  <span className="font-black text-base text-(--p-color) text-start flex-1">
+                    {selectedAmount}
+                  </span>
+                  <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+                    ر.س
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

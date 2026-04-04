@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Eye, ChevronDown, ChevronUp } from "lucide-react";
-import { ORDER_STATUS_MAP } from "./orderStatusMap";
+import { ORDER_STATUS_MAP } from "@/lib/themes/store/default/components/account/orderStatusMap";
 
 interface Props {
   order: any;
@@ -10,10 +10,11 @@ interface Props {
 }
 
 /**
- * Expandable order card — self-contained expand/collapse state.
- * Receives a single order as a plain serializable prop.
+ * Charity contribution card — no commercial invoice language.
+ * No shipping address display. Uses donation-centric labels.
+ * Amounts formatted with en-US locale (Western Arabic numerals).
  */
-export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
+export default function CharityContributionCard({ order }: Props) {
   const [expanded, setExpanded] = useState(false);
   const status = ORDER_STATUS_MAP[order.status] ?? ORDER_STATUS_MAP.PENDING;
 
@@ -21,7 +22,7 @@ export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
     <div className="p-6">
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-1">
-          <div className="font-black text-sm">طلب رقم #{order.orderCode}</div>
+          <div className="font-black text-sm">تبرع رقم #{order.orderCode}</div>
           <div className="text-xs text-gray-400">
             {new Date(order.createdAt).toLocaleDateString("ar-SA-u-nu-latn", {
               year: "numeric",
@@ -30,7 +31,7 @@ export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
             })}
           </div>
           <div className="text-xs text-gray-400">
-            {order.items?.length ?? 0} منتجات
+            {order.items?.length ?? 0} مشاريع
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -49,7 +50,7 @@ export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-1 text-xs text-[var(--p-color)] font-bold mt-3 hover:underline"
       >
-        <Eye size={14} /> {expanded ? "إخفاء التفاصيل" : "عرض التفاصيل"}
+        <Eye size={14} /> {expanded ? "إخفاء التفاصيل" : "عرض تفاصيل المساهمة"}
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
 
@@ -58,7 +59,7 @@ export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
           {order.items.map((item: any, i: number) => (
             <div
               key={i}
-              className="flex items-center gap-3 bg-gray-50 rounded-xl p-3"
+              className="flex items-center gap-3 bg-green-50 rounded-xl p-3"
             >
               {item.productImage && (
                 <img
@@ -69,21 +70,15 @@ export default function OrderCard({ order, storeSlug: _storeSlug }: Props) {
               )}
               <div className="flex-grow">
                 <div className="font-bold text-sm">{item.productName}</div>
-                <div className="text-xs text-gray-400">
-                  الكمية: {item.quantity}
-                </div>
+                <span className="text-xs text-green-600 font-bold">
+                  مشروع خيري
+                </span>
               </div>
               <div className="font-black text-sm text-[var(--p-color)]">
                 {item.total?.toLocaleString("en-US")} ر.س
               </div>
             </div>
           ))}
-          {order.shippingAddress && (
-            <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-500">
-              <span className="font-bold text-gray-700">عنوان التوصيل: </span>
-              {order.shippingAddress.street}، {order.shippingAddress.city}
-            </div>
-          )}
         </div>
       )}
     </div>

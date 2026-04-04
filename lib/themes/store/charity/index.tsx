@@ -8,12 +8,12 @@ import { Header, Footer } from "@/components/storefront/core";
 // Charity-specific pages
 import CharityHomePage from "./pages/HomePage";
 import CharityProductDetailPage from "./pages/ProductDetailPage";
+import CharityCartPage from "./pages/CartPage";
+import CharityCheckoutPage from "./pages/CharityCheckoutPage";
+import CharityOrderSuccessPage from "./pages/CharityOrderSuccessPage";
+import CharityAccountPage from "./components/account/CharityAccountPage";
 // Default pages reused as-is (they're theme-token-driven, not hardcoded)
 import ProductsPage from "@/lib/themes/store/default/pages/ProductsPage";
-import CartPage from "@/lib/themes/store/default/pages/CartPage";
-import AccountPage from "@/lib/themes/store/default/pages/AccountPage";
-import CheckoutPage from "@/lib/themes/store/default/pages/CheckoutPage";
-import OrderSuccessPage from "@/lib/themes/store/default/pages/OrderSuccessPage";
 import OrderTrackingPage from "@/lib/themes/store/default/pages/OrderTrackingPage";
 
 export default function CharityTheme({ storeData, initialView }: ThemeProps) {
@@ -91,14 +91,16 @@ export default function CharityTheme({ storeData, initialView }: ThemeProps) {
         />
       )}
 
-      {view === "cart" && <CartPage theme={theme} storeSlug={storeData.slug} />}
+      {view === "cart" && (
+        <CharityCartPage theme={theme} storeSlug={storeData.slug} />
+      )}
 
       {view === "checkout" && (
-        <CheckoutPage theme={theme} storeSlug={storeData.slug} />
+        <CharityCheckoutPage theme={theme} storeSlug={storeData.slug} />
       )}
 
       {view === "order-success" && (
-        <OrderSuccessPage storeSlug={storeData.slug} />
+        <CharityOrderSuccessPage storeSlug={storeData.slug} />
       )}
 
       {view === "track" && (
@@ -106,7 +108,7 @@ export default function CharityTheme({ storeData, initialView }: ThemeProps) {
       )}
 
       {view === "account" && (
-        <AccountPage theme={theme} storeSlug={storeData.slug} />
+        <CharityAccountPage theme={theme} storeSlug={storeData.slug} />
       )}
 
       <Footer

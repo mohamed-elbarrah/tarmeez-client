@@ -34,6 +34,10 @@ import DefaultRegisterPage from "./store/default/pages/RegisterPage";
 // ─── Charity theme pages (only those that differ) ──────────────────
 import CharityHomePage from "./store/charity/pages/HomePage";
 import CharityProductDetailPage from "./store/charity/pages/ProductDetailPage";
+import CharityCartPage from "./store/charity/pages/CartPage";
+import CharityCheckoutPage from "./store/charity/pages/CharityCheckoutPage";
+import CharityOrderSuccessPage from "./store/charity/pages/CharityOrderSuccessPage";
+import CharityAccountPage from "./store/charity/components/account/CharityAccountPage";
 
 // ─── Prop types per page kind ──────────────────────────────────────
 type HomePageProps = {
@@ -116,6 +120,10 @@ const THEME_OVERRIDES: Record<string, Partial<ThemePages>> = {
   charity: {
     HomePage: CharityHomePage,
     ProductDetailPage: CharityProductDetailPage,
+    CartPage: CharityCartPage,
+    CheckoutPage: CharityCheckoutPage as React.ComponentType<SimpleThemeProps>,
+    OrderSuccessPage: CharityOrderSuccessPage,
+    AccountPage: CharityAccountPage as React.ComponentType<SimpleThemeProps>,
   },
 };
 

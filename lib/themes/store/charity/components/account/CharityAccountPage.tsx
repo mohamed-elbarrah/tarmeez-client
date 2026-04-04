@@ -1,17 +1,14 @@
 "use client";
 
 import React from "react";
-import { Package, Truck, Heart, Settings, LogOut } from "lucide-react";
+import { Package, Settings, LogOut } from "lucide-react";
 import { ThemeTokens } from "@/lib/themes/types";
-import { useAccountPage } from "../components/account/useAccountPage";
-import {
-  AccountContextProvider,
-  AccountTab,
-} from "../components/account/AccountContext";
-import OrdersTab from "../components/account/OrdersTab";
-import TrackingTab from "../components/account/TrackingTab";
-import WishlistTab from "../components/account/WishlistTab";
-import ProfileSettingsForm from "../components/account/ProfileSettingsForm";
+import { useAccountPage } from "@/lib/themes/store/default/components/account/useAccountPage";
+import { AccountContextProvider } from "@/lib/themes/store/default/components/account/AccountContext";
+import type { AccountTab } from "@/lib/themes/store/default/components/account/AccountContext";
+import CharityContributionsTab from "./CharityContributionsTab";
+import WishlistTab from "@/lib/themes/store/default/components/account/WishlistTab";
+import ProfileSettingsForm from "@/lib/themes/store/default/components/account/ProfileSettingsForm";
 
 interface Props {
   theme: ThemeTokens;
@@ -19,20 +16,19 @@ interface Props {
 }
 
 const TABS: { id: AccountTab; label: string; icon: React.ReactNode }[] = [
-  { id: "orders", label: "طلباتي الأخيرة", icon: <Package size={18} /> },
-  { id: "tracking", label: "تتبع حالة طلبي", icon: <Truck size={18} /> },
-  { id: "wishlist", label: "منتجاتي المفضلة", icon: <Heart size={18} /> },
+  { id: "orders", label: "سجل المساهمات", icon: <Package size={18} /> },
+  { id: "wishlist", label: "المفضلة", icon: <Package size={18} /> },
   { id: "settings", label: "إعدادات الحساب", icon: <Settings size={18} /> },
 ];
 
 /**
- * Orchestrator — bootstraps AccountContext and delegates render to tab organisms.
- * Zero business logic: all API calls, auth redirect, and side-effects live in useAccountPage.
+ * Charity account page — "Orders" tab replaced with "Contributions" (سجل المساهمات).
+ * No shipping/tracking tab — irrelevant for charity.
  */
-export default function AccountPage({ storeSlug }: Props) {
+export default function CharityAccountPage({ storeSlug }: Props) {
   const { profileLoading, profileError, ...accountValue } = useAccountPage(
     storeSlug,
-    false,
+    true,
   );
 
   if (profileLoading) {
@@ -53,7 +49,7 @@ export default function AccountPage({ storeSlug }: Props) {
         {/* Sidebar */}
         <aside className="w-full lg:w-80 space-y-3">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 text-center mb-6 shadow-sm">
-            <div className="w-20 h-20 bg-gradient-to-br from-[var(--p-color)] to-blue-400 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--p-color)] to-green-400 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-lg">
               {(profile?.fullName || " ")[0] ?? "؟"}
             </div>
             <h3 className="font-black text-lg">{profile?.fullName ?? "---"}</h3>
@@ -84,8 +80,7 @@ export default function AccountPage({ storeSlug }: Props) {
 
         {/* Main content */}
         <div className="flex-grow space-y-8">
-          {activeTab === "orders" && <OrdersTab />}
-          {activeTab === "tracking" && <TrackingTab />}
+          {activeTab === "orders" && <CharityContributionsTab />}
           {activeTab === "wishlist" && <WishlistTab />}
           {activeTab === "settings" && <ProfileSettingsForm />}
         </div>

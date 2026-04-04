@@ -81,14 +81,9 @@ function AddressFields({
  * correct <input type> and handling the special `address` compound field.
  */
 export default function ShippingAddressForm() {
-  const { register, errors, isDonationOnly, checkoutFields } =
-    useCheckoutContext();
+  const { register, errors, checkoutFields } = useCheckoutContext();
 
-  const visibleFields = checkoutFields
-    .filter((f) => f.enabled)
-    .filter((f) => !(isDonationOnly && f.id === "address"));
-
-  console.log("[ShippingAddressForm] Current Fields in UI:", visibleFields);
+  const visibleFields = checkoutFields.filter((f) => f.enabled);
 
   const inputTypeMap: Record<string, string> = {
     phone: "tel",
@@ -98,9 +93,7 @@ export default function ShippingAddressForm() {
 
   return (
     <div className="bg-white p-8 border rounded-lg">
-      <h2 className="text-lg font-black mb-4">
-        {isDonationOnly ? "بيانات المتبرع" : "بيانات الطلب"}
-      </h2>
+      <h2 className="text-lg font-black mb-4">بيانات الطلب</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {visibleFields.map((field) => {
           // Address is a compound field rendered as three sub-inputs

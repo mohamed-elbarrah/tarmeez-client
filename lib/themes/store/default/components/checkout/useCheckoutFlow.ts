@@ -288,10 +288,7 @@ export function useCheckoutFlow(
     try {
       const res: { orderCode: string } = await createOrder(payload).unwrap();
       dispatch(clearCart(storeSlug));
-      const successUrl = isDonationOnly
-        ? `/store/${storeSlug}/order-success?code=${res.orderCode}&type=donation`
-        : `/store/${storeSlug}/order-success?code=${res.orderCode}`;
-      router.push(successUrl);
+      router.push(`/store/${storeSlug}/order-success?code=${res.orderCode}`);
     } catch (err: unknown) {
       const apiErr = err as {
         data?: { message?: string | string[] };

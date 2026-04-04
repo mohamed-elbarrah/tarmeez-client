@@ -18,21 +18,22 @@ interface Props {
   storeSlug: string;
 }
 
-export default function CartSummary({ theme, cart, storeSlug }: Props) {
+/**
+ * Charity cart summary — no shipping fees row, no payment logos, Islamic branding.
+ * All amounts use en-US locale for Western Arabic numerals.
+ */
+export default function CharityCartSummary({ cart, storeSlug }: Props) {
   const subtotal = cart.reduce((s, i) => s + i.price * (i.quantity || 0), 0);
+
   return (
     <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-fit space-y-6 sticky top-28">
-      <h3 className="text-xl font-black border-b pb-4">ملخص الطلب</h3>
+      <h3 className="text-xl font-black border-b pb-4">سلة الخير</h3>
       <div className="space-y-4">
         <div className="flex justify-between text-gray-400 text-sm font-bold">
-          <span>المجموع الفرعي</span>
+          <span>إجمالي المساهمات</span>
           <span className="text-gray-900">
             {subtotal.toLocaleString("en-US")} ر.س
           </span>
-        </div>
-        <div className="flex justify-between text-gray-400 text-sm font-bold">
-          <span>رسوم الشحن</span>
-          <span className="text-green-500">مجاني</span>
         </div>
         <div className="flex justify-between text-2xl font-black pt-4 border-t border-dashed">
           <span>الإجمالي</span>
@@ -50,25 +51,8 @@ export default function CartSummary({ theme, cart, storeSlug }: Props) {
         } transition-all`}
         style={{ borderRadius: "var(--radius)" }}
       >
-        إتمام عملية الشراء
+        إتمام التبرع
       </Link>
-      <div className="flex items-center justify-center gap-2 pt-2 opacity-50 grayscale">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
-          className="h-4"
-          alt="Visa"
-        />
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
-          className="h-6"
-          alt="Mastercard"
-        />
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
-          className="h-4"
-          alt="PayPal"
-        />
-      </div>
     </div>
   );
 }
