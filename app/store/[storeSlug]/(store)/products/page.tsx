@@ -30,6 +30,7 @@ export default async function Page({
       initialSearch={search}
       initialCategory={category}
       activityType={store.activityType}
+      themeSlug={themeSlug}
     />
   );
 }

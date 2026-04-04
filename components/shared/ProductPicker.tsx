@@ -118,7 +118,7 @@ export default function ProductPicker(props: ProductPickerProps) {
                       {product.name}
                     </span>
                     <span className="text-xs text-muted-foreground shrink-0">
-                      {product.price.toLocaleString("ar-SA")} ر.س
+                      {product.price} ر.س
                     </span>
                     <Check
                       className={cn(
@@ -200,7 +200,7 @@ export default function ProductPicker(props: ProductPickerProps) {
                       {product.name}
                     </span>
                     <span className="text-xs text-muted-foreground shrink-0">
-                      {product.price.toLocaleString("ar-SA")} ر.س
+                      {product.price} ر.س
                     </span>
                     <Check
                       className={cn(

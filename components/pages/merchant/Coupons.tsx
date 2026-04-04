@@ -1,20 +1,38 @@
 "use client";
 import { useState } from "react";
 import {
-  Plus, Tag, TrendingUp, DollarSign, Clock,
-  Edit, EyeOff, Eye, Trash2, Copy, Loader2,
+  Plus,
+  Tag,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  Edit,
+  EyeOff,
+  Eye,
+  Trash2,
+  Copy,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table, TableBody, TableCell,
-  TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
@@ -44,20 +62,26 @@ const TYPE_LABELS: Record<string, string> = {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    ACTIVE: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+    ACTIVE:
+      "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
     INACTIVE: "bg-muted text-muted-foreground",
-    EXPIRED: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+    EXPIRED:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
     DEPLETED: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[status] || styles.INACTIVE}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[status] || styles.INACTIVE}`}
+    >
       {STATUS_LABELS[status] || status}
     </span>
   );
 }
 
 function StatCard({
-  title, value, icon: Icon,
+  title,
+  value,
+  icon: Icon,
 }: {
   title: string;
   value: string | number;
@@ -114,7 +138,7 @@ function formatDiscount(coupon: Coupon) {
 function formatCurrency(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M ر.س`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K ر.س`;
-  return `${value.toLocaleString("ar-SA")} ر.س`;
+  return `${value} ر.س`;
 }
 
 export default function Coupons() {
@@ -138,7 +162,7 @@ export default function Coupons() {
     try {
       await toggleStatus(coupon.id).unwrap();
       toast.success(
-        coupon.status === "ACTIVE" ? "تم تعطيل الكوبون" : "تم تفعيل الكوبون"
+        coupon.status === "ACTIVE" ? "تم تعطيل الكوبون" : "تم تفعيل الكوبون",
       );
     } catch {
       toast.error("حدث خطأ");
@@ -179,11 +203,7 @@ export default function Coupons() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          title="كوبونات نشطة"
-          value={stats?.active ?? 0}
-          icon={Tag}
-        />
+        <StatCard title="كوبونات نشطة" value={stats?.active ?? 0} icon={Tag} />
         <StatCard
           title="إجمالي الاستخدامات"
           value={stats?.totalUsages ?? 0}
@@ -296,9 +316,7 @@ export default function Coupons() {
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => handleToggle(coupon)}
-                        title={
-                          coupon.status === "ACTIVE" ? "تعطيل" : "تفعيل"
-                        }
+                        title={coupon.status === "ACTIVE" ? "تعطيل" : "تفعيل"}
                       >
                         {coupon.status === "ACTIVE" ? (
                           <EyeOff className="h-4 w-4" />
@@ -321,7 +339,8 @@ export default function Coupons() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>حذف الكوبون</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أنت متأكد من حذف كوبون &ldquo;{coupon.name}&rdquo;؟
+                              هل أنت متأكد من حذف كوبون &ldquo;{coupon.name}
+                              &rdquo;؟
                               {coupon.usageCount > 0
                                 ? " سيتم تعطيله بدلاً من حذفه لأنه مُستخدَم."
                                 : " سيتم حذفه نهائياً."}

@@ -172,7 +172,9 @@ export interface WidgetProductCardProps {
   goalDisplay?: string;
   collectedDisplay?: string;
   donationPresets?: number[];
+  donationLabels?: Record<string, string>;
   allowCustomAmount?: boolean;
+  badgeText?: string;
 
   onPrimaryAction: (payload?: { amount?: number }) => void;
 }

@@ -23,6 +23,7 @@ export default async function StorePage({
       storeSlug={storeSlug}
       categories={store.categories}
       activityType={store.activityType}
+      themeSlug={themeSlug}
     />
   );
 }

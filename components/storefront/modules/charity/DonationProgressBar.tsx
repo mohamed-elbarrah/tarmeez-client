@@ -24,8 +24,8 @@ export default function DonationProgressBar({
     progressMessages,
   );
 
-  const formattedCurrent = currentAmount.toLocaleString("ar-SA");
-  const formattedTarget = targetAmount.toLocaleString("ar-SA");
+  const formattedCurrent = currentAmount;
+  const formattedTarget = targetAmount;
 
   return (
     <div className="space-y-3">

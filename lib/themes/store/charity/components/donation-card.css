@@ -1,0 +1,40 @@
+/* ═══════════════════════════════════════════════════════════
+   Donation Card — Scoped Styles (.donation-card context)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Progress Bar ── */
+.donation-card .progress-bar-fill {
+  background: var(--p-color);
+  transition: width 1s ease-out;
+}
+
+/* ── Waqf Options ── */
+.donation-card .waqf-option {
+  cursor: pointer;
+}
+
+/* ── CTA Button shine effect ── */
+.donation-card .donation-card__cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.donation-card .donation-card__cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.donation-card .donation-card__cta:hover::before {
+  left: 100%;
+}

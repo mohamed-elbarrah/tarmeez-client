@@ -42,6 +42,7 @@ type HomePageProps = {
   storeSlug: string;
   categories?: StoreCategory[];
   activityType?: "RETAIL" | "CHARITY";
+  themeSlug?: string;
 };
 
 type ProductDetailProps = {
@@ -57,6 +58,7 @@ type ProductsPageProps = {
   initialSearch?: string;
   initialCategory?: string;
   activityType?: "RETAIL" | "CHARITY";
+  themeSlug?: string;
 };
 
 type SimpleThemeProps = {

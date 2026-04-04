@@ -14,12 +14,13 @@ export function isRetail(store: Pick<StoreData, "activityType">): boolean {
 
 /**
  * Resolves the active theme slug from a store's data.
- * Priority: store.theme.slug → store.themeId → activityType fallback → "default"
+ * Priority: store.theme.slug → activityType fallback → "default"
+ * Note: store.themeId is a UUID (not a slug) — we only use theme.slug.
  */
 export function resolveThemeSlug(
   store: Pick<StoreData, "theme" | "themeId" | "activityType">,
 ): string {
-  const explicit = store.theme?.slug ?? store.themeId;
-  if (explicit) return explicit;
+  const slug = store.theme?.slug;
+  if (slug) return slug;
   return isCharity(store) ? "charity" : "default";
 }

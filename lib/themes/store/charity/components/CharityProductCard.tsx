@@ -1,18 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { Heart, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
+import { Heart } from "lucide-react";
 import Link from "next/link";
 import ProductImage from "@/lib/themes/store/default/components/ProductImage";
 import { WidgetProductCardProps } from "@/lib/themes/types";
+import DonationProgressBar from "@/components/storefront/modules/charity/shared/DonationProgressBar";
+import DonationAmountSelector from "@/components/storefront/modules/charity/shared/DonationAmountSelector";
+import "./donation-card.css";
 
 export default function CharityProductCard({
   id,
   title,
+  description,
   imageUrl,
   displayPrice,
-  primaryActionText,
+  primaryActionText = "تبرع الآن",
   primaryActionIcon,
   productUrl,
   progressBarPercent = 0,
@@ -21,19 +24,18 @@ export default function CharityProductCard({
   collectedDisplay,
   donationPresets = [10, 50, 100],
   allowCustomAmount = true,
+  badgeText,
   onPrimaryAction,
 }: WidgetProductCardProps) {
-  const [selectedAmount, setSelectedAmount] = useState<number>(donationPresets[0]);
-  const [isCustom, setIsCustom] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState<number>(
+    donationPresets[0],
+  );
   const [customValue, setCustomValue] = useState("");
+  const isCustom = selectedAmount === 0;
 
-  const handlePresetClick = (amount: number) => {
+  const handleAmountChange = (amount: number) => {
     setSelectedAmount(amount);
-    setIsCustom(false);
-  };
-
-  const handleCustomClick = () => {
-    setIsCustom(true);
+    if (amount !== 0) setCustomValue("");
   };
 
   const handleAction = (e: React.MouseEvent) => {
@@ -43,19 +45,16 @@ export default function CharityProductCard({
     onPrimaryAction({ amount: finalAmount || 0 });
   };
 
-  // Limit to 4 items in the grid (Constraint 2)
-  const presetsToShow = donationPresets.slice(0, 3);
-
   return (
     <div
-      className="group bg-white p-5 border border-emerald-50 hover:shadow-2xl transition-all relative flex flex-col h-full"
+      className="donation-card group bg-white p-3 border border-gray-200 hover:shadow-2xl transition-all relative flex flex-col h-full"
       style={{ borderRadius: "var(--radius)" }}
     >
-      <Link href={productUrl} className="flex flex-col h-full">
-        {/* Image Section */}
+      <Link href={productUrl} className="flex flex-col flex-1">
+        {/* Image — same as default */}
         <div
-          className="aspect-square mb-5 overflow-hidden relative bg-emerald-50/30 p-8"
-          style={{ borderRadius: "calc(var(--radius) * 1)" }}
+          className="aspect-square mb-4 overflow-hidden relative bg-gray-50 p-6"
+          style={{ borderRadius: "calc(var(--radius) * 0.75)" }}
         >
           <ProductImage
             src={imageUrl}
@@ -63,139 +62,88 @@ export default function CharityProductCard({
             fill
             className="object-contain group-hover:scale-110 transition-transform duration-700"
           />
-          <div className="absolute top-3 right-3 z-20">
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 shadow-xl backdrop-blur-md bg-white/90"
-            >
-              <Sparkles size={12} className="text-emerald-500" />
-              <span className="text-[10px] font-black text-gray-800 uppercase tracking-tight">
-                مشروع خيري
-              </span>
-            </div>
-          </div>
+          {badgeText && (
+            <span className="absolute top-3 right-3 bg-(--p-color) text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg z-10">
+              {badgeText}
+            </span>
+          )}
         </div>
 
-        {/* Title */}
+        {/* Title — same as default */}
         <h3
-          className="text-md font-black line-clamp-2 h-12 mb-4 leading-tight group-hover:text-emerald-600 transition-colors px-1"
+          className="text-sm font-black line-clamp-2 h-10 mb-1 leading-tight group-hover:text-(--p-color) transition-colors"
           style={{ color: "var(--h-color)" }}
         >
           {title}
         </h3>
 
-        {/* The Talking Bar (Constraint 2.1) */}
-        <div className="mb-6 px-1">
+        {/* ── Progress Bar (charity addition) ── */}
+        <DonationProgressBar
+          progressBarPercent={progressBarPercent}
+          progressMessage={progressMessage}
+          goalDisplay={goalDisplay}
+          collectedDisplay={collectedDisplay}
+        />
+
+        {/* Description — same as default */}
+        {/* {description && (
+          <p className="text-xs text-gray-500 line-clamp-2 mb-2 leading-relaxed">
+            {description}
+          </p>
+        )} */}
+      </Link>
+
+      {/* ── Waqf Options (charity addition) ── */}
+      <DonationAmountSelector
+        donationPresets={donationPresets}
+        allowCustomAmount={allowCustomAmount}
+        selectedAmount={selectedAmount}
+        onAmountChange={handleAmountChange}
+      />
+
+      {/* CTA row — same layout as default: button + price pill */}
+      <div className="flex items-center gap-2 mt-auto pt-2">
+        <button
+          onClick={handleAction}
+          className="donation-card__cta bg-(--p-color) text-white text-xs font-bold cursor-pointer px-4 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-2"
+          style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+        >
+          {primaryActionText}
+        </button>
+
+        {/* Price pill — shows selected amount, or input when custom */}
+        {isCustom ? (
           <div
-            className="w-full h-8 bg-gray-100 relative overflow-hidden"
-            style={{ borderRadius: "100px" }}
-          >
-            {/* Progress Fill */}
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progressBarPercent}%` }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-              className="h-full absolute top-0 right-0 bg-emerald-500"
-              style={{ borderRadius: "100px" }}
-            />
-            {/* The Message Inside */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-[10px] font-black text-gray-700 z-10 drop-shadow-sm">
-                {progressMessage || `${progressBarPercent}% تم تحقيق الهدف`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Dual Info Cards (Constraint 2.2) */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-emerald-50/50 p-3 rounded-2xl border border-emerald-100/50 text-center">
-            <span className="block text-[9px] font-black text-emerald-600 mb-1 uppercase tracking-widest">تم جمع</span>
-            <span className="block text-xs font-black text-gray-800">{collectedDisplay || "0"}</span>
-          </div>
-          <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 text-center">
-            <span className="block text-[9px] font-black text-gray-400 mb-1 uppercase tracking-widest">الهدف</span>
-            <span className="block text-xs font-black text-gray-800">{goalDisplay || "—"}</span>
-          </div>
-        </div>
-
-        {/* 4-Preset Grid (Constraint 2.3) */}
-        <div className="grid grid-cols-2 gap-2 mb-6" onClick={(e) => e.preventDefault()}>
-          {presetsToShow.map((amt) => (
-            <button
-              key={amt}
-              onClick={() => handlePresetClick(amt)}
-              className={`py-3 text-xs font-black transition-all border-2 ${
-                !isCustom && selectedAmount === amt
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-md scale-[1.02]"
-                  : "bg-white text-gray-500 border-gray-100 hover:border-emerald-200"
-              }`}
-              style={{ borderRadius: "calc(var(--radius) * 0.75)" }}
-            >
-              {amt} ر.س
-            </button>
-          ))}
-          {allowCustomAmount ? (
-            <button
-              onClick={handleCustomClick}
-              className={`py-3 text-xs font-black transition-all border-2 ${
-                isCustom
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-md scale-[1.02]"
-                  : "bg-white text-gray-500 border-gray-100 hover:border-emerald-200"
-              }`}
-              style={{ borderRadius: "calc(var(--radius) * 0.75)" }}
-            >
-              مبلغ مخصص
-            </button>
-          ) : (
-             donationPresets[3] && (
-              <button
-                onClick={() => handlePresetClick(donationPresets[3])}
-                className={`py-3 text-xs font-black transition-all border-2 ${
-                  !isCustom && selectedAmount === donationPresets[3]
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow-md scale-[1.02]"
-                    : "bg-white text-gray-500 border-gray-100 hover:border-emerald-200"
-                }`}
-                style={{ borderRadius: "calc(var(--radius) * 0.75)" }}
-              >
-                {donationPresets[3]} ر.س
-              </button>
-            )
-          )}
-        </div>
-
-        {/* Custom Input (Only shown if isCustom is true) */}
-        {isCustom && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 relative"
-            onClick={(e) => e.preventDefault()}
+            className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 overflow-hidden"
+            style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
           >
             <input
               type="number"
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
-              placeholder="أدخل المبلغ..."
-              className="w-full h-12 bg-gray-50 border-2 border-emerald-100 focus:border-emerald-500 outline-none pr-4 pl-12 text-sm font-black transition-all"
-              style={{ borderRadius: "calc(var(--radius) * 0.75)" }}
+              placeholder="المبلغ..."
+              className="flex-1 min-w-0  bg-transparent outline-none text-base font-black text-(--p-color)"
+              min={1}
             />
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">ر.س</span>
-          </motion.div>
+            <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+              ر.س
+            </span>
+          </div>
+        ) : (
+          <div
+            className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 cursor-pointer overflow-hidden"
+            style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+            aria-label={`المبلغ: ${selectedAmount} ر.س`}
+          >
+            <span className="font-black text-base text-(--p-color) text-start flex-1">
+              {selectedAmount}
+            </span>
+            <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+              ر.س
+            </span>
+          </div>
         )}
-
-        {/* Primary Action Button */}
-        <button
-          onClick={handleAction}
-          className="w-full py-4 text-white font-black text-sm flex items-center justify-center gap-3 shadow-xl transition-all hover:brightness-110 active:scale-95 group/btn"
-          style={{
-            backgroundColor: "var(--p-color)",
-            borderRadius: "calc(var(--radius) * 0.75)",
-          }}
-        >
-          {primaryActionIcon || <Heart size={18} fill="currentColor" className="group-hover/btn:scale-125 transition-transform" />}
-          {primaryActionText}
-        </button>
-      </Link>
+      </div>
     </div>
   );
 }

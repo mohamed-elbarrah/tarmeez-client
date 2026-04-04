@@ -56,6 +56,7 @@ export default function ConnectedCharityProductCard({
     <CharityProductCard
       id={product.id}
       title={product.name}
+      description={product.description}
       imageUrl={displayImage}
       displayPrice={contextManager.getPricingDisplay(product)}
       primaryActionText={contextManager.getPrimaryActionLabel()}
@@ -67,6 +68,7 @@ export default function ConnectedCharityProductCard({
       collectedDisplay={contextManager.getCollectedDisplay(product)}
       donationPresets={contextManager.getDonationPresets(product)}
       allowCustomAmount={contextManager.getAllowCustomAmount(product)}
+      badgeText={contextManager.getBadgeText(product)}
       onPrimaryAction={handlePrimaryAction}
     />
   );

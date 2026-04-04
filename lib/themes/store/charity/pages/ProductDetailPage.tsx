@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Heart, Star, Users, Target } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { toast } from "sonner";
 import { StoreProduct, StoreData } from "@/lib/themes/types";
 import ProductImage from "@/lib/themes/store/default/components/ProductImage";
@@ -17,8 +17,9 @@ import { useToggleWishlistMutation } from "@/lib/services/wishlistApi";
 import { useGetCustomerMeQuery } from "@/lib/services/customerApi";
 import { ThemeEngine } from "@/lib/themes/engine/ThemeEngine";
 import { ComponentRegistry } from "@/lib/themes/engine/ComponentRegistry";
-import DonationAmountSelector from "@/components/storefront/modules/charity/DonationAmountSelector";
-import { getDonationProgress, formatCurrency } from "@/lib/helpers/donation";
+import SharedDonationAmountSelector from "@/components/storefront/modules/charity/shared/DonationAmountSelector";
+import SharedDonationProgressBar from "@/components/storefront/modules/charity/shared/DonationProgressBar";
+import { getDonationProgress } from "@/lib/helpers/donation";
 
 interface Props {
   storeData: StoreData;
@@ -46,7 +47,6 @@ export default function CharityProductDetailPage({
   const targetAmount = dm?.targetAmount ?? 0;
   const currentAmount = dm?.currentAmount ?? 0;
   const donationOptions = dm?.donationOptions ?? [50, 100, 200, 500];
-  const donationLabels = dm?.donationLabels ?? {};
   const allowCustomAmount = dm?.allowCustomAmount ?? true;
   const progressMessages = dm?.progressMessages ?? null;
 
@@ -70,7 +70,11 @@ export default function CharityProductDetailPage({
           ? "#2563eb"
           : "#64748b";
 
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [selectedAmount, setSelectedAmount] = useState<number>(
+    donationOptions[0],
+  );
+  const [customValue, setCustomValue] = useState("");
+  const isCustom = selectedAmount === 0;
 
   // Wishlist
   const [toggleWishlist] = useToggleWishlistMutation();
@@ -112,7 +116,8 @@ export default function CharityProductDetailPage({
   if (!product) return null;
 
   const handleDonate = () => {
-    if (!selectedAmount || selectedAmount <= 0) {
+    const effectiveAmount = isCustom ? parseFloat(customValue) : selectedAmount;
+    if (!effectiveAmount || effectiveAmount <= 0) {
       toast.error("يرجى اختيار مبلغ التبرع");
       return;
     }
@@ -122,7 +127,7 @@ export default function CharityProductDetailPage({
         item: {
           id: product.id,
           name: product.name,
-          price: selectedAmount,
+          price: effectiveAmount,
           image: productImages[0] || "",
           quantity: 1,
           isDonation: true,
@@ -184,8 +189,6 @@ export default function CharityProductDetailPage({
     "--radius": theme.borderRadius,
     "--font-family": theme.fontFamily,
   } as React.CSSProperties;
-
-  const remaining = Math.max(targetAmount - currentAmount, 0);
 
   return (
     <div
@@ -299,126 +302,74 @@ export default function CharityProductDetailPage({
             </p>
           )}
 
-          {/* ═══ HERO: Donation Progress — large, prominent ═══ */}
+          {/* ═══ HERO: Donation Progress ═══ */}
           {targetAmount > 0 && (
-            <div
-              className="p-6 mb-6 border-2"
-              style={{
-                borderColor:
-                  "color-mix(in srgb, var(--p-color) 20%, transparent)",
-                backgroundColor: "color-mix(in srgb, var(--p-color) 3%, white)",
-                borderRadius: "var(--radius)",
-              }}
-            >
-              {/* Big numbers row */}
-              <div className="flex items-end justify-between mb-4">
-                <div>
-                  <div className="text-xs font-bold text-slate-400 mb-1">
-                    تم جمع
-                  </div>
-                  <div
-                    className="text-4xl md:text-5xl font-black leading-none"
-                    style={{ color: "var(--p-color)" }}
-                  >
-                    {currentAmount.toLocaleString("ar-SA")}
-                    <span className="text-lg mr-1">ر.س</span>
-                  </div>
-                </div>
-                <div className="text-left">
-                  <div className="text-xs font-bold text-slate-400 mb-1">
-                    الهدف
-                  </div>
-                  <div className="text-2xl font-black text-slate-600 leading-none">
-                    {targetAmount.toLocaleString("ar-SA")}
-                    <span className="text-sm mr-1">ر.س</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div
-                className="w-full h-4 bg-gray-200 overflow-hidden mb-3"
-                style={{ borderRadius: "var(--radius)" }}
-              >
-                <div
-                  className="h-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: `${donationPercent}%`,
-                    backgroundColor: "var(--p-color)",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-              </div>
-
-              {/* Stats row */}
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-4">
-                  <span
-                    className="flex items-center gap-1 font-black"
-                    style={{ color: "var(--p-color)" }}
-                  >
-                    <Target size={14} />
-                    {donationPercent}%
-                  </span>
-                  {remaining > 0 && (
-                    <span className="text-slate-400 font-bold">
-                      متبقي {remaining.toLocaleString("ar-SA")} ر.س
-                    </span>
-                  )}
-                </div>
-                {progressMessage && (
-                  <span
-                    className="font-bold"
-                    style={{ color: "var(--p-color)" }}
-                  >
-                    {progressMessage}
-                  </span>
-                )}
-              </div>
-            </div>
+            <SharedDonationProgressBar
+              progressBarPercent={donationPercent}
+              progressMessage={progressMessage}
+              goalDisplay={`${targetAmount} ر.س`}
+              collectedDisplay={`${currentAmount} ر.س`}
+            />
           )}
 
           {/* ═══ Donation Amount Selector ═══ */}
-          <div className="mb-6">
-            <DonationAmountSelector
-              donationOptions={donationOptions}
-              donationLabels={donationLabels}
+          <div className="mb-3">
+            <SharedDonationAmountSelector
+              donationPresets={donationOptions}
               allowCustomAmount={allowCustomAmount}
-              onSelect={(amount) => setSelectedAmount(amount)}
               selectedAmount={selectedAmount}
+              onAmountChange={(amount) => {
+                setSelectedAmount(amount);
+                if (amount !== 0) setCustomValue("");
+              }}
             />
           </div>
 
-          {/* ═══ Selected Donation Display ═══ */}
-          {selectedAmount && selectedAmount > 0 && (
-            <div
-              className="text-center py-3 mb-4 font-black text-lg"
-              style={{
-                color: "var(--p-color)",
-                backgroundColor:
-                  "color-mix(in srgb, var(--p-color) 8%, transparent)",
-                borderRadius: "var(--radius)",
-              }}
-            >
-              مبلغ التبرع المختار: {formatCurrency(selectedAmount)}
-            </div>
-          )}
-
-          {/* ═══ CTA Button ═══ */}
-          <div className="flex gap-2">
+          {/* ═══ CTA row — button + price pill (mirrors CharityProductCard) ═══ */}
+          <div className="flex items-center gap-2 mt-auto pt-2">
             <button
               onClick={handleDonate}
-              disabled={!selectedAmount || selectedAmount <= 0}
-              className="grow py-5 text-white font-black text-lg shadow-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                backgroundColor: "var(--p-color)",
-                borderRadius: "var(--radius)",
-              }}
+              disabled={
+                isCustom ? !(parseFloat(customValue) > 0) : selectedAmount <= 0
+              }
+              className="donation-card__cta bg-(--p-color) text-white text-xs font-bold cursor-pointer px-4 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
             >
-              {selectedAmount && selectedAmount > 0
-                ? `تبرع بـ ${formatCurrency(selectedAmount)} الآن 💚`
-                : "اختر مبلغ التبرع 💚"}
+              تبرع الآن
             </button>
+
+            {/* Price pill — input when custom, display when preset */}
+            {isCustom ? (
+              <div
+                className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 overflow-hidden"
+                style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+              >
+                <input
+                  type="number"
+                  value={customValue}
+                  onChange={(e) => setCustomValue(e.target.value)}
+                  placeholder="المبلغ..."
+                  className="flex-1 min-w-0 bg-transparent outline-none text-base font-black text-(--p-color)"
+                  min={1}
+                />
+                <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+                  ر.س
+                </span>
+              </div>
+            ) : (
+              <div
+                className="flex-1 min-w-0 h-full flex items-center justify-between gap-1 bg-gray-50 border border-gray-200 px-3 cursor-pointer overflow-hidden"
+                style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
+                aria-label={`المبلغ: ${selectedAmount} ر.س`}
+              >
+                <span className="font-black text-base text-(--p-color) text-start flex-1">
+                  {selectedAmount}
+                </span>
+                <span className="text-[11px] font-semibold text-gray-400 tracking-wide shrink-0">
+                  ر.س
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

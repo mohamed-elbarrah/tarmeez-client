@@ -40,5 +40,5 @@ export function getDonationProgress(
 }
 
 export function formatCurrency(amount: number, currency = "ر.س"): string {
-  return `${amount.toLocaleString("ar-SA")} ${currency}`;
+  return `${amount} ${currency}`;
 }

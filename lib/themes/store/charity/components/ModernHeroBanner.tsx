@@ -53,14 +53,14 @@ export default function ModernHeroBanner({
             className="px-8 py-3 font-bold text-sm rounded-full transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--p-color)", color: "#fff" }}
           >
-            تسوق الآن
+            تبرع الآن
           </Link>
           <Link
             href={`/store/${storeSlug}/products`}
             className="px-8 py-3 font-bold text-sm rounded-full border border-white/30 hover:bg-white/10 transition-colors"
             style={{ color: "#fff" }}
           >
-            جميع المنتجات
+            جميع المشاريع الخيرية
           </Link>
         </div>
       </div>

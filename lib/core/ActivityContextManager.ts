@@ -46,8 +46,16 @@ class RetailStrategy implements IActivityStrategy {
     return undefined;
   }
 
+  getDonationLabels(product: StoreProduct): Record<string, string> | undefined {
+    return undefined;
+  }
+
   getAllowCustomAmount(product: StoreProduct): boolean {
     return false;
+  }
+
+  getBadgeText(product: StoreProduct): string | undefined {
+    return undefined;
   }
 }
 
@@ -73,14 +81,14 @@ class CharityStrategy implements IActivityStrategy {
     if (!dm?.targetAmount || dm.targetAmount <= 0) return 0;
     return Math.min(
       Math.round(((dm.currentAmount ?? 0) / dm.targetAmount) * 100),
-      100
+      100,
     );
   }
 
   getProgressMessage(product: StoreProduct): string | undefined {
     const dm = product.donationMetadata;
     const percent = this.getProgressBarPercent(product) || 0;
-    
+
     if (percent === 0) return dm?.progressMessages?.["0"] || "كن أول مبادر";
     if (dm?.progressMessages?.[percent.toString()]) {
       return dm.progressMessages[percent.toString()];
@@ -90,7 +98,7 @@ class CharityStrategy implements IActivityStrategy {
   }
 
   getFloatingBadgeText(product: StoreProduct): string | undefined {
-    return undefined; 
+    return undefined;
   }
 
   shouldShowAmountInput(): boolean {
@@ -99,20 +107,32 @@ class CharityStrategy implements IActivityStrategy {
 
   getGoalDisplay(product: StoreProduct): string | undefined {
     const dm = product.donationMetadata;
-    return dm?.targetAmount ? `${dm.targetAmount.toLocaleString()} ر.س` : undefined;
+    return dm?.targetAmount
+      ? `${dm.targetAmount.toLocaleString()} ر.س`
+      : undefined;
   }
 
   getCollectedDisplay(product: StoreProduct): string | undefined {
     const dm = product.donationMetadata;
-    return dm?.currentAmount !== undefined ? `${dm.currentAmount.toLocaleString()} ر.س` : undefined;
+    return dm?.currentAmount !== undefined
+      ? `${dm.currentAmount.toLocaleString()} ر.س`
+      : undefined;
   }
 
   getDonationPresets(product: StoreProduct): number[] | undefined {
     return product.donationMetadata?.donationOptions || [10, 50, 100];
   }
 
+  getDonationLabels(product: StoreProduct): Record<string, string> | undefined {
+    return product.donationMetadata?.donationLabels;
+  }
+
   getAllowCustomAmount(product: StoreProduct): boolean {
     return product.donationMetadata?.allowCustomAmount ?? true;
+  }
+
+  getBadgeText(product: StoreProduct): string | undefined {
+    return product.category || undefined;
   }
 }
 
@@ -120,7 +140,8 @@ export class ActivityContextManager {
   private strategy: IActivityStrategy;
 
   constructor(type: "RETAIL" | "CHARITY" = "RETAIL") {
-    this.strategy = type === "CHARITY" ? new CharityStrategy() : new RetailStrategy();
+    this.strategy =
+      type === "CHARITY" ? new CharityStrategy() : new RetailStrategy();
   }
 
   getPrimaryActionLabel(): string {
@@ -164,10 +185,18 @@ export class ActivityContextManager {
   }
 
   getDonationPresets(product: StoreProduct): number[] | undefined {
-     return this.strategy.getDonationPresets(product);
+    return this.strategy.getDonationPresets(product);
+  }
+
+  getDonationLabels(product: StoreProduct): Record<string, string> | undefined {
+    return this.strategy.getDonationLabels(product);
   }
 
   getAllowCustomAmount(product: StoreProduct): boolean {
     return this.strategy.getAllowCustomAmount(product);
+  }
+
+  getBadgeText(product: StoreProduct): string | undefined {
+    return this.strategy.getBadgeText(product);
   }
 }

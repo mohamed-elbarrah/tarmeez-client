@@ -74,7 +74,7 @@ export default function DonationAmountSelector({
                 </span>
               )}
               <span>
-                {amount.toLocaleString("ar-SA")} {currency}
+                {amount} {currency}
               </span>
             </button>
           );
