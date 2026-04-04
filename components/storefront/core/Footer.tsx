@@ -16,7 +16,7 @@ export default function Footer({ storeSlug, storeName, logo, theme }: Props) {
   const [logoError, setLogoError] = useState(false);
   return (
     <footer className="bg-white border-t border-gray-100 mt-20 pt-16 pb-8 px-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      <div className="container grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             {logo && !logoError ? (
@@ -75,7 +75,7 @@ export default function Footer({ storeSlug, storeName, logo, theme }: Props) {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto border-t pt-8 text-center text-xs text-gray-400 font-bold">
+      <div className="container border-t pt-8 text-center text-xs text-gray-400 font-bold">
         © 2024 جميع الحقوق محفوظة لمتجر {storeName || "Tarmeez"}
       </div>
     </footer>

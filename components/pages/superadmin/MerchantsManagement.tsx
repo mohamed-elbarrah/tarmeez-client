@@ -23,20 +23,46 @@ export default function MerchantsManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">التاجر</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">المتاجر</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">الإيرادات</th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">تاريخ التسجيل</th>
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
+                  التاجر
+                </th>
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
+                  المتاجر
+                </th>
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
+                  الإيرادات
+                </th>
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
+                  تاريخ التسجيل
+                </th>
               </tr>
             </thead>
             <tbody>
               {[
-                { name: "أحمد محمد", email: "ahmad@example.com", stores: 2, revenue: "78,450", date: "يناير 2026" },
-                { name: "فاطمة علي", email: "fatima@example.com", stores: 1, revenue: "32,140", date: "فبراير 2026" },
-                { name: "محمد خالد", email: "mohammed@example.com", stores: 3, revenue: "125,670", date: "ديسمبر 2025" },
+                {
+                  name: "أحمد محمد",
+                  email: "ahmad@example.com",
+                  stores: 2,
+                  revenue: "78,450",
+                  date: "يناير 2026",
+                },
+                {
+                  name: "فاطمة علي",
+                  email: "fatima@example.com",
+                  stores: 1,
+                  revenue: "32,140",
+                  date: "فبراير 2026",
+                },
+                {
+                  name: "محمد خالد",
+                  email: "mohammed@example.com",
+                  stores: 3,
+                  revenue: "125,670",
+                  date: "ديسمبر 2025",
+                },
               ].map((merchant, i) => (
                 <tr key={i} className="border-b border-border">
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2">
                     <div>
                       <div className="font-medium">{merchant.name}</div>
                       <div className="text-sm text-muted-foreground flex items-center gap-2">
@@ -45,9 +71,13 @@ export default function MerchantsManagement() {
                       </div>
                     </div>
                   </td>
-                  <td className="py-4 px-4">{merchant.stores}</td>
-                  <td className="py-4 px-4 font-medium">{merchant.revenue} ر.س</td>
-                  <td className="py-4 px-4 text-muted-foreground">{merchant.date}</td>
+                  <td className="py-4 px-2">{merchant.stores}</td>
+                  <td className="py-4 px-2 font-medium">
+                    {merchant.revenue} ر.س
+                  </td>
+                  <td className="py-4 px-2 text-muted-foreground">
+                    {merchant.date}
+                  </td>
                 </tr>
               ))}
             </tbody>

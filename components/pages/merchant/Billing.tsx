@@ -28,7 +28,7 @@ export default function Billing() {
             "جميع القوالب",
             "أدوات AI",
             "دعم أولوية",
-            "API مخصص"
+            "API مخصص",
           ].map((feature, i) => (
             <div key={i} className="flex items-center gap-2">
               <Check className="w-5 h-5 text-accent" />
@@ -49,10 +49,14 @@ export default function Billing() {
             <div className="w-12 h-8 bg-card rounded border border-border"></div>
             <div>
               <div className="font-medium">فيزا •••• 4242</div>
-              <div className="text-sm text-muted-foreground">تنتهي في 12/2026</div>
+              <div className="text-sm text-muted-foreground">
+                تنتهي في 12/2026
+              </div>
             </div>
           </div>
-          <Button variant="ghost" size="sm">تعديل</Button>
+          <Button variant="ghost" size="sm">
+            تعديل
+          </Button>
         </div>
         <Button variant="outline">إضافة طريقة دفع</Button>
       </Card>
@@ -69,29 +73,56 @@ export default function Billing() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">الفاتورة</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">التاريخ</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">المبلغ</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">الحالة</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">إجراء</th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
+                  الفاتورة
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
+                  التاريخ
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
+                  المبلغ
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
+                  الحالة
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
+                  إجراء
+                </th>
               </tr>
             </thead>
             <tbody>
               {[
-                { id: "#INV-1234", date: "6 مارس 2026", amount: "199 ر.س", status: "مدفوعة" },
-                { id: "#INV-1233", date: "6 فبراير 2026", amount: "199 ر.س", status: "مدفوعة" },
-                { id: "#INV-1232", date: "6 يناير 2026", amount: "199 ر.س", status: "مدفوعة" },
+                {
+                  id: "#INV-1234",
+                  date: "6 مارس 2026",
+                  amount: "199 ر.س",
+                  status: "مدفوعة",
+                },
+                {
+                  id: "#INV-1233",
+                  date: "6 فبراير 2026",
+                  amount: "199 ر.س",
+                  status: "مدفوعة",
+                },
+                {
+                  id: "#INV-1232",
+                  date: "6 يناير 2026",
+                  amount: "199 ر.س",
+                  status: "مدفوعة",
+                },
               ].map((invoice, i) => (
                 <tr key={i} className="border-b border-border">
-                  <td className="py-3 px-4 font-medium">{invoice.id}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{invoice.date}</td>
-                  <td className="py-3 px-4 font-medium">{invoice.amount}</td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2 font-medium">{invoice.id}</td>
+                  <td className="py-3 px-2 text-muted-foreground">
+                    {invoice.date}
+                  </td>
+                  <td className="py-3 px-2 font-medium">{invoice.amount}</td>
+                  <td className="py-3 px-2">
                     <span className="px-3 py-1 bg-accent/10 rounded-full text-xs font-medium">
                       {invoice.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <Button variant="ghost" size="sm">
                       <Download className="w-4 h-4" />
                     </Button>

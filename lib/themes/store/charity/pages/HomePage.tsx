@@ -27,7 +27,7 @@ export default function CharityHomePage({
 }: Props) {
   const featuredProduct = products?.[0] ?? null;
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-16">
+    <main className="container py-8 space-y-16">
       {products.length > 0 && (
         <ModernHeroBanner
           theme={theme}

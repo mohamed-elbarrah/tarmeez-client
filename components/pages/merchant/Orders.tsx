@@ -169,25 +169,25 @@ export default function Orders() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   رقم الطلب
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   العميل
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   المنتجات
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   المبلغ
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   الحالة
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   التاريخ
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground"></th>
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground"></th>
               </tr>
             </thead>
             <tbody>
@@ -196,7 +196,7 @@ export default function Orders() {
                   key={i}
                   className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
                 >
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <Link
                       href={`/merchant/orders/${order.orderCode}`}
                       className="font-medium text-sm hover:text-primary"
@@ -204,7 +204,7 @@ export default function Orders() {
                       #{order.orderCode}
                     </Link>
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <div className="text-sm font-medium">
                       {order.customerName}
                     </div>
@@ -212,19 +212,19 @@ export default function Orders() {
                       {order.customerEmail}
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-sm text-muted-foreground">
+                  <td className="py-3 px-2 text-sm text-muted-foreground">
                     {order.items?.length || 0} منتج
                   </td>
-                  <td className="py-3 px-4 text-sm font-medium">
+                  <td className="py-3 px-2 text-sm font-medium">
                     {Number(order.total).toLocaleString()} ر.س
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <StatusBadge status={order.status} />
                   </td>
-                  <td className="py-3 px-4 text-sm text-muted-foreground">
+                  <td className="py-3 px-2 text-sm text-muted-foreground">
                     {formatDate(order.createdAt)}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <Button
                       variant="ghost"
                       size="icon"

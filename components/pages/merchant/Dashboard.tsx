@@ -264,19 +264,19 @@ export default function Dashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   رقم الطلب
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   العميل
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   المبلغ
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   الحالة
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   التاريخ
                 </th>
               </tr>
@@ -323,10 +323,10 @@ export default function Dashboard() {
                   key={i}
                   className="border-b border-border hover:bg-secondary/50 transition-colors"
                 >
-                  <td className="py-4 px-4 font-medium">{order.id}</td>
-                  <td className="py-4 px-4">{order.customer}</td>
-                  <td className="py-4 px-4 font-medium">{order.amount}</td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2 font-medium">{order.id}</td>
+                  <td className="py-4 px-2">{order.customer}</td>
+                  <td className="py-4 px-2 font-medium">{order.amount}</td>
+                  <td className="py-4 px-2">
                     <span
                       className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                         order.status === "مكتمل"
@@ -339,7 +339,7 @@ export default function Dashboard() {
                       {order.status}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-muted-foreground">
+                  <td className="py-4 px-2 text-muted-foreground">
                     {order.date}
                   </td>
                 </tr>

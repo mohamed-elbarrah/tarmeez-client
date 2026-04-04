@@ -111,7 +111,7 @@ export default async function PublicPage({
     >
       {/* Preview Banner */}
       {preview === "true" && (
-        <div className="bg-[var(--p-color)] text-white text-center py-2 px-4 text-sm font-bold sticky top-0 z-50">
+        <div className="bg-[var(--p-color)] text-white text-center py-2 px-2 text-sm font-bold sticky top-0 z-50">
           وضع المعاينة — هذه الصفحة غير منشورة للعملاء بعد
         </div>
       )}

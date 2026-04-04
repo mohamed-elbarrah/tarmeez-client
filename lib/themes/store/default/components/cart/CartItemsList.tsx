@@ -75,7 +75,7 @@ export default function CartItemsList({
             >
               <Minus size={14} />
             </button>
-            <span className="px-4 font-black text-sm">{item.quantity}</span>
+            <span className="px-2 font-black text-sm">{item.quantity}</span>
             <button
               onClick={() => onUpdateQty(item.id, 1)}
               className="p-1.5 hover:bg-white rounded-lg"

@@ -343,7 +343,7 @@ export default function VariantSelector({
                           disabled={!available}
                           onClick={() => onSelect(option.name, val.value)}
                           className={`
-                            relative flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 text-sm font-bold
+                            relative flex items-center gap-3 w-full px-2 py-3 rounded-xl border-2 text-sm font-bold
                             transition-all duration-200 text-right
                             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
                             ${
@@ -394,7 +394,7 @@ export default function VariantSelector({
                         disabled={!available}
                         onClick={() => onSelect(option.name, val.value)}
                         className={`
-                          relative px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all duration-200
+                          relative px-2 py-2 text-sm font-bold rounded-xl border-2 transition-all duration-200
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
                           ${
                             isSelected

@@ -14,12 +14,16 @@ import {
   Archive,
   RefreshCcw,
   Layout,
+  Home,
+  Settings2,
 } from "lucide-react";
 import {
   useGetPagesQuery,
   useDeletePageMutation,
   useUpdatePageStatusMutation,
+  useGetOrCreateHomePageQuery,
 } from "@/lib/services/pagesApi";
+import { useGetMyStoreQuery } from "@/lib/services/merchantApi";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,6 +63,10 @@ import { Resource, Action } from "@/lib/types/rbac";
 export default function PagesDashboard() {
   const { canManage } = useRole();
   const { data: pages, isLoading } = useGetPagesQuery();
+  const { data: homePage, isLoading: isHomePageLoading } =
+    useGetOrCreateHomePageQuery();
+  const { data: merchantData } = useGetMyStoreQuery();
+  const storeSlug = merchantData?.storeSlug;
   const [deletePage, { isLoading: isDeleting }] = useDeletePageMutation();
   const [updateStatus] = useUpdatePageStatusMutation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -120,6 +128,56 @@ export default function PagesDashboard() {
         )}
       </div>
 
+      {/* ── Home Page Highlight Card ─────────────────────────────────────── */}
+      <Card className="p-6 border-2 border-primary/20 bg-primary/5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-primary/10">
+              <Home className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold">الصفحة الرئيسية للمتجر</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                صمم واجهة متجرك الرئيسية باستخدام منشئ الصفحات
+              </p>
+              {isHomePageLoading ? (
+                <div className="mt-1 h-4 w-32 bg-muted animate-pulse rounded" />
+              ) : homePage ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={statusMap[homePage.status]?.variant}>
+                    {statusMap[homePage.status]?.label}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    آخر تعديل:{" "}
+                    {new Date(homePage.updatedAt).toLocaleDateString("ar-EG")}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {homePage && storeSlug && (
+              <Link
+                href={`/store/${storeSlug}/p/home?preview=true`}
+                target="_blank"
+              >
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Eye className="w-4 h-4" />
+                  معاينة
+                </Button>
+              </Link>
+            )}
+            {canManagePages && homePage && (
+              <Link href={`/merchant/pages/${homePage.id}/edit`}>
+                <Button size="sm" className="gap-2">
+                  <Settings2 className="w-4 h-4" />
+                  تخصيص
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -242,7 +300,7 @@ export default function PagesDashboard() {
                             </Button>
                           </Link>
                         )}
-                        
+
                         <Link
                           href={`/store/${page.storeId}/p/${page.slug}`}
                           target="_blank"
@@ -284,10 +342,12 @@ export default function PagesDashboard() {
                               </AlertDialogTrigger>
                               <AlertDialogContent dir="rtl">
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>حذف الصفحة؟</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    حذف الصفحة؟
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    سيتم حذف الصفحة وإزالتها من المتجر نهائياً. لا
-                                    يمكن التراجع عن هذا الإجراء.
+                                    سيتم حذف الصفحة وإزالتها من المتجر نهائياً.
+                                    لا يمكن التراجع عن هذا الإجراء.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -296,7 +356,9 @@ export default function PagesDashboard() {
                                     onClick={() => handleDelete(page.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
-                                    {isDeleting ? "جاري الحذف..." : "تأكيد الحذف"}
+                                    {isDeleting
+                                      ? "جاري الحذف..."
+                                      : "تأكيد الحذف"}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -305,7 +367,6 @@ export default function PagesDashboard() {
                         )}
                       </div>
                     </td>
-
                   </tr>
                 ))
               )}

@@ -44,7 +44,7 @@ export default function Header({ storeSlug, storeName, logo, theme }: Props) {
           <span>المساعدة</span>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
+      <div className="container py-4 flex items-center justify-between gap-8">
         <Link
           href={`/store/${storeSlug}`}
           className="flex items-center gap-2 cursor-pointer"

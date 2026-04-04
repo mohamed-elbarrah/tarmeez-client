@@ -40,22 +40,22 @@ export default function SupportTickets() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   رقم التذكرة
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الموضوع
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   المتجر
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الحالة
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   التاريخ
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   إجراء
                 </th>
               </tr>
@@ -88,12 +88,12 @@ export default function SupportTickets() {
                   key={i}
                   className="border-b border-border hover:bg-secondary/50 transition-colors"
                 >
-                  <td className="py-4 px-4 font-medium">{ticket.id}</td>
-                  <td className="py-4 px-4">{ticket.subject}</td>
-                  <td className="py-4 px-4 text-muted-foreground">
+                  <td className="py-4 px-2 font-medium">{ticket.id}</td>
+                  <td className="py-4 px-2">{ticket.subject}</td>
+                  <td className="py-4 px-2 text-muted-foreground">
                     {ticket.store}
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         ticket.status === "مفتوحة"
@@ -106,10 +106,10 @@ export default function SupportTickets() {
                       {ticket.status}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-muted-foreground">
+                  <td className="py-4 px-2 text-muted-foreground">
                     {ticket.date}
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2">
                     <Button variant="ghost" size="sm">
                       <Eye className="w-4 h-4" />
                     </Button>

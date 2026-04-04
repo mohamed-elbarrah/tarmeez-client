@@ -8,7 +8,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex items-center justify-center min-h-[60vh] px-4 text-center">
+    <div className="flex items-center justify-center min-h-[60vh] px-2 text-center">
       <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
         <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
           !

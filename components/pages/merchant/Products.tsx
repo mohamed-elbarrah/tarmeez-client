@@ -143,41 +143,41 @@ export default function Products() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   المنتج
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   السعر
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   المخزون
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   الحالة
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground"></th>
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground"></th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i} className="border-b border-border">
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <div className="flex items-center gap-3">
                         <Skeleton className="w-10 h-10 rounded-lg" />
                         <Skeleton className="h-4 w-32" />
                       </div>
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <Skeleton className="h-4 w-16" />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <Skeleton className="h-4 w-12" />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <Skeleton className="h-5 w-16 rounded-full" />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <Skeleton className="h-8 w-16" />
                     </td>
                   </tr>
@@ -197,7 +197,7 @@ export default function Products() {
                     key={product.id}
                     className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
                   >
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <div className="flex items-center gap-3">
                         {product.images?.[0] ? (
                           <img
@@ -213,16 +213,16 @@ export default function Products() {
                         </span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-sm font-medium">
+                    <td className="py-3 px-2 text-sm font-medium">
                       {product.price} ر.س
                     </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
+                    <td className="py-3 px-2 text-sm text-muted-foreground">
                       {product.quantity}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <ProductStatusBadge status={product.status} />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <div className="flex gap-1">
                         <Button
                           variant="ghost"

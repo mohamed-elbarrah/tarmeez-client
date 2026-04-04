@@ -175,7 +175,7 @@ export default function LoginPage({
               <div className="w-full border-t border-slate-300"></div>
             </div>
             <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-              <span className="bg-white px-4 text-slate-300">
+              <span className="bg-white px-2 text-slate-300">
                 أو المتابعة بواسطة
               </span>
             </div>

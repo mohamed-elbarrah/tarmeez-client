@@ -17,7 +17,7 @@ export default function Button({
   ...rest
 }: Props) {
   const sizeClasses = {
-    sm: "px-4 py-1.5 text-xs",
+    sm: "px-2 py-1.5 text-xs",
     md: "px-6 py-2.5 text-sm",
     lg: "px-8 py-3 text-base",
   };

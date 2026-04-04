@@ -80,7 +80,7 @@ export default function OrderReview() {
               <button
                 type="button"
                 onClick={handleRemoveCoupon}
-                className="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-slate-50 transition-colors"
+                className="px-2 py-2 text-sm font-bold border rounded-lg hover:bg-slate-50 transition-colors"
               >
                 إزالة
               </button>
@@ -89,7 +89,7 @@ export default function OrderReview() {
                 type="button"
                 onClick={handleApplyCoupon}
                 disabled={!couponCode.trim() || isValidating}
-                className="px-4 py-2 text-sm font-bold text-white rounded-lg bg-[var(--p-color)] hover:shadow-md transition-all disabled:opacity-50"
+                className="px-2 py-2 text-sm font-bold text-white rounded-lg bg-[var(--p-color)] hover:shadow-md transition-all disabled:opacity-50"
               >
                 {isValidating ? "..." : "تطبيق"}
               </button>

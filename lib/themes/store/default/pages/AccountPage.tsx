@@ -49,7 +49,7 @@ export default function AccountPage({ storeSlug }: Props) {
 
   return (
     <AccountContextProvider value={accountValue}>
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-10 flex flex-col lg:flex-row gap-8">
+      <main className="container py-10 flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
         <aside className="w-full lg:w-80 space-y-3">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 text-center mb-6 shadow-sm">

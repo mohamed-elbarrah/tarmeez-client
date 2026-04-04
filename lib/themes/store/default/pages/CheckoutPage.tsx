@@ -27,7 +27,7 @@ export default function CheckoutPage({
 
   return (
     <CheckoutContextProvider value={checkoutValue}>
-      <div className="max-w-6xl mx-auto py-10 px-4">
+      <div className="container py-10">
         <h1 className="text-2xl font-black mb-8">إتمام عملية الشراء</h1>
         <form
           onSubmit={checkoutValue.onSubmit}

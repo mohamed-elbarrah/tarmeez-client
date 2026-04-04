@@ -57,7 +57,7 @@ export default function DonationAmountSelector({
               key={idx}
               type="button"
               onClick={() => handlePresetSelect(amount)}
-              className="py-3 px-4 font-bold text-sm transition-all cursor-pointer border-2 flex flex-col items-center gap-1"
+              className="py-3 px-2 font-bold text-sm transition-all cursor-pointer border-2 flex flex-col items-center gap-1"
               style={{
                 borderRadius: "var(--radius)",
                 borderColor: isActive ? "var(--p-color)" : "#e5e7eb",
@@ -103,7 +103,7 @@ export default function DonationAmountSelector({
                 placeholder="أدخل المبلغ"
                 value={customAmount}
                 onChange={(e) => handleCustomChange(e.target.value)}
-                className="flex-1 border border-gray-200 py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-(--p-color)"
+                className="flex-1 border border-gray-200 py-2.5 px-2 text-sm outline-none focus:ring-2 focus:ring-(--p-color)"
                 style={{ borderRadius: "var(--radius)" }}
                 dir="rtl"
                 autoFocus
@@ -115,7 +115,7 @@ export default function DonationAmountSelector({
                   setCustomAmount("");
                   onSelect(0);
                 }}
-                className="px-4 py-2.5 text-sm font-bold border border-gray-200 hover:bg-gray-50 transition-colors"
+                className="px-2 py-2.5 text-sm font-bold border border-gray-200 hover:bg-gray-50 transition-colors"
                 style={{ borderRadius: "var(--radius)" }}
               >
                 إلغاء

@@ -31,7 +31,7 @@ export default function DonationProgressBar({
           className="progress-bar-fill h-full absolute top-0 right-0 bg-(--p-color)"
           style={{ borderRadius: "100px", width: `${progressBarPercent}%` }}
         />
-        <div className="progress-overlay absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+        <div className="progress-overlay absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
           <span className="text-[10px] font-bold text-gray-600 z-10">
             {resolvedProgressMessage}
           </span>

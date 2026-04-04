@@ -112,19 +112,19 @@ export default function Customers() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   العميل
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   الموقع
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   الطلبات
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">
                   إجمالي الإنفاق
                 </th>
-                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground"></th>
+                <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground"></th>
               </tr>
             </thead>
             <tbody>
@@ -133,7 +133,7 @@ export default function Customers() {
                   key={customer.id}
                   className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
                 >
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <span className="font-bold text-sm text-primary">
@@ -150,14 +150,14 @@ export default function Customers() {
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-sm text-muted-foreground">—</td>
-                  <td className="py-3 px-4 text-sm">
+                  <td className="py-3 px-2 text-sm text-muted-foreground">—</td>
+                  <td className="py-3 px-2 text-sm">
                     {customer.ordersCount ?? 0}
                   </td>
-                  <td className="py-3 px-4 text-sm font-medium">
+                  <td className="py-3 px-2 text-sm font-medium">
                     {customer.totalSpent ?? 0}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"

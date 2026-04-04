@@ -404,7 +404,7 @@ export default function SettingsPage() {
                             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" />
                           </div>
 
-                          <p className="text-[10px] font-medium text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-full border border-border/50 relative z-10">
+                          <p className="text-[10px] font-medium text-muted-foreground bg-muted/50 px-2 py-1.5 rounded-full border border-border/50 relative z-10">
                             عرض تجريبي للشكل النهائي في المتجر
                           </p>
                         </div>

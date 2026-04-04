@@ -95,10 +95,7 @@ export default function FiltersSection({
   } as React.CSSProperties;
 
   return (
-    <main
-      className="min-h-screen max-w-7xl mx-auto px-4 md:px-8 py-10"
-      style={themeStyles}
-    >
+    <main className="min-h-screen container py-10" style={themeStyles}>
       <div className="flex flex-col md:flex-row gap-8">
         <aside
           className="hidden md:block w-64 space-y-8 bg-white p-6 border border-gray-100 h-fit sticky top-28"
@@ -168,7 +165,7 @@ export default function FiltersSection({
               <div className="md:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
-                    <button className="flex items-center gap-2 text-xs font-bold bg-white px-4 py-2 rounded-xl border hover:bg-gray-50 transition-colors">
+                    <button className="flex items-center gap-2 text-xs font-bold bg-white px-2 py-2 rounded-xl border hover:bg-gray-50 transition-colors">
                       <Filter size={14} /> الفلاتر
                     </button>
                   </SheetTrigger>
@@ -213,7 +210,7 @@ export default function FiltersSection({
                                 <button
                                   key={cat}
                                   onClick={() => handleCategoryChange(cat)}
-                                  className={`px-4 py-2 font-bold transition-all whitespace-nowrap ${
+                                  className={`px-2 py-2 font-bold transition-all whitespace-nowrap ${
                                     selectedCategory === cat
                                       ? "bg-[var(--p-color)] text-white shadow-md"
                                       : "bg-gray-100 text-gray-500 hover:bg-[var(--p-color)] hover:text-white"
@@ -255,7 +252,7 @@ export default function FiltersSection({
                 </Sheet>
               </div>
 
-              <div className=" hidden lg:flex items-center gap-2 text-xs font-bold bg-white px-4 py-2 rounded-xl border">
+              <div className=" hidden lg:flex items-center gap-2 text-xs font-bold bg-white px-2 py-2 rounded-xl border">
                 <SlidersHorizontal size={14} /> ترتيب حسب: الأحدث
               </div>
             </div>

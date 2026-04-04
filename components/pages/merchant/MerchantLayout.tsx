@@ -41,21 +41,81 @@ import { useEffect } from "react";
 
 const navigation = [
   { name: "لوحة التحكم", href: "/merchant", icon: LayoutDashboard }, // Dashboard is generally open for all
-  { name: "الطلبات", href: "/merchant/orders", icon: ShoppingCart, resource: Resource.ORDERS },
-  { name: "المنتجات", href: "/merchant/products", icon: Package, resource: Resource.PRODUCTS },
-  { name: "الفئات", href: "/merchant/categories", icon: FolderOpen, resource: Resource.CATEGORIES },
-  { name: "العملاء", href: "/merchant/customers", icon: Users, resource: Resource.CUSTOMERS },
-  { name: "التحليلات", href: "/merchant/analytics", icon: BarChart3, resource: Resource.ANALYTICS },
-  { name: "التسويق", href: "/merchant/marketing", icon: Megaphone, resource: Resource.ANALYTICS },
-  { name: "صفحاتي", href: "/merchant/pages", icon: Layout, resource: Resource.PAGES },
-  { name: "القوالب", href: "/merchant/themes", icon: Palette, resource: Resource.SETTINGS },
-  { name: "التطبيقات", href: "/merchant/apps", icon: Puzzle, resource: Resource.SETTINGS },
+  {
+    name: "الطلبات",
+    href: "/merchant/orders",
+    icon: ShoppingCart,
+    resource: Resource.ORDERS,
+  },
+  {
+    name: "المنتجات",
+    href: "/merchant/products",
+    icon: Package,
+    resource: Resource.PRODUCTS,
+  },
+  {
+    name: "الفئات",
+    href: "/merchant/categories",
+    icon: FolderOpen,
+    resource: Resource.CATEGORIES,
+  },
+  {
+    name: "العملاء",
+    href: "/merchant/customers",
+    icon: Users,
+    resource: Resource.CUSTOMERS,
+  },
+  {
+    name: "التحليلات",
+    href: "/merchant/analytics",
+    icon: BarChart3,
+    resource: Resource.ANALYTICS,
+  },
+  {
+    name: "التسويق",
+    href: "/merchant/marketing",
+    icon: Megaphone,
+    resource: Resource.ANALYTICS,
+  },
+  {
+    name: "صفحاتي",
+    href: "/merchant/pages",
+    icon: Layout,
+    resource: Resource.PAGES,
+  },
+  {
+    name: "القوالب",
+    href: "/merchant/themes",
+    icon: Palette,
+    resource: Resource.SETTINGS,
+  },
+  {
+    name: "التطبيقات",
+    href: "/merchant/apps",
+    icon: Puzzle,
+    resource: Resource.SETTINGS,
+  },
 ];
 
 const bottomNavigation = [
-  { name: "الإعدادات", href: "/merchant/settings", icon: Settings, resource: Resource.SETTINGS },
-  { name: "الفريق", href: "/merchant/team", icon: UsersRound, resource: Resource.TEAM },
-  { name: "الفواتير", href: "/merchant/billing", icon: CreditCard, resource: Resource.SETTINGS },
+  {
+    name: "الإعدادات",
+    href: "/merchant/settings",
+    icon: Settings,
+    resource: Resource.SETTINGS,
+  },
+  {
+    name: "الفريق",
+    href: "/merchant/team",
+    icon: UsersRound,
+    resource: Resource.TEAM,
+  },
+  {
+    name: "الفواتير",
+    href: "/merchant/billing",
+    icon: CreditCard,
+    resource: Resource.SETTINGS,
+  },
   { name: "الدعم", href: "/merchant/support", icon: HelpCircle },
 ];
 
@@ -75,8 +135,8 @@ export default function MerchantLayout({
 
   // ROUTE PROTECTION: Sync layout with RBAC
   useEffect(() => {
-    const currentNavItem = [...navigation, ...bottomNavigation].find((item) =>
-      pathname.startsWith(item.href) && item.href !== "/merchant"
+    const currentNavItem = [...navigation, ...bottomNavigation].find(
+      (item) => pathname.startsWith(item.href) && item.href !== "/merchant",
     );
 
     if (currentNavItem?.resource && !canRead(currentNavItem.resource)) {
@@ -93,12 +153,12 @@ export default function MerchantLayout({
   const initials = merchantName ? merchantName.charAt(0) : "ت";
 
   // Filter Nav Items
-  const filteredNav = navigation.filter(item => 
-    !item.resource || canRead(item.resource)
+  const filteredNav = navigation.filter(
+    (item) => !item.resource || canRead(item.resource),
   );
 
-  const filteredBottomNav = bottomNavigation.filter(item => 
-    !item.resource || canRead(item.resource)
+  const filteredBottomNav = bottomNavigation.filter(
+    (item) => !item.resource || canRead(item.resource),
   );
 
   return (
@@ -112,7 +172,7 @@ export default function MerchantLayout({
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           {/* Logo */}
-          <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0">
+          <div className="flex items-center gap-3 px-2 h-16 border-b border-sidebar-border shrink-0">
             <Link href="/merchant" className="flex items-center gap-3 min-w-0">
               <div className="w-9 h-9 shrink-0 rounded-lg bg-sidebar-primary flex items-center justify-center">
                 <span className="text-sidebar-primary-foreground font-bold text-lg">
@@ -256,7 +316,6 @@ export default function MerchantLayout({
     </TooltipProvider>
   );
 }
-
 
 /* ─── Sidebar Link Component ─── */
 function SidebarLink({

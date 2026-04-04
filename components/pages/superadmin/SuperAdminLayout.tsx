@@ -65,7 +65,7 @@ export default function SuperAdminLayout({
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           {/* Logo */}
-          <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0">
+          <div className="flex items-center gap-3 px-2 h-16 border-b border-sidebar-border shrink-0">
             <Link
               href="/superadmin"
               className="flex items-center gap-3 min-w-0"

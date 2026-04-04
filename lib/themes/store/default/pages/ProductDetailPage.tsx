@@ -54,7 +54,7 @@ export default function ProductDetailPage({ storeData, product }: Props) {
       allProducts={storeData.products ?? []}
     >
       <div
-        className="max-w-6xl mx-auto p-4 md:p-8"
+        className="container py-4 md:py-8"
         dir="rtl"
         style={{ ...themeStyles, fontFamily: "var(--font-family)" }}
       >

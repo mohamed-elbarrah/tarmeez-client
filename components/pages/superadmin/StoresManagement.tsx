@@ -37,25 +37,25 @@ export default function StoresManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   المتجر
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   التاجر
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الخطة
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الطلبات
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الإيرادات
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   الحالة
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-4 px-2 text-sm font-medium text-muted-foreground">
                   إجراءات
                 </th>
               </tr>
@@ -91,12 +91,12 @@ export default function StoresManagement() {
                   key={i}
                   className="border-b border-border hover:bg-secondary/50 transition-colors"
                 >
-                  <td className="py-4 px-4 font-medium">{store.store}</td>
-                  <td className="py-4 px-4">{store.merchant}</td>
-                  <td className="py-4 px-4">{store.plan}</td>
-                  <td className="py-4 px-4">{store.orders}</td>
-                  <td className="py-4 px-4 font-medium">{store.revenue} ر.س</td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2 font-medium">{store.store}</td>
+                  <td className="py-4 px-2">{store.merchant}</td>
+                  <td className="py-4 px-2">{store.plan}</td>
+                  <td className="py-4 px-2">{store.orders}</td>
+                  <td className="py-4 px-2 font-medium">{store.revenue} ر.س</td>
+                  <td className="py-4 px-2">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         store.status === "نشط"
@@ -107,7 +107,7 @@ export default function StoresManagement() {
                       {store.status}
                     </span>
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-2">
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm">
                         <Eye className="w-4 h-4" />

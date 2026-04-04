@@ -23,7 +23,7 @@ export default function SystemLogs() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="بحث في السجلات..." className="pr-10" />
           </div>
-          <select className="px-4 py-2 bg-card border border-border rounded-lg">
+          <select className="px-2 py-2 bg-card border border-border rounded-lg">
             <option>جميع الأنواع</option>
             <option>تسجيل دخول</option>
             <option>إنشاء متجر</option>

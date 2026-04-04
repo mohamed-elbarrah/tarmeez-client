@@ -86,7 +86,7 @@ export default function ProductCard({
       <div className="flex items-center gap-2 mt-auto pt-2">
         <button
           onClick={handleAction}
-          className="bg-(--p-color) text-white text-xs font-bold cursor-pointer px-4 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0"
+          className="bg-(--p-color) text-white text-xs font-bold cursor-pointer px-2 py-2 hover:opacity-90 transition-all duration-300 active:scale-95 whitespace-nowrap shrink-0"
           style={{ borderRadius: "calc(var(--radius) * 0.5)" }}
         >
           {primaryActionText}

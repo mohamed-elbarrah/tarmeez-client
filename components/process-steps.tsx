@@ -1,9 +1,9 @@
-import React from 'react'
+import React from "react";
 
 function ProcessSteps() {
   return (
     <div className="py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto  containerpx-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
           {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-primary-500 mb-4">
             <path fillRule="evenodd"
@@ -14,69 +14,89 @@ function ProcessSteps() {
             ثلاث خطوات فقط للانطلاق
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-            من الفكرة إلى التنفيذ.. نبسط لك الإجراءات لتبدأ مشروعك اليوم بأقل مجهود
+            من الفكرة إلى التنفيذ.. نبسط لك الإجراءات لتبدأ مشروعك اليوم بأقل
+            مجهود
           </p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
             <div className="flex flex-col">
               <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
-                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round"
-                  strokeLinejoin="round" className="h-12 w-12 flex-none text-primary-600" 
-                  xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-12 w-12 flex-none text-primary-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path
-                    d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z">
-                  </path>
+                  <path d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z"></path>
                   <path d="M10 10l2 -2v8"></path>
                 </svg>
                 اختر نوع المنصة
               </dt>
               <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                <p className="flex-auto">حدد ما إذا كنت تريد منصة تبرعات، وقف، أو متجر إلكتروني</p>
+                <p className="flex-auto">
+                  حدد ما إذا كنت تريد منصة تبرعات، وقف، أو متجر إلكتروني
+                </p>
               </dd>
             </div>
             <div className="flex flex-col">
               <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
-                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round"
-                  strokeLinejoin="round" className="h-12 w-12 flex-none text-primary-600"
-                  xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-12 w-12 flex-none text-primary-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path
-                    d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z">
-                  </path>
+                  <path d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z"></path>
                   <path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path>
                 </svg>
                 اختر القالب
               </dt>
               <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                <p className="flex-auto">اختر من بين قوالب احترافية جاهزة وقابلة للتخصيص.</p>
+                <p className="flex-auto">
+                  اختر من بين قوالب احترافية جاهزة وقابلة للتخصيص.
+                </p>
               </dd>
             </div>
             <div className="flex flex-col">
               <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
-                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round"
-                  strokeLinejoin="round" className="h-12 w-12 flex-none text-primary-600"
-                  xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-12 w-12 flex-none text-primary-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path
-                    d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z">
-                  </path>
-                  <path
-                    d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1">
-                  </path>
+                  <path d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z"></path>
+                  <path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1"></path>
                 </svg>
                 أطلق منصتك
               </dt>
               <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                <p className="flex-auto">انشر منصتك فورًا وابدأ باستقبال الطلبات أو التبرعات.</p>
+                <p className="flex-auto">
+                  انشر منصتك فورًا وابدأ باستقبال الطلبات أو التبرعات.
+                </p>
               </dd>
             </div>
           </dl>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default ProcessSteps;

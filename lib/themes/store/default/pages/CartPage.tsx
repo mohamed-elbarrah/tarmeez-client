@@ -19,7 +19,7 @@ export default function CartPage({ theme, storeSlug }: Props) {
   const { cartItems, updateQty, removeCartItem } = useCartActions(storeSlug);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-8 py-10">
+    <main className="container py-10">
       <h1 className="text-3xl font-black mb-10">سلة التسوق الخاصة بك</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">

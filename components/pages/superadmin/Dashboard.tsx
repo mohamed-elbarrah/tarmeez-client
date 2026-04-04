@@ -138,19 +138,19 @@ export default function Dashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   المتجر
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   التاجر
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   الخطة
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   الطلبات
                 </th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">
                   تاريخ الإنشاء
                 </th>
               </tr>
@@ -180,11 +180,11 @@ export default function Dashboard() {
                 },
               ].map((store, i) => (
                 <tr key={i} className="border-b border-border">
-                  <td className="py-3 px-4 font-medium">{store.store}</td>
-                  <td className="py-3 px-4">{store.merchant}</td>
-                  <td className="py-3 px-4">{store.plan}</td>
-                  <td className="py-3 px-4">{store.orders}</td>
-                  <td className="py-3 px-4 text-muted-foreground">
+                  <td className="py-3 px-2 font-medium">{store.store}</td>
+                  <td className="py-3 px-2">{store.merchant}</td>
+                  <td className="py-3 px-2">{store.plan}</td>
+                  <td className="py-3 px-2">{store.orders}</td>
+                  <td className="py-3 px-2 text-muted-foreground">
                     {store.date}
                   </td>
                 </tr>
