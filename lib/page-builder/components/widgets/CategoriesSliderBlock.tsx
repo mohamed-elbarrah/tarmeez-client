@@ -190,9 +190,9 @@ export const CategoriesSliderBlock = ({
 
       {/* Carousel */}
       <Carousel opts={{ align: "start", direction: "rtl" }} className="w-auto">
-        <CarouselContent className="-ml-4 gap-2">
+        <CarouselContent className="flex gap-4">
           {categories.map((cat) => (
-            <CarouselItem key={cat.id} className={cn("pl-4", basisClass)}>
+            <CarouselItem key={cat.id} className={cn("max-w-24")}>
               <Link
                 href={`/store/${slug}/products?category=${cat.slug}`}
                 className="flex flex-col items-center gap-2 cursor-pointer group"
