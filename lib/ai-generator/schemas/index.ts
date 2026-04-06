@@ -38,7 +38,9 @@ export const LandingPageContentSchema = z.object({
   sections: z.array(LandingSectionSchema).min(1).max(13),
   metadata: z.object({
     language: z.enum(["ar", "en"]).default("ar"),
-    tone: z.enum(["professional", "casual", "luxurious", "playful", "urgent"]).default("professional"),
+    tone: z
+      .enum(["professional", "casual", "luxurious", "playful", "urgent"])
+      .default("professional"),
     colorScheme: z.string().max(50).optional(),
   }),
 });

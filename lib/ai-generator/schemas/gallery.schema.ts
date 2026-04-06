@@ -10,7 +10,7 @@ export const GallerySectionSchema = z.object({
         src: z.string().min(1).max(500),
         alt: z.string().min(1).max(200),
         caption: z.string().max(200).optional(),
-      })
+      }),
     )
     .min(1)
     .max(20),

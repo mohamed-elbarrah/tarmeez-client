@@ -9,7 +9,7 @@ export const FaqSectionSchema = z.object({
       z.object({
         question: z.string().min(1).max(300),
         answer: z.string().min(1).max(1000),
-      })
+      }),
     )
     .min(2)
     .max(20),

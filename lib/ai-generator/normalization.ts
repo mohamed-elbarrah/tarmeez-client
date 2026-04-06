@@ -45,7 +45,13 @@ export function normalizeAIOutput(raw: unknown): NormalizationResult {
     return {
       success: false,
       data: null,
-      errors: [{ section: "root", path: "", message: "Expected object or JSON string" }],
+      errors: [
+        {
+          section: "root",
+          path: "",
+          message: "Expected object or JSON string",
+        },
+      ],
       warnings: [],
     };
   }
@@ -61,7 +67,13 @@ export function normalizeAIOutput(raw: unknown): NormalizationResult {
     return {
       success: false,
       data: null,
-      errors: [{ section: "root", path: "sections", message: "Missing sections array" }],
+      errors: [
+        {
+          section: "root",
+          path: "sections",
+          message: "Missing sections array",
+        },
+      ],
       warnings: [],
     };
   }
@@ -75,7 +87,9 @@ export function normalizeAIOutput(raw: unknown): NormalizationResult {
       validSections.push(result.data);
     } else {
       const sectionType =
-        typeof rawSection === "object" && rawSection !== null && "type" in rawSection
+        typeof rawSection === "object" &&
+        rawSection !== null &&
+        "type" in rawSection
           ? String((rawSection as Record<string, unknown>).type)
           : `index_${i}`;
       for (const issue of result.error.issues) {
@@ -108,10 +122,17 @@ export function normalizeAIOutput(raw: unknown): NormalizationResult {
   const sorted = sortByCanonicalOrder(deduped);
 
   // Step 6: Extract metadata with defaults
-  const rawMetadata = typeof parsed.metadata === "object" && parsed.metadata !== null ? parsed.metadata : {};
+  const rawMetadata =
+    typeof parsed.metadata === "object" && parsed.metadata !== null
+      ? parsed.metadata
+      : {};
   const metadata = {
     language: getStringField(rawMetadata, "language", "ar") as "ar" | "en",
-    tone: getStringField(rawMetadata, "tone", "professional") as LandingPageContent["metadata"]["tone"],
+    tone: getStringField(
+      rawMetadata,
+      "tone",
+      "professional",
+    ) as LandingPageContent["metadata"]["tone"],
     colorScheme: getStringField(rawMetadata, "colorScheme", undefined),
   };
 
@@ -133,7 +154,9 @@ export function normalizeAIOutput(raw: unknown): NormalizationResult {
   }
 
   if (errors.length > 0) {
-    warnings.push(`${errors.length} section(s) failed validation and were dropped`);
+    warnings.push(
+      `${errors.length} section(s) failed validation and were dropped`,
+    );
   }
 
   return {
@@ -159,7 +182,7 @@ function sortByCanonicalOrder(sections: LandingSection[]): LandingSection[] {
 function getStringField(
   obj: unknown,
   key: string,
-  fallback: string | undefined
+  fallback: string | undefined,
 ): string | undefined {
   if (typeof obj !== "object" || obj === null) return fallback;
   const val = (obj as Record<string, unknown>)[key];
