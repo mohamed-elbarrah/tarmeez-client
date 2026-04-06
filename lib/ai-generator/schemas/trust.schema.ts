@@ -8,7 +8,7 @@ export const TrustSectionSchema = z.object({
       z.object({
         value: z.string().min(1).max(30),
         label: z.string().min(1).max(100),
-      }),
+      })
     )
     .max(6)
     .optional(),
@@ -17,7 +17,7 @@ export const TrustSectionSchema = z.object({
       z.object({
         icon: z.string().max(50).optional(),
         label: z.string().min(1).max(100),
-      }),
+      })
     )
     .max(8)
     .optional(),

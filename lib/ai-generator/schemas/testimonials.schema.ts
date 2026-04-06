@@ -10,7 +10,7 @@ export const TestimonialsSectionSchema = z.object({
         authorName: z.string().min(1).max(100),
         authorTitle: z.string().max(100).optional(),
         rating: z.number().int().min(1).max(5).optional(),
-      }),
+      })
     )
     .min(1)
     .max(12),

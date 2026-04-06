@@ -10,7 +10,7 @@ export const FeaturesSectionSchema = z.object({
         icon: z.string().max(50).optional(),
         title: z.string().min(1).max(100),
         description: z.string().min(1).max(300),
-      }),
+      })
     )
     .min(2)
     .max(12),

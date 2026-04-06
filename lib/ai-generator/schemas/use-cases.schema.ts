@@ -11,7 +11,7 @@ export const UseCasesSectionSchema = z.object({
         title: z.string().min(1).max(100),
         description: z.string().min(1).max(400),
         persona: z.string().max(100).optional(),
-      }),
+      })
     )
     .min(2)
     .max(8),

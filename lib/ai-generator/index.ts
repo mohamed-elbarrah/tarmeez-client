@@ -1,8 +1,4 @@
-export {
-  normalizeAIOutput,
-  type NormalizationResult,
-  type NormalizationError,
-} from "./normalization";
+export { normalizeAIOutput, type NormalizationResult, type NormalizationError } from "./normalization";
 export {
   LandingPageContentSchema,
   LandingSectionSchema,
