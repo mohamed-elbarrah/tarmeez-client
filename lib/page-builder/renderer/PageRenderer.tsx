@@ -1,4 +1,5 @@
 import React from "react";
+import { AIPageRenderer } from "./AIPageRenderer";
 import { HeroBanner } from "../components/widgets/HeroBanner";
 import { ProductBlock } from "../components/widgets/ProductBlock";
 import { CountdownTimer } from "../components/widgets/CountdownTimer";
@@ -36,6 +37,13 @@ export default function PageRenderer({
   storeData,
 }: PageRendererProps) {
   const content = ensureVersion(page.content ?? {});
+
+  // AI-generated pages carry a `sections` array at the top level.
+  // Route them to the dedicated AI renderer instead of the Puck mapper.
+  if (Array.isArray(content.sections)) {
+    return <AIPageRenderer content={content as any} />;
+  }
+
   const puckData = content.puckData ?? {
     content: [],
     root: { props: {} },
