@@ -14,6 +14,7 @@ import { pagesApi } from "@/lib/services/pagesApi";
 import { analyticsApi } from "@/lib/services/analyticsApi";
 import { couponsApi } from "@/lib/services/couponsApi";
 import { teamApi } from "@/lib/services/teamApi";
+import { landingPageApi } from "@/lib/services/landingPageApi";
 import { analyticsListenerMiddleware } from "./analytics-listener";
 
 export const store = configureStore({
@@ -33,6 +34,7 @@ export const store = configureStore({
     [analyticsApi.reducerPath]: analyticsApi.reducer,
     [couponsApi.reducerPath]: couponsApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
+    [landingPageApi.reducerPath]: landingPageApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -51,6 +53,7 @@ export const store = configureStore({
         analyticsApi.middleware,
         couponsApi.middleware,
         teamApi.middleware,
+        landingPageApi.middleware,
       ),
 });
 

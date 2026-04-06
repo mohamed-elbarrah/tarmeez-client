@@ -31,6 +31,7 @@ import {
   PanelRightOpen,
   ExternalLink,
   Layout,
+  Sparkles,
 } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 
@@ -81,6 +82,12 @@ const navigation = [
     name: "صفحاتي",
     href: "/merchant/pages",
     icon: Layout,
+    resource: Resource.PAGES,
+  },
+  {
+    name: "مولّد الذكاء الاصطناعي",
+    href: "/merchant/ai-generator",
+    icon: Sparkles,
     resource: Resource.PAGES,
   },
   {
