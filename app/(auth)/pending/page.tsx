@@ -26,7 +26,7 @@ export default function PendingPage() {
   }, [searchParams]);
 
   return (
-    <Card className="border-none shadow-2xl bg-card/50 backdrop-blur-sm text-center py-6">
+    <Card className="  shadow-2xl bg-card/50 backdrop-blur-sm text-center py-6">
       <CardHeader>
         <div className="flex justify-center mb-4">
           <div className="w-20 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary animate-pulse">

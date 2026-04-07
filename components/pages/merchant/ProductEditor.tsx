@@ -625,7 +625,7 @@ export default function ProductEditor() {
                               </span>
                             ))}
                             <input
-                              className="flex-1 bg-transparent border-none outline-none text-sm min-w-[120px]"
+                              className="flex-1 bg-transparent   outline-none text-sm min-w-[120px]"
                               placeholder="اكتب القيمة ثم اضغط Enter..."
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {

@@ -86,7 +86,7 @@ export default function Header({ storeSlug, storeName, logo, theme }: Props) {
             placeholder="ما الذي تبحث عنه اليوم؟"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-100 border-none py-2.5 px-12 text-sm focus:ring-2 focus:ring-(--p-color) outline-none"
+            className="w-full bg-gray-100   py-2.5 px-12 text-sm focus:ring-2 focus:ring-(--p-color) outline-none"
             style={{ borderRadius: "var(--radius)" }}
           />
           <Search

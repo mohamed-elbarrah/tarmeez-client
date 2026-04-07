@@ -88,7 +88,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="border-none shadow-2xl bg-card/50 backdrop-blur-sm">
+    <Card className="  shadow-2xl bg-card/50 backdrop-blur-sm">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">تسجيل الدخول</CardTitle>
         <CardDescription className="text-center">
