@@ -39,11 +39,14 @@ export default function TrackingTab() {
                       طلب رقم #{order.orderCode}
                     </div>
                     <div className="text-xs text-gray-400">
-                      {new Date(order.createdAt).toLocaleDateString("ar-SA", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {new Date(order.createdAt).toLocaleDateString(
+                        "ar-SA-u-nu-latn",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </div>
                   </div>
                   <div className="text-left">

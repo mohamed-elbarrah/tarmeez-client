@@ -506,7 +506,9 @@ export default function CharityProductDetailPage({
                     {review.customerName || "عميل"}
                   </div>
                   <div className="text-xs text-slate-400">
-                    {new Date(review.createdAt).toLocaleDateString("ar-SA")}
+                    {new Date(review.createdAt).toLocaleDateString(
+                      "ar-SA-u-nu-latn",
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   AreaChart,
@@ -11,13 +11,8 @@ import {
   CartesianGrid,
   XAxis,
   Legend,
-} from 'recharts'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -25,55 +20,62 @@ import {
   ChartLegend,
   ChartLegendContent,
   type ChartConfig,
-} from '@/components/ui/chart'
+} from "@/components/ui/chart";
 import {
   Users,
   DollarSign,
   ShoppingBag,
   TrendingUp,
   ShoppingCart,
-} from 'lucide-react'
-import { useGetOverviewQuery } from '@/lib/services/analyticsApi'
-import { useGetTrafficQuery } from '@/lib/services/analyticsApi'
-import { useGetSalesQuery } from '@/lib/services/analyticsApi'
-import type { AnalyticsPeriod } from '@/lib/types/analytics'
-import { StatCard } from '../StatCard'
-import { ChartSkeleton } from '../ChartSkeleton'
-import { EmptyState } from '../EmptyState'
-import { ErrorState } from '../ErrorState'
-import { formatNumber, formatCurrency, formatPercent } from '../formatters'
+} from "lucide-react";
+import { useGetOverviewQuery } from "@/lib/services/analyticsApi";
+import { useGetTrafficQuery } from "@/lib/services/analyticsApi";
+import { useGetSalesQuery } from "@/lib/services/analyticsApi";
+import type { AnalyticsPeriod } from "@/lib/types/analytics";
+import { StatCard } from "../StatCard";
+import { ChartSkeleton } from "../ChartSkeleton";
+import { EmptyState } from "../EmptyState";
+import { ErrorState } from "../ErrorState";
+import {
+  formatNumber,
+  formatCurrency,
+  formatPercent,
+  fillSalesDays,
+  fillTrafficDays,
+  chartTickInterval,
+} from "../formatters";
 
 interface OverviewTabProps {
-  period: AnalyticsPeriod
+  period: AnalyticsPeriod;
 }
 
 const visitorsConfig: ChartConfig = {
-  visitors: { label: 'الزوار', color: 'var(--color-chart-1)' },
-}
+  visitors: { label: "الزوار", color: "var(--color-chart-1)" },
+};
 
 const revenueConfig: ChartConfig = {
-  revenue: { label: 'الإيرادات', color: 'var(--color-chart-2)' },
-}
+  revenue: { label: "الإيرادات", color: "var(--color-chart-2)" },
+};
 
 const DEVICE_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-3)',
-  'var(--color-chart-5)',
-]
+  "var(--color-chart-1)",
+  "var(--color-chart-3)",
+  "var(--color-chart-5)",
+];
 
 const SOURCE_COLORS = [
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
-]
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+];
 
 const SOURCE_LABELS: Record<string, string> = {
-  organic: 'بحث عضوي',
-  social: 'سوشيال ميديا',
-  direct: 'مباشر',
-  referral: 'إحالة',
-}
+  organic: "بحث عضوي",
+  social: "سوشيال ميديا",
+  direct: "مباشر",
+  referral: "إحالة",
+};
 
 export function OverviewTab({ period }: OverviewTabProps) {
   const {
@@ -81,36 +83,42 @@ export function OverviewTab({ period }: OverviewTabProps) {
     isLoading: overviewLoading,
     isError: overviewError,
     refetch: refetchOverview,
-  } = useGetOverviewQuery({ period }, { pollingInterval: 60000 })
+  } = useGetOverviewQuery({ period }, { pollingInterval: 60000 });
 
   const {
     data: traffic,
     isLoading: trafficLoading,
     isError: trafficError,
     refetch: refetchTraffic,
-  } = useGetTrafficQuery({ period }, { pollingInterval: 60000 })
+  } = useGetTrafficQuery({ period }, { pollingInterval: 60000 });
 
   const {
     data: sales,
     isLoading: salesLoading,
     isError: salesError,
     refetch: refetchSales,
-  } = useGetSalesQuery({ period }, { pollingInterval: 60000 })
+  } = useGetSalesQuery({ period }, { pollingInterval: 60000 });
 
   const devicesData = traffic
     ? [
-        { name: 'موبايل', value: traffic.devices.mobile },
-        { name: 'تابلت', value: traffic.devices.tablet },
-        { name: 'كمبيوتر', value: traffic.devices.desktop },
+        { name: "موبايل", value: traffic.devices.mobile },
+        { name: "تابلت", value: traffic.devices.tablet },
+        { name: "كمبيوتر", value: traffic.devices.desktop },
       ]
-    : []
+    : [];
 
   const sourcesData = traffic
     ? Object.entries(traffic.sources).map(([key, val]) => ({
         name: SOURCE_LABELS[key] ?? key,
         value: val,
       }))
-    : []
+    : [];
+
+  // Fill every day in the period — missing days become 0
+  const filledTraffic = fillTrafficDays(traffic?.daily ?? [], period);
+  const filledSales = fillSalesDays(sales?.daily ?? [], period);
+  const visitorsInterval = chartTickInterval(filledTraffic.length);
+  const revenueInterval = chartTickInterval(filledSales.length);
 
   return (
     <div className="space-y-6">
@@ -118,7 +126,7 @@ export function OverviewTab({ period }: OverviewTabProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="الزوار"
-          value={overview ? formatNumber(overview.totalVisitors) : '—'}
+          value={overview ? formatNumber(overview.totalVisitors) : "—"}
           trend={overview?.trend.visitors}
           icon={Users}
           loading={overviewLoading}
@@ -126,7 +134,7 @@ export function OverviewTab({ period }: OverviewTabProps) {
         />
         <StatCard
           title="المبيعات"
-          value={overview ? formatCurrency(overview.totalRevenue) : '—'}
+          value={overview ? formatCurrency(overview.totalRevenue) : "—"}
           trend={overview?.trend.revenue}
           icon={DollarSign}
           loading={overviewLoading}
@@ -134,7 +142,7 @@ export function OverviewTab({ period }: OverviewTabProps) {
         />
         <StatCard
           title="الطلبات"
-          value={overview ? formatNumber(overview.totalOrders) : '—'}
+          value={overview ? formatNumber(overview.totalOrders) : "—"}
           trend={overview?.trend.orders}
           icon={ShoppingBag}
           loading={overviewLoading}
@@ -142,7 +150,7 @@ export function OverviewTab({ period }: OverviewTabProps) {
         />
         <StatCard
           title="معدل التحويل"
-          value={overview ? formatPercent(overview.conversionRate) : '—'}
+          value={overview ? formatPercent(overview.conversionRate) : "—"}
           icon={TrendingUp}
           loading={overviewLoading}
         />
@@ -160,15 +168,29 @@ export function OverviewTab({ period }: OverviewTabProps) {
               <ChartSkeleton height={250} />
             ) : trafficError ? (
               <ErrorState onRetry={refetchTraffic} />
-            ) : !traffic?.daily?.length ? (
+            ) : !filledTraffic.length ? (
               <EmptyState message="لا توجد بيانات للفترة المحددة" />
             ) : (
-              <ChartContainer config={visitorsConfig} className="h-62.5">
-                <AreaChart data={traffic.daily}>
+              <ChartContainer config={visitorsConfig} className=" ">
+                <AreaChart data={filledTraffic}>
                   <defs>
-                    <linearGradient id="visitorsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-chart-1)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--color-chart-1)" stopOpacity={0} />
+                    <linearGradient
+                      id="visitorsGrad"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-chart-1)"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-chart-1)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} className="stroke-border" />
@@ -177,20 +199,22 @@ export function OverviewTab({ period }: OverviewTabProps) {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fontSize: 11 }}
+                    interval={visitorsInterval}
                     tickFormatter={(d) =>
-                      new Date(d).toLocaleDateString('ar-SA', {
-                        month: 'short',
-                        day: 'numeric',
+                      new Date(d).toLocaleDateString("ar-SA-u-nu-latn", {
+                        month: "short",
+                        day: "numeric",
                       })
                     }
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area
-                    type="monotone"
+                    type="monotoneX"
                     dataKey="visitors"
                     stroke="var(--color-chart-1)"
                     fill="url(#visitorsGrad)"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
+                    dot={false}
                   />
                 </AreaChart>
               </ChartContainer>
@@ -208,15 +232,29 @@ export function OverviewTab({ period }: OverviewTabProps) {
               <ChartSkeleton height={250} />
             ) : salesError ? (
               <ErrorState onRetry={refetchSales} />
-            ) : !sales?.daily?.length ? (
+            ) : !filledSales.length ? (
               <EmptyState message="لا توجد بيانات للفترة المحددة" />
             ) : (
-              <ChartContainer config={revenueConfig} className="h-62.5">
-                <AreaChart data={sales.daily}>
+              <ChartContainer config={revenueConfig} className=" ">
+                <AreaChart data={filledSales}>
                   <defs>
-                    <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-chart-2)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--color-chart-2)" stopOpacity={0} />
+                    <linearGradient
+                      id="revenueGrad"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-chart-2)"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-chart-2)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} className="stroke-border" />
@@ -225,20 +263,22 @@ export function OverviewTab({ period }: OverviewTabProps) {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fontSize: 11 }}
+                    interval={revenueInterval}
                     tickFormatter={(d) =>
-                      new Date(d).toLocaleDateString('ar-SA', {
-                        month: 'short',
-                        day: 'numeric',
+                      new Date(d).toLocaleDateString("ar-SA-u-nu-latn", {
+                        month: "short",
+                        day: "numeric",
                       })
                     }
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area
-                    type="monotone"
+                    type="monotoneX"
                     dataKey="revenue"
                     stroke="var(--color-chart-2)"
                     fill="url(#revenueGrad)"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
+                    dot={false}
                   />
                 </AreaChart>
               </ChartContainer>
@@ -338,9 +378,11 @@ export function OverviewTab({ period }: OverviewTabProps) {
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: 'var(--color-chart-2)' }}
+                      style={{ backgroundColor: "var(--color-chart-2)" }}
                     />
-                    <span className="text-sm text-muted-foreground">إضافات للسلة</span>
+                    <span className="text-sm text-muted-foreground">
+                      إضافات للسلة
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-foreground">
                     {formatNumber(overview.cartAdds)}
@@ -350,9 +392,11 @@ export function OverviewTab({ period }: OverviewTabProps) {
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: 'var(--color-chart-4)' }}
+                      style={{ backgroundColor: "var(--color-chart-4)" }}
                     />
-                    <span className="text-sm text-muted-foreground">سلات مهجورة</span>
+                    <span className="text-sm text-muted-foreground">
+                      سلات مهجورة
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-foreground">
                     {formatNumber(overview.cartAbandons)}
@@ -362,25 +406,29 @@ export function OverviewTab({ period }: OverviewTabProps) {
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: 'var(--color-chart-5)' }}
+                      style={{ backgroundColor: "var(--color-chart-5)" }}
                     />
-                    <span className="text-sm text-muted-foreground">نسبة الإهمال</span>
+                    <span className="text-sm text-muted-foreground">
+                      نسبة الإهمال
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-foreground">
                     {overview.cartAdds > 0
                       ? formatPercent(
                           (overview.cartAbandons / overview.cartAdds) * 100,
                         )
-                      : '—'}
+                      : "—"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: 'var(--color-chart-1)' }}
+                      style={{ backgroundColor: "var(--color-chart-1)" }}
                     />
-                    <span className="text-sm text-muted-foreground">بدء الدفع</span>
+                    <span className="text-sm text-muted-foreground">
+                      بدء الدفع
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-foreground">
                     {formatNumber(overview.checkoutStarts)}
@@ -392,5 +440,5 @@ export function OverviewTab({ period }: OverviewTabProps) {
         </Card>
       </div>
     </div>
-  )
+  );
 }

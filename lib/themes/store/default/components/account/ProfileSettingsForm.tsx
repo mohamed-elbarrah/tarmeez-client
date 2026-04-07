@@ -45,11 +45,14 @@ export default function ProfileSettingsForm() {
             </label>
             <div className="p-4 bg-gray-50 rounded-xl font-bold text-sm">
               {profile?.createdAt
-                ? new Date(profile.createdAt).toLocaleDateString("ar-SA", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
+                ? new Date(profile.createdAt).toLocaleDateString(
+                    "ar-SA-u-nu-latn",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )
                 : "---"}
             </div>
           </div>

@@ -220,7 +220,7 @@ function DatePickerField({
           >
             <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             {value
-              ? value.toLocaleDateString("ar-SA", {
+              ? value.toLocaleDateString("ar-SA-u-nu-latn", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -805,7 +805,9 @@ export default function CouponFormDialog({
       rows.push({
         label: "ينتهي في",
         value: (
-          <span dir="ltr">{values.expiresAt.toLocaleDateString("ar-SA")}</span>
+          <span dir="ltr">
+            {values.expiresAt.toLocaleDateString("ar-SA-u-nu-latn")}
+          </span>
         ),
       });
 

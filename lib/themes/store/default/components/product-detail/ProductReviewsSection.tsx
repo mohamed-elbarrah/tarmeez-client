@@ -171,7 +171,9 @@ export default function ProductReviewsSection() {
                   {review.customer.fullName}
                 </div>
                 <div className="text-xs text-slate-400">
-                  {new Date(review.createdAt).toLocaleDateString("ar-SA")}
+                  {new Date(review.createdAt).toLocaleDateString(
+                    "ar-SA-u-nu-latn",
+                  )}
                 </div>
               </div>
               <StarRating rating={review.rating} />

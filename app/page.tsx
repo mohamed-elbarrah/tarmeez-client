@@ -10,7 +10,7 @@ import ProcessSteps from "@/components/process-steps";
 
 export default function Home() {
   return (
-    <main>
+    <main className="container m-auto">
       <HeroHeader />
       <HeroSection />
       <FeaturesSection />
@@ -20,6 +20,6 @@ export default function Home() {
       <CallToAction />
       <FooterSection />
     </main>
-  
+
   );
 }

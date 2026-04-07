@@ -294,7 +294,9 @@ export default function Coupons() {
                   </TableCell>
                   <TableCell>
                     {coupon.expiresAt
-                      ? new Date(coupon.expiresAt).toLocaleDateString("ar-SA")
+                      ? new Date(coupon.expiresAt).toLocaleDateString(
+                          "ar-SA-u-nu-latn",
+                        )
                       : "—"}
                   </TableCell>
                   <TableCell>

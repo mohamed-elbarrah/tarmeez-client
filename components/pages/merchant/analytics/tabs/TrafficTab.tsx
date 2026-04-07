@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   BarChart,
@@ -9,13 +9,8 @@ import {
   CartesianGrid,
   XAxis,
   Legend,
-} from 'recharts'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -23,7 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   ChartContainer,
   ChartTooltip,
@@ -31,42 +26,42 @@ import {
   ChartLegend,
   ChartLegendContent,
   type ChartConfig,
-} from '@/components/ui/chart'
-import { useGetTrafficQuery } from '@/lib/services/analyticsApi'
-import type { AnalyticsPeriod } from '@/lib/types/analytics'
-import { ChartSkeleton } from '../ChartSkeleton'
-import { EmptyState } from '../EmptyState'
-import { ErrorState } from '../ErrorState'
-import { formatNumber, countryToFlag } from '../formatters'
+} from "@/components/ui/chart";
+import { useGetTrafficQuery } from "@/lib/services/analyticsApi";
+import type { AnalyticsPeriod } from "@/lib/types/analytics";
+import { ChartSkeleton } from "../ChartSkeleton";
+import { EmptyState } from "../EmptyState";
+import { ErrorState } from "../ErrorState";
+import { formatNumber, countryToFlag } from "../formatters";
 
 interface TrafficTabProps {
-  period: AnalyticsPeriod
+  period: AnalyticsPeriod;
 }
 
 const dailyConfig: ChartConfig = {
-  visitors: { label: 'الزوار', color: 'var(--color-chart-1)' },
-  pageViews: { label: 'مشاهدات الصفحة', color: 'var(--color-chart-2)' },
-}
+  visitors: { label: "الزوار", color: "var(--color-chart-1)" },
+  pageViews: { label: "مشاهدات الصفحة", color: "var(--color-chart-2)" },
+};
 
 const DEVICE_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-3)',
-  'var(--color-chart-5)',
-]
+  "var(--color-chart-1)",
+  "var(--color-chart-3)",
+  "var(--color-chart-5)",
+];
 
 const SOURCE_COLORS = [
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
-]
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+];
 
 const SOURCE_LABELS: Record<string, string> = {
-  organic: 'بحث عضوي',
-  social: 'سوشيال ميديا',
-  direct: 'مباشر',
-  referral: 'إحالة',
-}
+  organic: "بحث عضوي",
+  social: "سوشيال ميديا",
+  direct: "مباشر",
+  referral: "إحالة",
+};
 
 export function TrafficTab({ period }: TrafficTabProps) {
   const {
@@ -74,27 +69,27 @@ export function TrafficTab({ period }: TrafficTabProps) {
     isLoading,
     isError,
     refetch,
-  } = useGetTrafficQuery({ period }, { pollingInterval: 60000 })
+  } = useGetTrafficQuery({ period }, { pollingInterval: 60000 });
 
   const devicesData = traffic
     ? [
-        { name: 'موبايل', value: traffic.devices.mobile },
-        { name: 'تابلت', value: traffic.devices.tablet },
-        { name: 'كمبيوتر', value: traffic.devices.desktop },
+        { name: "موبايل", value: traffic.devices.mobile },
+        { name: "تابلت", value: traffic.devices.tablet },
+        { name: "كمبيوتر", value: traffic.devices.desktop },
       ]
-    : []
+    : [];
 
   const sourcesData = traffic
     ? Object.entries(traffic.sources).map(([key, val]) => ({
         name: SOURCE_LABELS[key] ?? key,
         value: val,
       }))
-    : []
+    : [];
 
-  const totalSourceVisitors = sourcesData.reduce((a, d) => a + d.value, 0)
+  const totalSourceVisitors = sourcesData.reduce((a, d) => a + d.value, 0);
 
-  const topCountries = traffic?.countries?.slice(0, 10) ?? []
-  const totalCountryVisits = topCountries.reduce((a, c) => a + c.count, 0)
+  const topCountries = traffic?.countries?.slice(0, 10) ?? [];
+  const totalCountryVisits = topCountries.reduce((a, c) => a + c.count, 0);
 
   return (
     <div className="space-y-6">
@@ -111,7 +106,7 @@ export function TrafficTab({ period }: TrafficTabProps) {
           ) : !traffic?.daily?.length ? (
             <EmptyState message="لا توجد بيانات للفترة المحددة" />
           ) : (
-            <ChartContainer config={dailyConfig} className="h-75">
+            <ChartContainer config={dailyConfig} className=" ">
               <BarChart data={traffic.daily}>
                 <CartesianGrid vertical={false} className="stroke-border" />
                 <XAxis
@@ -120,16 +115,24 @@ export function TrafficTab({ period }: TrafficTabProps) {
                   axisLine={false}
                   tick={{ fontSize: 11 }}
                   tickFormatter={(d) =>
-                    new Date(d).toLocaleDateString('ar-SA', {
-                      month: 'short',
-                      day: 'numeric',
+                    new Date(d).toLocaleDateString("ar-SA-u-nu-latn", {
+                      month: "short",
+                      day: "numeric",
                     })
                   }
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="visitors" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="pageViews" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="visitors"
+                  fill="var(--color-chart-1)"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="pageViews"
+                  fill="var(--color-chart-2)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ChartContainer>
           )}
@@ -253,8 +256,9 @@ export function TrafficTab({ period }: TrafficTabProps) {
                       <TableCell>{formatNumber(c.count)}</TableCell>
                       <TableCell>
                         {totalCountryVisits > 0
-                          ? ((c.count / totalCountryVisits) * 100).toFixed(1) + '%'
-                          : '—'}
+                          ? ((c.count / totalCountryVisits) * 100).toFixed(1) +
+                            "%"
+                          : "—"}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -265,5 +269,5 @@ export function TrafficTab({ period }: TrafficTabProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

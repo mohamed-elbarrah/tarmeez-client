@@ -121,7 +121,7 @@ function formatDiscount(coupon: Coupon): string {
     case "PRODUCT_DISCOUNT":
       return `${coupon.discountValue}%`;
     case "FIXED_AMOUNT":
-      return `${coupon.discountValue? } ر.س`;
+      return `${coupon.discountValue} ر.س`;
     case "FREE_SHIPPING":
       return "شحن مجاني";
     case "FREE_PRODUCT":
@@ -134,7 +134,7 @@ function formatDiscount(coupon: Coupon): string {
 function formatCurrency(v: number): string {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M ر.س`;
   if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K ر.س`;
-  return `${v } ر.س`;
+  return `${v} ر.س`;
 }
 
 /* ─── Copy Button ─── */
@@ -379,7 +379,9 @@ function CouponsTab() {
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {coupon.expiresAt
-                      ? new Date(coupon.expiresAt).toLocaleDateString("ar-SA")
+                      ? new Date(coupon.expiresAt).toLocaleDateString(
+                          "ar-SA-u-nu-latn",
+                        )
                       : "—"}
                   </TableCell>
                   <TableCell>
