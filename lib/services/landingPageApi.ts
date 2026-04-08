@@ -7,11 +7,32 @@ export type GenerationStatus =
   | "COMPLETED"
   | "FAILED";
 
+export type RefineScope = "full" | "section" | "field";
+
 export interface CreateGenerationDto {
   prompt: string;
   productId?: string;
   language?: "ar" | "en";
   tone?: "professional" | "casual" | "luxurious" | "playful" | "urgent";
+}
+
+export interface RefinePageDto {
+  instruction: string;
+  scope: RefineScope;
+  sectionType?: string;
+  fieldPath?: string;
+  currentContent: Record<string, any>;
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>;
+}
+
+export interface RefineResult {
+  success: boolean;
+  scope: RefineScope;
+  updatedContent: Record<string, any>;
+  affectedSection?: string;
+  affectedField?: string;
+  assistantMessage: string;
+  durationMs: number;
 }
 
 export interface GenerationSummary {
@@ -67,6 +88,17 @@ export const landingPageApi = createApi({
         { type: "Generation", id },
       ],
     }),
+
+    refinePage: build.mutation<
+      RefineResult,
+      { pageId: string; dto: RefinePageDto }
+    >({
+      query: ({ pageId, dto }) => ({
+        url: `/merchant/landing-page/${pageId}/refine`,
+        method: "POST",
+        body: dto,
+      }),
+    }),
   }),
 });
 
@@ -75,4 +107,5 @@ export const {
   useListGenerationsQuery,
   useGetGenerationQuery,
   useRetryGenerationMutation,
+  useRefinePageMutation,
 } = landingPageApi;
