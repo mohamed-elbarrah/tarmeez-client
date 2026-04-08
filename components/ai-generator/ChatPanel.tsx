@@ -8,10 +8,11 @@ import { ChatInput } from "./ChatInput";
 import { InitialPromptForm } from "./InitialPromptForm";
 import { GenerationPoller } from "./GenerationPoller";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function ChatPanel() {
   const { state, dispatch } = useGenerator();
-  const { phase, conversation, activeGenerationId } = state;
+  const { phase, conversation, activeGenerationId, isLoadingPage } = state;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when conversation grows
@@ -35,12 +36,16 @@ export function ChatPanel() {
               مساعد الذكاء الاصطناعي
             </h2>
             <p className="text-[10px] text-muted-foreground mt-0.5">
-              {isWorkspace ? "اكتب لتعديل الصفحة" : "أنشئ صفحة هبوط"}
+              {isLoadingPage
+                ? "جاري تحميل المحادثة..."
+                : isWorkspace
+                  ? "اكتب لتعديل الصفحة"
+                  : "أنشئ صفحة هبوط"}
             </p>
           </div>
         </div>
 
-        {isWorkspace && (
+        {isWorkspace && !isLoadingPage && (
           <Button
             size="sm"
             variant="ghost"
@@ -61,7 +66,15 @@ export function ChatPanel() {
 
       {/* ── Scrollable content area ── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        {phase === "prompt" ? (
+        {isLoadingPage ? (
+          /* Loading skeleton while hydrating from DB */
+          <div className="p-4 space-y-3">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-2/3" />
+            <Skeleton className="h-10 w-4/5" />
+          </div>
+        ) : phase === "prompt" ? (
           /* Initial prompt form — shown before any generation */
           <InitialPromptForm />
         ) : (
@@ -71,7 +84,7 @@ export function ChatPanel() {
       </div>
 
       {/* ── Chat input — only visible in workspace phase ── */}
-      {isWorkspace && <ChatInput />}
+      {isWorkspace && !isLoadingPage && <ChatInput />}
     </div>
   );
 }

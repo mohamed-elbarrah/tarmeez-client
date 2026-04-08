@@ -98,7 +98,7 @@ export function ChatInput() {
           }
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 min-h-[40px] max-h-[140px] leading-relaxed"
+          className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 min-h-10 max-h-35 leading-relaxed"
           style={{ height: "40px" }}
         />
         <button

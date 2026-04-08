@@ -4,10 +4,11 @@ import React, {
   createContext,
   useContext,
   useReducer,
-  useCallback,
   useEffect,
   useRef,
 } from "react";
+import type { ChatMessage } from "@/lib/services/landingPageApi";
+import { useGetPageQuery } from "@/lib/services/pagesApi";
 
 // ─── SessionStorage persistence ──────────────────────────────
 
@@ -76,6 +77,8 @@ export interface GeneratorState {
   isGenerating: boolean;
   isRefining: boolean;
   previewMode: PreviewMode;
+  /** True while we are loading an existing page from DB */
+  isLoadingPage: boolean;
 }
 
 // ─── Actions ─────────────────────────────────────────────────
@@ -93,12 +96,28 @@ type Action =
   | { type: "SET_REFINING"; value: boolean }
   | { type: "SET_PAGE_CONTENT"; content: Record<string, any> }
   | { type: "SET_PREVIEW_MODE"; mode: PreviewMode }
+  | {
+      type: "LOAD_EXISTING_PAGE";
+      pageId: string;
+      content: Record<string, any>;
+      chatHistory: ChatMessage[];
+    }
+  | { type: "SET_LOADING_PAGE"; value: boolean }
   | { type: "RESET" };
 
 // ─── Reducer ──────────────────────────────────────────────────
 
 function makeId() {
   return Math.random().toString(36).slice(2, 10);
+}
+
+function chatHistoryToMessages(history: ChatMessage[]): Message[] {
+  return history.map((m) => ({
+    id: makeId(),
+    role: m.role,
+    content: m.content,
+    timestamp: Date.now(),
+  }));
 }
 
 function reducer(state: GeneratorState, action: Action): GeneratorState {
@@ -202,6 +221,22 @@ function reducer(state: GeneratorState, action: Action): GeneratorState {
     case "SET_PREVIEW_MODE":
       return { ...state, previewMode: action.mode };
 
+    case "LOAD_EXISTING_PAGE":
+      return {
+        ...state,
+        phase: "workspace",
+        pageId: action.pageId,
+        pageContent: action.content,
+        isGenerating: false,
+        isRefining: false,
+        isLoadingPage: false,
+        activeGenerationId: null,
+        conversation: chatHistoryToMessages(action.chatHistory),
+      };
+
+    case "SET_LOADING_PAGE":
+      return { ...state, isLoadingPage: action.value };
+
     case "RESET":
       if (typeof window !== "undefined") {
         try {
@@ -228,6 +263,7 @@ const initialState: GeneratorState = {
   isGenerating: false,
   isRefining: false,
   previewMode: "desktop",
+  isLoadingPage: false,
 };
 
 // ─── Context ──────────────────────────────────────────────────
@@ -243,17 +279,76 @@ const GeneratorContext = createContext<GeneratorContextValue | null>(null);
 
 // ─── Provider ─────────────────────────────────────────────────
 
-export function GeneratorProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState, () => ({
-    ...initialState,
-    ...loadFromStorage(),
-  }));
+interface GeneratorProviderProps {
+  children: React.ReactNode;
+  /** When set, the workspace loads this existing page from DB */
+  loadPageId?: string;
+  /** When true, starts a blank workspace — wipes any sessionStorage state */
+  fresh?: boolean;
+}
+
+export function GeneratorProvider({
+  children,
+  loadPageId,
+  fresh,
+}: GeneratorProviderProps) {
+  // Determine initial state:
+  //   loadPageId → blank + isLoadingPage (will hydrate from DB)
+  //   fresh      → clear sessionStorage + blank state
+  //   otherwise  → restore from sessionStorage
+  const [state, dispatch] = useReducer(reducer, initialState, () => {
+    if (loadPageId) return { ...initialState, isLoadingPage: true };
+    if (fresh) {
+      // Wipe any previously saved session so old page doesn't leak in
+      if (typeof window !== "undefined") {
+        try {
+          sessionStorage.removeItem(STORAGE_KEY);
+        } catch {
+          /* ignore */
+        }
+      }
+      return { ...initialState };
+    }
+    return { ...initialState, ...loadFromStorage() };
+  });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  // Persist relevant state on every change
+  // Fetch page (content + chatHistory arrive in a single request)
+  const { data: pageData, isError: pageError } = useGetPageQuery(
+    loadPageId ?? "",
+    { skip: !loadPageId },
+  );
+
+  // Hydrate state once the page arrives (or fail gracefully on error)
   useEffect(() => {
+    if (!loadPageId) return;
+
+    if (pageError) {
+      // Unblock UI even if the fetch failed — show empty workspace
+      dispatch({ type: "SET_LOADING_PAGE", value: false });
+      return;
+    }
+
+    if (!pageData) return; // still in flight
+
+    const chatHistory = Array.isArray(pageData.chatHistory)
+      ? (pageData.chatHistory as ChatMessage[])
+      : [];
+
+    dispatch({
+      type: "LOAD_EXISTING_PAGE",
+      pageId: pageData.id,
+      content: pageData.content ?? {},
+      chatHistory,
+    });
+  }, [loadPageId, pageData, pageError]);
+
+  // Persist relevant state on every change (skip when loading/creating specific page)
+  const shouldPersist = !loadPageId && !fresh;
+  useEffect(() => {
+    if (!shouldPersist) return;
     saveToStorage(state);
-  }, [state]);
+  }, [state, shouldPersist]);
 
   return (
     <GeneratorContext.Provider value={{ state, dispatch, iframeRef }}>
@@ -272,11 +367,11 @@ export function useGenerator() {
 }
 
 /**
- * Derive the last 6 conversation messages for sending as history to the API.
+ * All user/assistant conversation messages for sending as history to the API.
+ * Returns full history (not capped) so AI has complete context of previous decisions.
  */
 export function useConversationHistory(state: GeneratorState) {
   return state.conversation
     .filter((m) => m.role === "user" || m.role === "assistant")
-    .slice(-6)
     .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 }

@@ -8,6 +8,7 @@ export interface Page {
   type: "LANDING" | "CUSTOM" | "POLICY";
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   content: Record<string, any>;
+  chatHistory?: Array<{ role: string; content: string }> | null;
   showHeader: boolean;
   showFooter: boolean;
   linkedProductId: string | null;

@@ -28,9 +28,13 @@ export interface RefinePageDto {
 export interface RefineResult {
   success: boolean;
   scope: RefineScope;
+  /** "FULL" or "PARTIAL" — indicates whether the whole page or only specific sections changed */
+  updateType: "FULL" | "PARTIAL";
   updatedContent: Record<string, any>;
   affectedSection?: string;
   affectedField?: string;
+  /** Section types that were patched (for PARTIAL updates) */
+  patchedSections?: string[];
   assistantMessage: string;
   durationMs: number;
 }
@@ -54,10 +58,31 @@ export interface GenerationDetail extends GenerationSummary {
   errorMessage: string | null;
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface AIPageSummary {
+  id: string;
+  title: string;
+  slug: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  createdAt: string;
+  updatedAt: string;
+  linkedProductId: string | null;
+  metadata: {
+    generationId?: string;
+    prompt?: string;
+    language?: string;
+    tone?: string;
+  } | null;
+}
+
 export const landingPageApi = createApi({
   reducerPath: "landingPageApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Generation"],
+  tagTypes: ["Generation", "AIPage"],
   endpoints: (build) => ({
     generate: build.mutation<GenerationSummary, CreateGenerationDto>({
       query: (body) => ({
@@ -99,6 +124,15 @@ export const landingPageApi = createApi({
         body: dto,
       }),
     }),
+
+    listAIPages: build.query<AIPageSummary[], void>({
+      query: () => "/merchant/landing-page/ai-pages",
+      providesTags: ["AIPage"],
+    }),
+
+    getChatHistory: build.query<{ chatHistory: ChatMessage[] }, string>({
+      query: (pageId) => `/merchant/landing-page/${pageId}/chat`,
+    }),
   }),
 });
 
@@ -108,4 +142,6 @@ export const {
   useGetGenerationQuery,
   useRetryGenerationMutation,
   useRefinePageMutation,
+  useListAIPagesQuery,
+  useGetChatHistoryQuery,
 } = landingPageApi;
