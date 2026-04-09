@@ -284,7 +284,7 @@ const TRAFFIC_COLORS = [
 ];
 
 export default function DashboardHome() {
-  const [period, setPeriod] = useState<AnalyticsPeriod>("7d");
+  const [period, setPeriod] = useState<AnalyticsPeriod>("30d");
 
   const { data: storeData, isLoading: storeLoading } = useGetMyStoreQuery();
 
