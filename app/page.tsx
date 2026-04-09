@@ -7,10 +7,9 @@ import MultiStoreFeatures from "@/components/multi-store-features";
 import Pricing from "@/components/pricing";
 import ProcessSteps from "@/components/process-steps";
 
-
 export default function Home() {
   return (
-    <main className="container m-auto">
+    <main className="container">
       <HeroHeader />
       <HeroSection />
       <FeaturesSection />
@@ -20,6 +19,5 @@ export default function Home() {
       <CallToAction />
       <FooterSection />
     </main>
-
   );
 }

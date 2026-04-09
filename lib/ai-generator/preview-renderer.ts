@@ -1,10 +1,13 @@
 /**
- * Generates a self-contained HTML document for the landing page preview iframe.
- * This is intentionally simple — it renders the section structure with basic styling
- * so the merchant can see their content changing in real time.
+ * @deprecated
+ * This module generated a self-contained static HTML document for the preview
+ * iframe.  It has been superseded by the `/merchant/preview-sandbox` Next.js
+ * route, which renders the actual React section components (AIPageRenderer)
+ * with real Tailwind CSS, Cairo font, and theme CSS variables — eliminating
+ * the visual discrepancy between the preview and the live store.
  *
- * A postMessage listener in the generated HTML allows the parent to push
- * content updates without a full iframe reload.
+ * The file is kept to avoid breaking any remaining imports during the transition.
+ * Remove it (and any remaining usages) once the migration is complete.
  */
 
 // ─── Section renderers ────────────────────────────────────────
