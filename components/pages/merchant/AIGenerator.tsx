@@ -311,7 +311,6 @@ export default function AIGenerator() {
   const router = useRouter();
   const { canManage } = useRole();
   const { data: merchantData } = useGetMyStoreQuery();
-  // @ts-ignore
   const storeSlug = merchantData?.storeSlug;
   const { data: productsData, isLoading: isLoadingProducts } =
     useGetProductsQuery();
