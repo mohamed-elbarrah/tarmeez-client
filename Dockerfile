@@ -9,6 +9,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Inject environment variables for the build process
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # هنا يتم معالجة Tailwind v4 تلقائياً أثناء البناء
 RUN npm run build
 
